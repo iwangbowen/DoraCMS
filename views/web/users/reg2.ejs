@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="<%=siteConfig.cmsDescription%>">
+    <meta content="<%=siteConfig.keywords%>" name="keywords" />
+    <meta name="author" content="">
+    <link rel="icon" href="<%=staticFilePath%>/stylesheets/front/images/favicon.ico">
+
+    <title><%=siteConfig.title%></title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="<%=staticFilePath%>/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<%=staticFilePath%>/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+
+    <!-- Custom styles for this template -->
+    <link href="<%=staticFilePath%>/stylesheets/front/css/newblue.css" rel="stylesheet">
+    <script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="101238712" data-redirecturi="http://www.html-js.cn/users/confirmMoreInfo" charset="utf-8"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body ng-app="webApp">
+
+
+<div class="reg_setp" ng-controller="user">
+    <a href="/" class="btn btn-gray1 back_setp">返回</a>
+    <div class="blogo">
+        <a href="###">
+            <img src="<%=staticFilePath%>/stylesheets/front/images/large_logo.png">
+        </a>
+    </div>
+    <div style="display:none" id="setp_pofile" class="confirmInfo">
+        <h3>欢迎你！<a href="##" id="nickName"></a>，完善下你的信息，以后你也可以使用该邮箱和密码来登录html-js.cn</h3>
+
+        <div class="confirm-form col-md-12">
+            <div class="col-md-8 col-md-offset-4">
+                <span class="submitwarning pull-left" style="margin-bottom: 20px;">请正确填写邮箱和密码</span>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-4">
+                <img src="/stylesheets/front/images/myheader.jpg" class="img-responsive" alt=""/>
+            </div>
+            <div class="col-md-8 col-sm-8 col-xs-8 text-left">
+                <input type="hidden" value="" id="openId"/>
+                <form  name="confirmForm" ng-submit="processConfirmForm(confirmForm.$valid)" novalidate>
+
+                    <div class="form-group">
+                        <input type="text" class="form-control"  name="userName" id="userName" ng-minlength="2" ng-maxlength="12" ng-model="confirmFormData.userName" placeholder="请输入用户名" required/>
+                        <label for="inputError" class="control-label text-danger" ng-show="confirmForm.userName.$invalid && !confirmForm.userName.$pristine"><i class="fa fa-times-circle-o"></i> 2-12个非特殊字符</label>
+
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control"  placeholder="请输入邮箱" name="email" ng-model="confirmFormData.email" required/>
+                        <label for="inputError" class="control-label text-danger" ng-show="confirmForm.email.$invalid && !confirmForm.email.$pristine"><i class="fa fa-times-circle-o"></i>请填写正确的邮箱地址</label>
+
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control"  name="password" ng-model="confirmFormData.password"  placeholder="请输入密码" required/>
+                    </div>
+
+                    <div>
+                        <button class="btn btn-blue btn-configInfo" role="button" ng-disabled="confirmForm.$invalid">提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BEGIN FOOTER -->
+
+<%- include ../temp/footer %>
+
+<!-- END FOOTER -->
+<script type="text/javascript">
+    $(function(){
+        //从页面收集OpenAPI必要的参数。get_user_info不需要输入参数，因此paras中没有参数
+        var paras = {};
+        var userOpenid = "";
+
+        //用JS SDK调用OpenAPI
+        QC.api("get_user_info", paras)
+            //指定接口访问成功的接收函数，s为成功返回Response对象
+                .success(function(s){
+                    //成功回调，通过s.data获取OpenAPI的返回数据
+                    QC.Login.getMe(function(openId, accessToken){
+                        userOpenid = openId;
+                        var userInfo = {
+                            userName:s.data.nickname,
+                            logo:s.data.figureurl_2,
+                            gender:s.data.gender,
+                            province:s.data.province,
+                            city:s.data.city,
+                            year:s.data.year,
+                            openid:userOpenid
+                        };
+
+                        $.ajax({
+                            url : "/users/qq/updateUserInfo",
+                            method : 'GET',
+                            data : userInfo,
+                            dataType : 'json',
+                            success : function(result){
+                                $('#openId').val(userOpenid);
+                                $('#nickName').val(s.data.nickname);
+                                $('#userName').val(s.data.nickname);
+                                var ustate = result.uInfo;
+                                if(ustate){
+                                    if(ustate == 'oldUser'){
+                                        window.location = '/';
+
+                                    }else{
+                                        $('#setp_pofile').show();
+                                    }
+                                }
+                            }
+                        })
+                    });
+                })
+            //指定接口访问失败的接收函数，f为失败返回Response对象
+                .error(function(f){
+                    //失败回调
+                    location.href='/';
+//                    alert("获取用户信息失败！");
+                })
+            //指定接口完成请求后的接收函数，c为完成请求返回Response对象
+                .complete(function(c){
+                    //完成请求回调
+//                    alert("获取用户信息完成！");
+
+                });
+    })
+
+
+</script>
+<script>
+//    var doraApp = angular.module("webApp",[]);
+    doraApp.controller("user",function($scope,$http) {
+        $scope.confirmFormData = {};
+
+        $scope.processConfirmForm =  function(isValid){
+            if(isValid){
+                $http({
+                    method  : 'POST',
+                    url     : '/users/qq/updateUserEmail?openId='+$('#openId').val(),
+                    data    : $.param($scope.confirmFormData),  // pass in data as strings
+                    headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                })
+                        .success(function(data) {
+                            if(data === "success"){
+                                alert('修改成功！')
+                                window.location.reload();
+                            }else{
+                                $('.submitwarning').show();
+                            }
+                        });
+            }
+            else{
+                alert("校验失败，请检查");
+            }
+        }
+    })
+</script>

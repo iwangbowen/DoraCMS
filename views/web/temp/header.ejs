@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<!--
+Version: 1.0.0
+Author: Dora
+Website: http://www.html-js.cn/
+Contact: cms@doramart.com
+-->
+
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
+<!-- BEGIN HEAD -->
+<head>
+    <meta charset="utf-8" />
+    <title><%=siteConfig.title%></title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="<%=siteConfig.cmsDescription%>" name="description" />
+    <meta content="<%=siteConfig.keywords%>" name="keywords" />
+    <meta content="" name="author" />
+    <meta name="baidu-site-verification" content="G2KdAnAnIL" />
+    <meta property="qc:admins" content="341536763760454523636" />
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <link href="http://apps.bdimg.com/libs/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=staticFilePath%>/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <!-- END GLOBAL MANDATORY STYLES -->
+
+    <!-- BEGIN THEME STYLES -->
+    <link href="<%=staticFilePath%>/stylesheets/front/css/style-metronic.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=staticFilePath%>/stylesheets/front/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=staticFilePath%>/stylesheets/front/css/blue.css" rel="stylesheet" type="text/css" id="style_color"/>
+    <link href="<%=staticFilePath%>/stylesheets/front/css/style-responsive.css" rel="stylesheet" type="text/css"/>
+    <!-- END THEME STYLES -->
+
+    <link rel="shortcut icon" href="<%=staticFilePath%>/stylesheets/front/images/favicon.ico" />
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "//hm.baidu.com/hm.js?00bedeafedf2236ccbe9706d3a9e09b3";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+    <script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="101225673" data-redirecturi="http://www.doramart.com/users/qq/loginSuccess" charset="utf-8"></script>
+
+</head>
+<!-- END HEAD -->
+
+<!-- BEGIN BODY -->
+<body class="">
+<!-- BEGIN HEADER -->
+<div class="header navbar navbar-default navbar-static-top">
+    <!-- BEGIN TOP BAR -->
+    <div class="front-topbar">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-9 col-sm-9">
+                    <ul class="list-unstyle inline">
+                        <li><i class="fa fa-envelope-o topbar-info-icon top-2"></i>Email: <span>cms@doramart.com</span></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 col-sm-3 login-reg-links">
+                    <ul class="list-unstyled inline">
+                        <% if(!logined){ %>
+                        <li><span id="qqLoginBtn"></span></li>
+                        <% }else{ %>
+                        <li>您好，
+                            <img border="0" width="16" height="16" alt="<%=userInfo.userName%>" src="<%=userInfo.logo%>" />&nbsp;
+                            <a href="/users/info"><%=userInfo.userName%></a>
+                        </li>
+                        <li class="sep"><span>|</span></li>
+                        <li><a href="#" id="userLoginOut">注销</a></li>
+                        <% } %>
+                    </ul>
+
+                    <script type="text/javascript">
+                        //调用QC.Login方法，指定btnId参数将按钮绑定在容器节点中
+                        QC.Login({
+                                    //btnId：插入按钮的节点id，必选
+                                    btnId:"qqLoginBtn",
+                                    //用户需要确认的scope授权项，可选，默认all
+                                    scope:"all",
+                                    //按钮尺寸，可用值[A_XL| A_L| A_M| A_S|  B_M| B_S| C_S]，可选，默认B_S
+                                    size: "B_S"
+                                }, function(reqData, opts){//登录成功
+                                    //根据返回数据，更换按钮显示状态方法
+
+                                }, function(opts){//注销成功
+                                    alert('QQ登录 注销成功');
+                                    window.location = "/users/doSuccess?key=loginOutSuccess"
+                                }
+                        );
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END TOP BAR -->
+    <div class="container">
+        <div class="navbar-header">
+            <!-- BEGIN RESPONSIVE MENU TOGGLER -->
+            <button class="navbar-toggle btn navbar-btn" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- END RESPONSIVE MENU TOGGLER -->
+            <!-- BEGIN LOGO (you can use logo image instead of text)-->
+            <a class="navbar-brand logo-v1" href="/">
+                <img src="<%=staticFilePath%>/stylesheets/front/images/logo_blue.png" id="logoimg" alt="前端开发俱乐部">
+            </a>
+            <!-- END LOGO -->
+        </div>
+
+        <!-- BEGIN TOP NAVIGATION MENU -->
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="dropdown" id="nav_home">
+                    <a class="dropdown-toggle" href="/"  data-delay="0" data-close-others="false" href="#">
+                        首页
+                    </a>
+                </li>
+                <%for(var i=0;i<cateTypes.length;i++){
+                        if(cateTypes[i].parentID === '0'){%>
+                <li class="dropdown" id="nav_<%=cateTypes[i]._id%>">
+                    <a class="dropdown-toggle" href="/<%=cateTypes[i].defaultUrl%>___<%=cateTypes[i]._id%>"  data-delay="0" data-close-others="false">
+                        <%=cateTypes[i].name%>
+                    </a>
+                </li>
+                <%}}%>
+                <li class="menu-search">
+                    <span class="sep"></span>
+                    <i class="fa fa-search search-btn"></i>
+
+                    <div class="search-box">
+                        <form action="/content/searchResult/items">
+                            <div class="input-group input-large">
+                                <input class="form-control" type="text" placeholder="请输入关键字" name="searchKey">
+                                    <span class="input-group-btn">
+                                        <button type="submit" class="btn theme-btn">Go</button>
+                                    </span>
+                            </div>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <!-- BEGIN TOP NAVIGATION MENU -->
+    </div>
+</div>
+<!-- END HEADER -->

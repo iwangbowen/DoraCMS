@@ -1,0 +1,283 @@
+<div class="row">
+    <div class="col-xs-12">
+        <div class="panel">
+            <a href="#addContentTemps" role="button" class="btn btn-primary btn-sm" data-toggle="modal"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>增加一个新模板</a>
+        </div>
+        <div class="box">
+            <div class="box-body" >
+                <p class="alert alert-danger">注意：一个模板组合包含三部分：模板首页，分类列表，文档详情；选择一个模板组合相当于定义了一套模板</p>
+                <table id="" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>选择</th>
+                        <th>模板名称</th>
+                        <th>模板组合名称</th>
+                        <th>管理</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="tag in data">
+                        <td><input type="checkbox" class="mini"/></td>
+                        <td class="  sorting_1">{{tag.name}}</td>
+                        <td class=" ">{{tag.alias}}</td>
+                        <td class=" ">{{tag.comments}}</td>
+                        <td class=" ">
+                            <button class="btn btn-primary btn-xs" data-whatever="{{tag._id}}" data-toggle="modal" data-target="#addContentTemps"><span class="fa fa-fw fa-edit" aria-hidden="true"></span>编辑</button>&nbsp;
+                            <button class="btn btn-default btn-xs" data-whatever="{{tag._id}}" data-toggle="modal" data-target="#checkIfDel"><span class="fa fa-fw fa-trash-o" aria-hidden="true"></span>删除</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th>选择</th>
+                        <th>模板名称</th>
+                        <th>模板组合名称</th>
+                        <th>管理</th>
+                    </tr>
+                    </tfoot>
+                </table>
+                <br/>
+                <!--分页-->
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="dataTables_info" id="example2_info">显示 {{startNum}} 到 {{startNum + limit -1}} 条，共 {{totalItems}} 条记录</div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="dataTables_paginate paging_bootstrap">
+                            <ul class="pagination">
+                                <li ng-class="{true:'disabled'}[currentPage==1]"><a href="javascript:void(0);" ng-click="prevPage()">← 上一页</a></li>
+                                <!--<li ng-class="{true:'active'}[currentPage==1]"><a href="#">1</a></li>-->
+                                <li ng-repeat="page in pages" ng-class="{true:'active'}[currentPage==page]"><a href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a></li>
+                                <li ng-class="{true:'disabled'}[currentPage==totalPage]"><a href="javascript:void(0);" ng-click="nextPage()">下一页 → </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.box-body -->
+        </div><!-- /.box -->
+
+    </div><!-- /.col -->
+    <!--信息提示模态窗口-->
+    <div class="modal fade" id="checkIfDel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">系统提示</h4>
+                </div>
+                <div class="modal-body">
+                    <h4><i class="icon fa fa-warning"></i> 确认删除该条记录？</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" ng-click="delTagItem(targetID)">删除</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!--添加用户组模态窗口-->
+    <div class="modal fade" id="addContentTemps">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">添加文章模板</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger hide" role="alert" id="TempsInfo"><i class="fa fa-exclamation-triangle"></i>&nbsp;<span id="errMsg"></span></div>
+                    <form role="form" class="form-horizontal" name="myForm" ng-submit="processForm(myForm.$valid)" novalidate>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">模板名称</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="name" ng-model="formData.name" ng-minlength="1" ng-maxlength="12" required/>
+                                <label for="inputError" class="control-label text-danger" ng-show="myForm.name.$invalid && !myForm.name.$pristine"><i class="fa fa-times-circle-o"></i> 1-12个非特殊字符</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">模板组合</label>
+                            <div class="col-sm-5">
+                                <div class="dropdown">
+                                    <button id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i id="tempForderName">请选择模板组合</i>
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="tempForderTree" class="ztree">
+                                        <li role="presentation"><a href="#">test</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">备注</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="comments" ng-model="formData.comments" ng-minlength="1" ng-maxlength="30" placeholder="暂时填写备注" required/>
+                                <label for="inputError" class="control-label text-danger" ng-show="myForm.comments.$invalid && !myForm.comments.$pristine"><i class="fa fa-times-circle-o"></i> 备注不能为空</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" ng-disabled="myForm.$invalid">提交</button>
+                        </div>
+                    </form>
+
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+    </div><!-- /.row -->
+
+</div>
+
+
+<script>
+    /*targetID:全局对应指定记录的标记，在修改和删除时使用*/
+    angular.module("adminApp",[])
+            .controller("adminCtrl",function($scope,$http){
+//                读取模板文件夹列表
+                getTempFolderList($scope,$http)
+//                初始化名称和权限
+                $scope.formData = {};
+                //获取模板列表
+                getData($scope,$http);
+                //删除模板
+                $('#checkIfDel').on('show.bs.modal', function (event) {
+                    var obj = $(event.relatedTarget);
+                    $scope.targetID = obj.data('whatever');
+                }).on('hide.bs.modal', function (event) {
+                    $scope.targetID ="";
+                })
+                //确认执行删除
+                $scope.delTagItem = function () {
+                    var currentID =  $scope.targetID;
+                    $http.get("/admin/manage/contentTemps/del?uid="+currentID).success(function(result){
+                        $('#checkIfDel').modal("hide");
+                        console.log("del success!");
+                        getData($scope,$http);
+                    })
+                }
+
+//                修改模板
+                $('#addContentTemps').on('show.bs.modal', function (event) {
+                    var obj = $(event.relatedTarget);
+                    var editId = obj.data('whatever');
+                    var modalTitle = $(this).find('.modal-title');
+//                    如果不为空则为编辑状态
+                    if(editId){
+                        modalTitle.text("编辑文章模板");
+                        $http.get("/admin/manage/contentTemps/item?uid="+editId).success(function(result){
+                            $scope.formData = result;
+                            $scope.targetID = editId;
+                        })
+                    }else{
+                        modalTitle.text("添加新模板");
+                        $scope.formData = {};
+                    }
+                }).on('hidden.bs.modal', function (e) {
+                    // 清空数据
+                    $scope.formData = {};
+                    $scope.targetID ="";
+                    $(this).find("input").val("");
+                    $("#TempsInfo").addClass("hide");
+                })
+
+//                添加新模板
+                $scope.processForm = function(isValid){
+                    var curentUrl = "/admin/manage/addContentTemps/add";
+                    if($scope.targetID)
+                    {
+                        curentUrl = "/admin/manage/addContentTemps/modify?uid="+$scope.targetID;
+                    }
+                    if(isValid){
+                        $http({
+                            method  : 'POST',
+                            url     : curentUrl,
+                            data    : $.param($scope.formData),  // pass in data as strings
+                            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                        })
+                                .success(function(data) {
+                                    if(data === "success"){
+                                        $("#addContentTemps").modal("hide");
+                                        getData($scope,$http);
+                                    }else{
+                                        $("#TempsInfo").removeClass("hide");
+                                        $("#errMsg").text(data);
+                                    }
+                                });
+                    }
+                    else{
+                        alert("error");
+                    }
+                }
+            })
+            .filter('cutPower',function(){ // 为过长的power数据添加过滤器
+                var powerFilter = function(input,cutLength) {
+                    var newInput;
+                    newInput =  input.substring(0,cutLength);
+                    if(input.length > cutLength){
+                        newInput += "..."
+                    }
+                    return newInput;
+                };
+                return powerFilter;
+            })
+
+    function getData($scope,$http){
+        $scope.currentPage = 1;
+        $scope.totalPage = 1;
+        $scope.totalItems = 1
+        $scope.limit = 10;
+        $scope.pages = [];
+        $scope.startNum = 1;
+        getPageInfos($scope,$http,"/admin/manage/contentTemps/listByParam");
+    }
+
+
+    function getTempFolderList($scope,$http){
+
+        $http.get("/admin/manage/contentTemps/forderList").success(function(result){
+
+            var tempsName = $("#tempForderName");
+            tempsName.html(getCateNameById(result,$scope.formData.alias));
+            var arrTree = changeToTreeJson(result,"tempForders");
+            var setting = {
+                view: {
+                    dblClickExpand: false,
+                    selectedMulti: false
+                },
+                data: {
+                    simpleData: {
+                        enable: true
+                    }
+                },
+                callback: {
+                    beforeClick: beforeClick,
+                    onClick: onClick
+                }
+            };
+
+            function beforeClick(treeId, treeNode) {
+                var check = (treeNode && !treeNode.isParent);
+                if (!check) alert("不能选择顶级分类");
+                return check;
+            }
+
+            function onClick(e, treeId, treeNode) {
+                var zTree = $.fn.zTree.getZTreeObj("tempForderTree"),
+                        nodes = zTree.getSelectedNodes(),
+                        v = "";
+
+
+                nodes.sort(function compare(a,b){return a.id-b.id;});
+                for (var i=0, l=nodes.length; i<l; i++) {
+                    v += nodes[i].name ;
+                }
+                tempsName.html(v);
+                $scope.formData.alias = v;
+
+            }
+
+            $.fn.zTree.init($("#tempForderTree"), setting, arrTree);
+
+        })
+    }
+</script>

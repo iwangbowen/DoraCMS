@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>stuwebfk blog</title>
+</head>
+<body>
+<h1><%=locals.article.title%></h1>
+<%var date = new Date(locals.article.createTime);%>
+<p>发布时间:<%=date.getFullYear()%>年<%=date.getMonth()+1%>月<%=date.getDate()%></p>
+<p><img src="/img/<%=locals.article.id%>"/></p>
+<p>
+<%=locals.article.content%>
+</p>
+</body>
+</html>

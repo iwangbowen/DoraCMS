@@ -1,0 +1,167 @@
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-body" >
+                <table id="" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>选择</th>
+                        <th>文章标题</th>
+                        <th>留言内容</th>
+                        <th>留言者</th>
+                        <th>关联ID(回复)</th>
+                        <th>时间</th>
+                        <th>管理</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="msgs in data">
+                        <td><input type="checkbox" class="mini"/></td>
+                        <td class="  sorting_1"><a href="/details/{{msgs.contentId}}.html" target="_blank">{{msgs.contentTitle | limitTo : 20}}</a></td>
+                        <td class=" ">{{msgs.content}}</td>
+                        <td class=" ">{{msgs.uName}}</td>
+                        <td class=" ">{{msgs.relationUid}}</td>
+                        <td class=" ">{{msgs.date | date : "yyyy-MM-dd hh:mm:ss"}}</td>
+                        <td class=" ">
+                            <button class="btn btn-primary btn-xs" data-whatever="{{msgs.content}}" data-toggle="modal" data-target="#getMsgDetails"><span class="fa fa-fw fa-comments-o" aria-hidden="true"></span>详情</button>
+                            <button class="btn btn-default btn-xs" data-whatever="{{msgs._id}}" data-toggle="modal" data-target="#checkIfDel"><span class="fa fa-fw fa-trash-o" aria-hidden="true"></span>删除</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th>选择</th>
+                        <th>文章标题</th>
+                        <th>留言内容</th>
+                        <th>留言者</th>
+                        <th>关联ID(回复)</th>
+                        <th>时间</th>
+                        <th>管理</th>
+                    </tr>
+                    </tfoot>
+                </table>
+                <br/>
+                <!--分页-->
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="dataTables_info" id="example2_info">显示 {{startNum}} 到 {{startNum + limit -1}} 条，共 {{totalItems}} 条记录</div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="dataTables_paginate paging_bootstrap">
+                            <ul class="pagination">
+                                <li ng-class="{true:'disabled'}[currentPage==1]"><a href="javascript:void(0);" ng-click="prevPage()">← 上一页</a></li>
+                                <!--<li ng-class="{true:'active'}[currentPage==1]"><a href="#">1</a></li>-->
+                                <li ng-repeat="page in pages" ng-class="{true:'active'}[currentPage==page]"><a href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a></li>
+                                <li ng-class="{true:'disabled'}[currentPage==totalPage]"><a href="javascript:void(0);" ng-click="nextPage()">下一页 → </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.box-body -->
+        </div><!-- /.box -->
+
+    </div><!-- /.col -->
+    <!--信息提示模态窗口-->
+    <div class="modal fade" id="checkIfDel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">系统提示</h4>
+                </div>
+                <div class="modal-body">
+                    <h4><i class="icon fa fa-warning"></i> 确认删除该条记录？</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" ng-click="delTagItem(targetID)">删除</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!--查看留言详情模态窗口-->
+    <div class="modal fade" id="getMsgDetails">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">查看留言详情</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="" id="showMsgDetail" style="min-height: 60px;padding: 20px;">
+
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+    </div><!-- /.row -->
+
+</div>
+
+
+<script>
+    /*targetID:全局对应指定记录的标记，在修改和删除时使用*/
+    angular.module("adminApp",[])
+            .controller("adminCtrl",function($scope,$http){
+//                初始化名称和权限
+                $scope.formData = {};
+                //获取留言列表
+                getData($scope,$http);
+                //删除留言
+                $('#checkIfDel').on('show.bs.modal', function (event) {
+                    var obj = $(event.relatedTarget);
+                    $scope.targetID = obj.data('whatever');
+                }).on('hide.bs.modal', function (event) {
+                    $scope.targetID ="";
+                })
+                //确认执行删除
+                $scope.delTagItem = function () {
+                    var currentID =  $scope.targetID;
+                    $http.get("/admin/manage/contentMsgs/del?uid="+currentID).success(function(result){
+                        $('#checkIfDel').modal("hide");
+                        console.log("del success!");
+                        getData($scope,$http);
+                    })
+                }
+
+//                查看留言详情
+                $('#getMsgDetails').on('show.bs.modal', function (event) {
+                    var obj = $(event.relatedTarget);
+                    var msgDetails = obj.data('whatever');
+
+                    $('#showMsgDetail').html(msgDetails);
+
+                }).on('hidden.bs.modal', function (e) {
+                    // 清空数据
+                    $('#showMsgDetail').html("");
+                });
+
+
+
+
+
+            })
+            .filter('cutPower',function(){ // 为过长的power数据添加过滤器
+                var powerFilter = function(input,cutLength) {
+                    var newInput;
+                    newInput =  input.substring(0,cutLength);
+                    if(input.length > cutLength){
+                        newInput += "..."
+                    }
+                    return newInput;
+                };
+                return powerFilter;
+            })
+
+    function getData($scope,$http){
+        $scope.currentPage = 1;
+        $scope.totalPage = 1;
+        $scope.totalItems = 1
+        $scope.limit = 10;
+        $scope.pages = [];
+        $scope.startNum = 1;
+        getPageInfos($scope,$http,"/admin/manage/contentMsgs/listByParam");
+    }
+</script>

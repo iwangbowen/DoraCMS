@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="<%=siteConfig.cmsDescription%>">
+    <meta content="<%=siteConfig.keywords%>" name="keywords" />
+    <meta name="author" content="">
+    <link rel="icon" href="<%=staticFilePath%>/stylesheets/front/images/favicon.ico">
+
+    <title><%=siteConfig.title%></title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="<%=staticFilePath%>/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<%=staticFilePath%>/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+
+    <!-- Custom styles for this template -->
+    <link href="<%=staticFilePath%>/stylesheets/front/css/newblue.css" rel="stylesheet">
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body  ng-app="webApp">
+
+<!-- login Modal -->
+<div class="modal fade loginModal" id="uLoginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"  ng-controller="userlogin">
+    <div class="modal-dialog" role="document" style="width: 440px;">
+        <div class="modal-content">
+            <div class="userlogin">
+                <div class="ulpanel">
+                    <form name="loginForm" ng-submit="processLogForm(loginForm.$valid)" novalidate>
+                        <p class="login-title">
+                            <span id="ul-s2">会员登录</span>
+                            <span id="ul-s3">还没有账号 <a href="##">立即注册</a></span>
+                        </p>
+                        <p class="email-login">邮箱登录<span class="submitwarning">邮箱格式不正确</span></p>
+
+                        <div class="form-group">
+                            <input type="email" class="form-control" name="email" ng-model="logFormData.email" placeholder="请填写邮箱"  required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" name="password" ng-model="logFormData.password" ng-minlength="6" ng-maxlength="12" placeholder="请输入密码" ng-pattern="/(?!^\\d+$)(?!^[a-zA-Z]+$)(?!^[_#@]+$).{6,}/" title="6-12个有效字符" required>
+                        </div>
+                        <div id="ul-s5">
+                            <button type="submit" class="btn btn-blue btn-login" ng-disabled="loginForm.$invalid">登录</button>
+                            <a href="###" id="ul-s6">忘记密码 ? </a>
+                        </div>
+                    </form>
+                </div>
+                <div id="ulline"></div>
+                <div class="clear"></div>
+                <div class="qtpanel"><p>用第三方帐号直接登录</p>
+                    <div>
+                        <a id="qql" href="###">
+                            <span class="yy-icon yy-qql"></span>QQ账号登录
+                        </a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="btn-close" id="closeLoginModal">
+                    <a class="pwclose" href="###">
+                        <div class="pwclose_h"></div>
+                        <div class="pwclose_s"></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fixed navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-
+                    controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/"><img src="/stylesheets/front/images/logo.png" alt=""/></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+
+            <ul class="nav navbar-nav pull-right">
+                <div id="hrnav">
+
+                    <% if(!logined){ %>
+                    <div id="mulogin">
+                        <button type="button" class="btn btn-gray" data-toggle="modal" data-target="#uLoginModal">登录</button>
+                        <button type="button" class="btn btn-blue">注册</button>
+                    </div>
+                    <% }else{ %>
+                    <div class="ulogo">
+                    <span class="logoImg" id="showMyOpt">
+                        <a href="##"><img src="<%=userInfo.logo%>" width="30" height="30" alt="<%=userInfo.userName%>"/></a>
+                    </span>
+                        <div class="rncontent rnct hide" id="uoptlist">
+                            <ul>
+                                <li><a href="###">我的主页</a></li>
+                                <li><a href="/users/setUserInfo">账号设置</a></li>
+                                <li><a href="###" id="userLoginOut">退出</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+
+</nav>
+<!-- END HEADER -->
+
+<!-- BEGIN PAGE CONTAINER -->
+    <%-body %><!-- Your Page Content Here -->
+<!-- END PAGE CONTAINER -->
+
+<!-- BEGIN FOOTER -->
+<%- include footer %>
+<!-- END FOOTER -->
+
+
+<!-- END PAGE LEVEL JAVASCRIPTS -->
+</body>
+<!-- END BODY -->
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="<%=siteConfig.cmsDescription%>">
+    <meta content="<%=siteConfig.keywords%>" name="keywords" />
+    <meta name="author" content="">
+    <link rel="icon" href="<%=staticFilePath%>/stylesheets/front/images/favicon.ico">
+
+    <title><%=siteConfig.title%></title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="<%=staticFilePath%>/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<%=staticFilePath%>/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+
+    <!-- Custom styles for this template -->
+    <link href="<%=staticFilePath%>/stylesheets/front/css/newblue.css" rel="stylesheet">
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+
+<div class="reg_setp">
+    <a href="/" class="btn btn-gray1 back_setp">返回</a>
+    <div class="blogo">
+        <a href="###">
+            <img src="<%=staticFilePath%>/stylesheets/front/images/large_logo.png">
+        </a>
+    </div>
+    <div style="display:block" id="setp_quicklogin">
+        <h3>您可以选择以下第三方帐号直接登录html-js.cn，一分钟完成注册</h3>
+        <ul class="quicklogin_socical">
+
+            <li class="quicklogin_socical_qq">
+                <a href="http://openapi.qzone.qq.com/oauth/show?which=ConfirmPage&display=pc&client_id=101238712&response_type=token&scope=all&redirect_uri=http://www.html-js.cn/users/confirmMoreInfo" class=""><span class="yy-icon yy-qql"></span>&nbsp;&nbsp;QQ帐号注册</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- BEGIN FOOTER -->
+
+<%- include ../temp/footer %>
+
+<!-- END FOOTER -->

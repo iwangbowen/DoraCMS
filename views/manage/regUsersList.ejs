@@ -1,0 +1,307 @@
+﻿<div class="row" >
+    <div class="col-xs-12">
+        <div class="panel">
+            <!--<a href="#addNewAdminUser" role="button" class="btn btn-primary btn-sm" data-toggle="modal"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>添加用户</a>-->
+        </div>
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+                <div class="box-tools">
+                    <form action="/admin/manage/regUsersList" name="searchForm" >
+                        <div class="input-group">
+                            <input type="text" name="searchKey" id="searchInput" class="form-control input-sm pull-right" style="width: 200px;" placeholder="请输入用户名或姓名" value="<%= searchKey%>"/>
+                            <div class="input-group-btn">
+                                <button class="btn btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.box-header -->
+            <div class="box-body" >
+                <table id="" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>用户名</th>
+                            <th>用户类型</th>
+                            <th>姓名</th>
+                            <th>联系方式</th>
+                            <th>邮箱</th>
+                            <th>注册时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in data">
+                            <td class="  sorting_1">{{user.userName}}</td>
+                            <td class=" ">{{user.group}}</td>
+                            <td class=" ">{{user.name}}</td>
+                            <td class=" ">{{user.phoneNum}}</td>
+                            <td class=" ">{{user.email}}</td>
+                            <td class=" ">{{user.date | date : "M/d/yy h:mm a"}}</td>
+                            <td class=" ">
+                                <button class="btn btn-primary btn-xs" data-whatever="{{user._id}}" data-toggle="modal" data-target="#addNewRegUser"><span class="fa fa-fw fa-edit" aria-hidden="true"></span>编辑</button>&nbsp;
+                                <button class="btn btn-default btn-xs" data-whatever="{{user._id}}" data-toggle="modal" data-target="#checkIfDel"><span class="fa fa-fw fa-trash-o" aria-hidden="true"></span>删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>用户名</th>
+                            <th>用户类型</th>
+                            <th>姓名</th>
+                            <th>联系方式</th>
+                            <th>邮箱</th>
+                            <th>注册时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <br/>
+                <!--分页-->
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="dataTables_info" id="example2_info">显示 {{startNum}} 到 {{startNum + limit -1}} 条，共 {{totalItems}} 条记录</div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="dataTables_paginate paging_bootstrap">
+                            <ul class="pagination">
+                                <li ng-class="{true:'disabled'}[currentPage==1]"><a href="javascript:void(0);" ng-click="prevPage()">← 上一页</a></li>
+                                <!--<li ng-class="{true:'active'}[currentPage==1]"><a href="#">1</a></li>-->
+                                <li ng-repeat="page in pages" ng-class="{true:'active'}[currentPage==page]"><a href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a></li>
+                                <li ng-class="{true:'disabled'}[currentPage==totalPage]"><a href="javascript:void(0);" ng-click="nextPage()">下一页 → </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.box-body -->
+        </div><!-- /.box -->
+
+    </div><!-- /.col -->
+    <!--信息提示模态窗口-->
+    <div class="modal fade" id="checkIfDel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">系统提示</h4>
+                </div>
+                <div class="modal-body">
+                    <h4><i class="icon fa fa-warning"></i> 确认删除该条记录？</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" ng-click="delUser()">删除</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!--添加新用户模态窗口-->
+    <div class="modal fade" id="addNewRegUser">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">修改注册用户信息</h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form" class="form-horizontal" name="myForm" ng-submit="processForm(myForm.$valid)" novalidate>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">用户名</label>
+                            <div class="col-sm-6">
+                                <p class="form-control-static text-primary">{{formData.userName}}</p>
+                                <!--<input type="text" class="form-control" name="userName" ng-minlength="5" ng-maxlength="12" ng-pattern="/^[a-zA-Z][a-zA-Z0-9_]{4,11}$/" ng-model="formData.userName" required/>-->
+                                <!--<label for="inputError" class="control-label text-danger" ng-show="myForm.userName.$invalid && !myForm.userName.$pristine"><i class="fa fa-times-circle-o"></i> 5-12个英文字符</label>-->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">姓名</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="name" ng-minlength="2" ng-maxlength="6" ng-pattern="/[\u4e00-\u9fa5]/" ng-model="formData.name" required/>
+                                <label for="inputError" class="control-label text-danger" ng-show="myForm.name.$invalid && !myForm.name.$pristine"><i class="fa fa-times-circle-o"></i>2-6个中文字符</label>
+                            </div>
+                        </div>
+                        <div class="form-group hide">
+                            <label class="control-label col-sm-4">用户组</label>
+                            <div class="col-sm-6">
+                                <div class="dropdown">
+                                    <button id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i id="categoryName">请选择用户组</i>
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="groupTree" class="ztree">
+                                        <li role="presentation"><a href="#">test</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">电话</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="phoneNum" ng-model="formData.phoneNum" ng-pattern="/^1[3|4|5|8][0-9]\d{4,8}$/" required/>
+                                <label for="inputError" class="control-label text-danger" ng-show="myForm.phoneNum.$invalid && !myForm.phoneNum.$pristine"><i class="fa fa-times-circle-o"></i>请填写正确的手机号码</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">邮箱</label>
+                            <div class="col-sm-6">
+                                <input type="email" class="form-control" name="email" ng-model="formData.email" required/>
+                                <label for="inputError" class="control-label text-danger" ng-show="myForm.email.$invalid && !myForm.email.$pristine"><i class="fa fa-times-circle-o"></i>请填写正确的邮箱地址</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">备注</label>
+                            <div class="col-sm-6">
+                                <textarea name="comments" ng-model="formData.comments" ng-minlength="5" id="" cols="30" rows="2" class="form-control" required></textarea>
+                                <label for="inputError" class="control-label text-danger" ng-show="myForm.comments.$invalid && !myForm.comments.$pristine"><i class="fa fa-times-circle-o"></i>请输入5-30个字符</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" ng-disabled="myForm.$invalid">提交</button>
+                        </div>
+                    </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div><!-- /.row -->
+
+</div>
+
+
+
+<script>
+    angular.module("adminApp",[])
+            .controller("adminCtrl",function($scope,$http){
+                $scope.formData = {};
+                //获取注册用户列表信息
+                getData($scope,$http,$("#searchInput").val());
+                //删除用户
+                $('#checkIfDel').on('show.bs.modal', function (event) {
+                    var obj = $(event.relatedTarget);
+                    $scope.targetID = obj.data('whatever');
+                }).on('hide.bs.modal', function (event) {
+                    $scope.targetID ="";
+                })
+                //确认执行删除
+                $scope.delUser = function () {
+                    var currentID =  $scope.targetID;
+                    $http.get("/admin/manage/regUsersList/del?uid="+currentID).success(function(result){
+                        $('#checkIfDel').modal("hide");
+                        console.log("del success!");
+                        getData($scope,$http,$("#searchInput").val());
+                    })
+                }
+
+//                修改用户
+                $('#addNewRegUser').on('show.bs.modal', function (event) {
+                    var obj = $(event.relatedTarget);
+                    var editId = obj.data('whatever');
+
+//                    如果不为空则为编辑状态
+                    if(editId){
+                        $http.get("/admin/manage/regUsersList/user?uid="+editId).success(function(result){
+                            $scope.formData = result;
+                            $scope.targetID = editId;
+                        })
+                    }else{
+                        $scope.formData = {};
+                    }
+//                    getAdminGroup($scope,$http);
+                }).on('hidden.bs.modal', function (e) {
+                    // 清空数据
+                    $scope.formData = {};
+                    $scope.targetID = "";
+                    $(this).find(".form-control").val("");
+                })
+
+//                添加新用户或修改用户
+                $scope.processForm = function(isValid){
+                    var url = "/admin/manage/addRegUser/add";
+                    if($scope.targetID){
+                        url = "/admin/manage/addRegUser/modify?uid="+$scope.targetID;
+                    }
+                    if(isValid){
+                        $http({
+                            method  : 'POST',
+                            url     : url,
+                            data    : $.param($scope.formData),  // pass in data as strings
+                            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                        })
+                                .success(function(data) {
+
+                                    if(data === "success"){
+                                        $("#addNewRegUser").modal("hide");
+                                        getData($scope,$http,$("#searchInput").val());
+                                    }else{
+                                        alert("未知异常，请稍后重试");
+                                    }
+                                });
+                    }
+                    else{
+                        alert("error");
+                    }
+                }
+//
+            })
+
+    function getData($scope,$http,keywords){
+        //                初始化分页信息
+        $scope.currentPage = 1;
+        $scope.totalPage = 1;
+        $scope.totalItems = 1
+        $scope.limit = 10;
+        $scope.pages = [];
+        $scope.startNum = 1;
+        $scope.keywords = keywords;
+        getPageInfos($scope,$http,"/admin/manage/regUsersList/listByParam");
+    }
+
+//    获取用户组信息
+    function getAdminGroup($scope,$http){
+        $http.get("/admin/manage/adminGroupList/list").success(function(result){
+            var categoryName = $("#categoryName");
+            categoryName.html(getCateNameById(result,$scope.formData.group));
+            var arrTree = changeToTreeJson(result);
+            var setting = {
+                view: {
+                    dblClickExpand: false,
+                    selectedMulti: false
+                },
+                data: {
+                    simpleData: {
+                        enable: true
+                    }
+                },
+                callback: {
+                    beforeClick: beforeClick,
+                    onClick: onClick
+                }
+            };
+
+            $.fn.zTree.init($("#groupTree"), setting, arrTree);
+
+            function beforeClick(treeId, treeNode) {
+                var check = (treeNode && !treeNode.isParent);
+                if (!check) alert("不能选择顶级分类");
+                return check;
+            }
+
+            function onClick(e, treeId, treeNode) {
+                var zTree = $.fn.zTree.getZTreeObj("groupTree"),
+                        nodes = zTree.getSelectedNodes(),
+                        v = "",
+                        vid = "";
+
+                nodes.sort(function compare(a,b){return a.id-b.id;});
+                for (var i=0, l=nodes.length; i<l; i++) {
+                    v += nodes[i].name ;
+                    vid += nodes[i].id ;
+                }
+                if (v.length > 0 ) v = v.substring(0, v.length-1);
+
+                categoryName.html(v);
+                $scope.formData.group = vid;
+            }
+        })
+    }
+</script>

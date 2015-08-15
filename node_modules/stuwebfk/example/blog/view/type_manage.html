@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>类别管理</title>
+</head>
+<body>
+    <header>
+        <div id="top_bar">
+            <a href="/">首页</a> | 
+            <a href="/create">写文章</a> | 
+            <a href="/logout">退出</a>            
+        </div>
+        <h1>我的博客</h1>
+    </header>
+    <div id="content">
+        <section>
+            <h3>创建新类别</h3>
+            <form action="/type/create" method="post">
+                <label>类别名称<input type="text" name="title"/><input type="submit" value="创建"></label>
+            </form>
+        </section>
+        <section>
+            <h3>类别管理</h3>
+            <ul>
+                <% locals.types.forEach(function(type){ %>
+                <li>
+                    <span><%=type.title%></span>
+                    <form action="/type/del/<%=type.id%>" method="post">
+                        <input type="submit" value="删除"/>
+                    </form>
+                    <form action="/type/update/<%=type.id%>" method="post">
+                        <input type="text" name="title" />
+                        <input type="submit" value="更改"/>
+                    </form>
+                </li>
+                <% }) %>            
+            </ul>
+
+        </section>
+    </div>
+    <footer>
+        博客采用stuwebfk框架开发
+    </footer>
+</body>
+</html>

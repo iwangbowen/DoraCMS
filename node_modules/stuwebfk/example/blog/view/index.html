@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>stuwebfk blog</title>
+</head>
+<body>
+    <header>
+        <div id="top_bar">
+            
+            <% if(locals.isLogined){ %>
+                <a href="/create">写文章</a> | 
+                <a href="/type/manage">类别管理</a> | 
+                <a href="/logout">退出</a>
+            <% }else{ %>
+                <a href="/login">登录</a>
+            <% } %>
+            
+        </div>
+        <h1>我的博客</h1>
+    </header>
+    <div id="content">
+        <section>
+            <h3>文章类别</h3>
+            <ul>
+                <% locals.types.forEach(function(type){ %>
+                    <li><a href="/?type=<%=type.id%>"><%=type.title%></a></li>
+                <% }) %>
+            </ul>
+        </section>
+        <section>
+            <h3>博客文章</h3>
+            <ul>
+                <% locals.articles.forEach(function(art){%>
+                <li>
+                    <header>
+                        <h4><a target="_blank" href="/article/<%=art.id%>"><%=art.title%></a></h4>
+                        <% var date = new Date(art.updateTime); %>
+                        <span class="time">
+                            <%= date.getFullYear()%>年
+                            <%= date.getMonth()+1%>月
+                            <%= date.getDate()%>日
+                        </span>
+                        <% if(locals.isLogined){ %>
+                        <div class="article_toolbar">
+                            <!-- 删除文章 -->
+                            <a href="/del/<%=art.id%>">删除</a>
+                            
+                            <!-- 更改文章 -->
+                            <a href="/edit/<%=art.id%>">更改</a>
+                        </div>
+                        <% } %>
+                    </header>
+                    <article>
+                        <!-- 显示部分内容 -->
+                        <%=art.content.slice(0,20)+"... ..."%>
+                    </article>
+                </li>
+                <% }) %>
+            </ul>
+        </section>
+    </div>
+    <footer>
+        博客采用stuwebfk框架开发
+    </footer>
+</body>
+</html>

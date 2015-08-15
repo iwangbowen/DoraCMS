@@ -1,0 +1,7 @@
+<%tagsData.forEach(function(item){%>
+
+
+    <li ng-repeat="tag in contentTags"><a href="/content/searchResult/items?searchKey=<%=item.name%>&area=tags"><i class="fa fa-tags"></i><%=item.name%></a></li>
+
+
+<%})%>

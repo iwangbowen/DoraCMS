@@ -1,0 +1,211 @@
+
+<!-- BEGIN HEAD -->
+<%- include indexHeader %>
+<!-- END HEAD -->
+
+
+<!-- BEGIN PAGE CONTAINER -->
+
+        <%-body %>
+
+<!-- END BEGIN PAGE CONTAINER -->
+
+<!-- BEGIN FOOTER -->
+<link href="<%=staticFilePath%>/plugins/uploadify/uploadify.css" rel="stylesheet" type="text/css" />
+<%- include footer %>
+<!-- END FOOTER -->
+
+
+<!--七牛上传-->
+<script src="<%=staticFilePath%>/plugins/qiniu/plupload.full.min.js"></script>
+<script src="<%=staticFilePath%>/plugins/qiniu/qiniu.js"></script>
+<script>
+    $(function(){
+
+    })
+</script>
+
+<script>
+    doraApp.controller("user",function($scope,$http){
+
+                $scope.targetId = "<%= userInfo._id%>";
+
+                $scope.formData = {};
+
+
+                if($scope.targetId){
+                    // 查询用户信息
+                    getData($scope,$http);
+                }
+
+                //        用户注册
+                $scope.processRegForm = function(isValid){
+                    if(isValid){
+                        $http({
+                            method  : 'POST',
+                            url     : "/users/doReg",
+                            data    : $.param($scope.regFormData),  // pass in data as strings
+                            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                        })
+                                .success(function(data) {
+                                    if(data === "success"){
+                                        window.location = "/users/doSuccess?key=regSuccess"
+                                    }else{
+                                        $("#regInfo").removeClass("hide");
+                                        $("#errMsg").text(data);
+                                    }
+                                });
+                    }
+                    else{
+                        alert("error");
+                    }
+                };
+                //        用户登录
+                $scope.processLogForm = function(isValid){
+
+                    if(isValid){
+                        $http({
+                            method  : 'POST',
+                            url     : "/users/doLogin",
+                            data    : $.param($scope.logFormData),  // pass in data as strings
+                            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                        })
+                                .success(function(data) {
+                                    if(data === "success"){
+                                        window.location = "/users/doSuccess?key=loginSuccess"
+                                    }else{
+                                        $("#loginInfo").show();
+//                                alert("未知异常，请稍后重试");
+                                    }
+                                });
+                    }
+                    else{
+                        alert("error");
+                    }
+                };
+
+
+                //        找回密码校验
+                $scope.processConfirmForm = function (isValid) {
+                    if (isValid) {
+                        $http({
+                            method: 'POST',
+                            url: "/users/doCheckInfo",
+                            data: $.param($scope.confirmFormData),  // pass in data as strings
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                        })
+                                .success(function (data) {
+                                    if (data === "success") {
+//                                    alert("发送成功")
+                                        window.location = "/users/doSuccess?key=findPwdSuccess"
+                                    } else {
+                                        $("#confirmInfo").show();
+//                                        alert("未知异常，请稍后重试");
+                                    }
+                                });
+                    }
+                };
+
+                //        重置密码
+                $scope.processReSetForm = function(isValid){
+
+                    if (isValid) {
+
+                        var uid = '<%=userInfo._id%>';
+                        $http({
+                            method: 'POST',
+                            url: "/users/resetMyPsd?uid="+uid,
+                            data: $.param($scope.reSetFormData),  // pass in data as strings
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                        })
+                                .success(function (data) {
+                                    if (data === "success") {
+                                        alert('密码修改成功！为安全起见，请退出后重新登录');
+                                        window.location.reload();
+                                    } else {
+                                        $('.submitwarning').show().text('修改失败！原密码输入有误')
+                                    }
+                                });
+                    }
+                };
+
+
+
+                // 修改用户信息
+                $scope.processForm = function(isValid){
+                    if(isValid){
+                        $http({
+                            method  : 'POST',
+                            url     : "/users/userInfo/modify?uid="+$scope.targetId,
+                            data    : $.param($scope.formData),  // pass in data as strings
+                            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                        })
+                                .success(function(data) {
+                                    if(data === "success"){
+                                        alert('修改信息成功')
+                                    }else{
+                                        alert("未知异常，请稍后重试");
+                                    }
+                                });
+                    }
+                    else{
+                        alert("error");
+                    }
+                };
+
+
+//                初始化上传按钮
+                $scope.logoFormData = {};
+
+//                初始化七牛云存储
+                initQiniuBtn($scope,'upContainer','pickfiles',afterUpdateLogo);
+
+//                更新用户logo
+                $scope.processUpdateLogo = function(){
+                    if($('#submitLogo').hasClass('disabled')){
+                       return false;
+                    }
+                    $http({
+                        method  : 'POST',
+                        url     : "/users/userInfo/modifylogo?uid="+$scope.targetId,
+                        data    : $.param($scope.logoFormData),  // pass in data as strings
+                        headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                    })
+                    .success(function(data) {
+                        if(data === "success"){
+                            alert('修改头像成功');
+                            window.location.reload();
+                        }else{
+                            alert("未知异常，请稍后重试");
+                        }
+                    });
+                };
+
+            })
+            .directive('pwCheck', [function () { // 密码校验
+                return {
+                    require: 'ngModel',
+                    link: function (scope, elem, attrs, ctrl) {
+                        var firstPassword = '#' + attrs.pwCheck;
+                        elem.add(firstPassword).on('keyup', function () {
+                            scope.$apply(function () {
+                                var v = elem.val()===$(firstPassword).val();
+                                ctrl.$setValidity('pwmatch', v);
+                            });
+                        });
+                    }
+                }
+            }]);
+
+    function getData($scope,$http){
+        $http.get("/users/userInfo?uid="+$scope.targetId).success(function(result){
+            $scope.formData = result;
+        })
+    }
+
+
+</script>
+<!-- END PAGE LEVEL JAVASCRIPTS -->
+</body>
+<!-- END BODY -->
+</html>

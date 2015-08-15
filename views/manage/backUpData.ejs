@@ -1,0 +1,170 @@
+<div class="row">
+    <p class="myInfoBox bg-warning text-warning"><i class="icon fa fa-warning"></i> 下载备份数据请联系超级管理员</p>
+    <div class="col-xs-12">
+        <div class="panel">
+            <a href="#checkIfBackUp" role="button" data-toggle="modal" class="btn btn-primary btn-sm"><span class="fa fa-fw fa-cloud" aria-hidden="true">&nbsp;</span>执行数据备份</a>
+        </div>
+        <div class="box">
+            <div class="box-body" >
+                <table id="" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>选择</th>
+                        <th>文件名</th>
+                        <th>行为</th>
+                        <th>备份时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="opt in data">
+                        <td><input type="checkbox" class="mini"/></td>
+                        <td><i class="fa fa-fw fa-table"></i> {{opt.fileName}}</td>
+                        <td class="  sorting_1">{{opt.logs}}</td>
+                        <td class=" ">{{opt.date}}</td>
+                        <td class=" ">
+                            <button class="btn btn-default btn-xs" data-whatever="{{opt._id}}" data-filepath="{{opt.path}}" data-toggle="modal" data-target="#checkIfDel"><span class="fa fa-fw fa-trash-o" aria-hidden="true"></span>删除</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th>选择</th>
+                        <th>文件名</th>
+                        <th>行为</th>
+                        <th>备份时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </tfoot>
+                </table>
+                <br/>
+                <!--分页-->
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="dataTables_info" id="example2_info">显示 {{startNum}} 到 {{startNum + limit -1}} 条，共 {{totalItems}} 条记录</div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="dataTables_paginate paging_bootstrap">
+                            <ul class="pagination">
+                                <li ng-class="{true:'disabled'}[currentPage==1]"><a href="javascript:void(0);" ng-click="prevPage()">← 上一页</a></li>
+                                <li ng-repeat="page in pages" ng-class="{true:'active'}[currentPage==page]"><a href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a></li>
+                                <li ng-class="{true:'disabled'}[currentPage==totalPage]"><a href="javascript:void(0);" ng-click="nextPage()">下一页 → </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.box-body -->
+        </div><!-- /.box -->
+
+    </div><!-- /.col -->
+    <!--信息提示模态窗口-->
+    <div class="modal fade" id="checkIfDel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">系统提示</h4>
+                </div>
+                <div class="modal-body">
+                    <h4><i class="icon fa fa-warning"></i> 确认删除该条记录？</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" ng-click="deloptItem(targetID)">删除</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!--信息提示模态窗口-->
+    <div class="modal fade" id="checkIfBackUp">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">系统提示</h4>
+                </div>
+                <div class="modal-body">
+                    <h4><i class="icon fa fa-warning"></i> 确认执行备份操作？数据库操作请谨慎处理</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" ng-click="confirmBackUp()">执行</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div>
+
+
+<script>
+    /*targetID:全局对应指定记录的标记，在修改和删除时使用*/
+    angular.module("adminApp",[])
+            .controller("adminCtrl",function($scope,$http){
+//                初始化名称和权限
+                $scope.formData = {};
+                //获取标签列表
+                getData($scope,$http);
+                //删除标签
+                $('#checkIfDel').on('show.bs.modal', function (event) {
+                    var obj = $(event.relatedTarget);
+                    $scope.targetID = obj.data('whatever');
+                    $scope.filePath = obj.data('filepath');
+                }).on('hide.bs.modal', function (event) {
+                    $scope.targetID ="";
+                    $scope.filePath = "";
+                });
+
+
+
+                $scope.confirmBackUp = function(){
+
+                    $http.get("/admin/manage/backupDataManage/backUp").success(function(result){
+                        $('#checkIfBackUp').modal("hide");
+                        if(result == "success"){
+                            alert("备份成功")
+                            getData($scope,$http);
+                        }
+                    })
+                }
+
+                //确认执行删除
+                $scope.deloptItem = function () {
+                    var currentID =  $scope.targetID;
+                    var forderPath =  $scope.filePath;
+                    $http.get("/admin/manage/backupDataManage/del?uid="+currentID+"&filePath="+forderPath).success(function(result){
+                        if(result == "success"){
+                            $('#checkIfDel').modal("hide");
+                            console.log("del success!");
+                            getData($scope,$http);
+                        }else{
+                            alert("删除操作异常");
+                        }
+
+                    })
+                }
+
+            })
+            .filter('cutPower',function(){ // 为过长的power数据添加过滤器
+                var powerFilter = function(input,cutLength) {
+                    var newInput;
+                    newInput =  input.substring(0,cutLength);
+                    if(input.length > cutLength){
+                        newInput += "..."
+                    }
+                    return newInput;
+                };
+                return powerFilter;
+            })
+
+    function getData($scope,$http){
+        $scope.currentPage = 1;
+        $scope.totalPage = 1;
+        $scope.totalItems = 1
+        $scope.limit = 10;
+        $scope.pages = [];
+        $scope.startNum = 1;
+        getPageInfos($scope,$http,"/admin/manage/backupDataManage/listByParam");
+    }
+</script>

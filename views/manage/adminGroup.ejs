@@ -1,0 +1,286 @@
+<div class="row">
+<div class="col-xs-12">
+    <div class="panel">
+        <a href="#addAdminGroup" role="button" class="btn btn-primary btn-sm" data-toggle="modal"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>增加一个用户组</a>
+    </div>
+    <div class="box">
+        <div class="box-body" >
+            <table id="" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>组名称</th>
+                    <th>权限范围</th>
+                    <th>管理</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="group in data">
+                    <td class="  sorting_1">{{group.name}}</td>
+                    <td class=" " title="{{group.power}}">{{group.power | cutPower : 80}}</td>
+                    <td class=" ">
+                        <button class="btn btn-primary btn-xs" data-whatever="{{group._id}}" data-toggle="modal" data-target="#addAdminGroup"><span class="fa fa-fw fa-edit" aria-hidden="true"></span>编辑</button>&nbsp;
+                        <button class="btn btn-default btn-xs" data-whatever="{{group._id}}" data-toggle="modal" data-target="#checkIfDel"><span class="fa fa-fw fa-trash-o" aria-hidden="true"></span>删除</button>
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th>组名称</th>
+                    <th>权限范围</th>
+                    <th>管理</th>
+                </tr>
+                </tfoot>
+            </table>
+            <br/>
+            <!--分页-->
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="dataTables_info" id="example2_info">显示 {{startNum}} 到 {{startNum + limit -1}} 条，共 {{totalItems}} 条记录</div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="dataTables_paginate paging_bootstrap">
+                        <ul class="pagination">
+                            <li ng-class="{true:'disabled'}[currentPage==1]"><a href="javascript:void(0);" ng-click="prevPage()">← 上一页</a></li>
+                            <!--<li ng-class="{true:'active'}[currentPage==1]"><a href="#">1</a></li>-->
+                            <li ng-repeat="page in pages" ng-class="{true:'active'}[currentPage==page]"><a href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a></li>
+                            <li ng-class="{true:'disabled'}[currentPage==totalPage]"><a href="javascript:void(0);" ng-click="nextPage()">下一页 → </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.box-body -->
+    </div><!-- /.box -->
+
+</div><!-- /.col -->
+<!--信息提示模态窗口-->
+<div class="modal fade" id="checkIfDel">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">系统提示</h4>
+            </div>
+            <div class="modal-body">
+                <h4><i class="icon fa fa-warning"></i> 确认删除该条记录？</h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" ng-click="delGroupItem(targetID)">删除</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!--添加用户组模态窗口-->
+<div class="modal fade" id="addAdminGroup">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">添加用户组</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form" class="form-horizontal" name="myForm" ng-submit="processForm(myForm.$valid)" novalidate>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">组名称</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" name="name" ng-model="formData.name" ng-pattern="/^[\u4e00-\u9fa5]{2,10}$/" required/>
+                            <label for="inputError" class="control-label text-danger" ng-show="myForm.name.$invalid && !myForm.name.$pristine"><i class="fa fa-times-circle-o"></i> 2-10个中文字符</label>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">权限范围</label>
+                        <div class="col-sm-6">
+                            <label class="control-label">系统管理</label><br/>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.sysTemManage_0_1" />&nbsp;系统用户管理
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.sysTemManage_0_2" />&nbsp;用户组设定
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.sysTemManage_0_3" />&nbsp;邮件模板
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.sysTemManage_0_4" />&nbsp;广告管理
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.sysTemManage_0_5" />&nbsp;文件管理器
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.sysTemManage_0_6" />&nbsp;数据管理
+                                </label>
+                            </div>
+                            <label class="control-label">文档管理</label><br/>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.contentManage_1_1" />&nbsp;文档管理
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.contentManage_1_2" />&nbsp;文档类别管理
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.contentManage_1_3" />&nbsp;文档标签管理
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.contentManage_1_4" />&nbsp;文档模板管理
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.contentManage_1_5" />&nbsp;文档属性管理
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.contentManage_1_6" />&nbsp;留言管理
+                                </label>
+                            </div>
+                            <label class="control-label">会员管理</label><br/>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="minimal" ng-model="formData.power.userManage_2_1" />&nbsp;注册会员列表
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" ng-disabled="myForm.$invalid">提交</button>
+                    </div>
+                </form>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+ </div><!-- /.row -->
+
+</div>
+
+
+<script>
+    /*targetID:全局对应指定记录的标记，在修改和删除时使用*/
+    angular.module("adminApp",[])
+            .controller("adminCtrl",function($scope,$http){
+//                初始化名称和权限
+                $scope.formData = {};
+                $scope.formData.power = {};
+                //获取管理员用户组列表
+                getData($scope,$http);
+                //删除用户
+                $('#checkIfDel').on('show.bs.modal', function (event) {
+                    var obj = $(event.relatedTarget);
+                    $scope.targetID = obj.data('whatever');
+                }).on('hide.bs.modal', function (event) {
+                    $scope.targetID ="";
+                })
+                //确认执行删除
+                $scope.delGroupItem = function () {
+                    var currentID =  $scope.targetID;
+                    $http.get("/admin/manage/adminGroup/del?uid="+currentID).success(function(result){
+                        $('#checkIfDel').modal("hide");
+                        console.log("del success!");
+                        getData($scope,$http);
+                    })
+                }
+
+//                修改用户
+                $('#addAdminGroup').on('show.bs.modal', function (event) {
+                    var obj = $(event.relatedTarget);
+                    var editId = obj.data('whatever');
+                    var modalTitle = $(this).find('.modal-title');
+//                    如果不为空则为编辑状态
+                    if(editId){
+                        modalTitle.text("编辑用户组");
+                        $http.get("/admin/manage/adminGroup/item?uid="+editId).success(function(result){
+                            $scope.formData.name = result.name;
+                            $scope.formData.power = JSON.parse(result.power);
+                            $scope.targetID = editId;
+                        })
+                    }else{
+                        modalTitle.text("添加新用户组");
+                        $scope.formData = {};
+                    }
+                }).on('hidden.bs.modal', function (e) {
+                    // 清空数据
+                    $scope.formData = {};
+                    $scope.targetID ="";
+                    $(this).find("input").val("");
+                })
+
+//                添加新用户
+                $scope.processForm = function(isValid){
+                    var curentUrl = "/admin/manage/addAdminGroup/add";
+                    if($scope.targetID)
+                    {
+                        curentUrl = "/admin/manage/addAdminGroup/modify?uid="+$scope.targetID;
+                    }
+                    var groupData = {
+                        name : $scope.formData.name,
+                        power : JSON.stringify($scope.formData.power)
+                    }
+                    if(isValid){
+                        $http({
+                            method  : 'POST',
+                            url     : curentUrl,
+                            data    : $.param(groupData),  // pass in data as strings
+                            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                        })
+                                .success(function(data) {
+                                    if(data === "success"){
+                                        $("#addAdminGroup").modal("hide");
+                                        getData($scope,$http);
+                                    }else{
+                                        alert("未知异常，请稍后重试");
+                                    }
+                                });
+                    }
+                    else{
+                        alert("error");
+                    }
+                }
+            })
+            .filter('cutPower',function(){ // 为过长的power数据添加过滤器
+                var powerFilter = function(input,cutLength) {
+                    var newInput;
+                    newInput =  input.substring(0,cutLength);
+                    if(input.length > cutLength){
+                        newInput += "..."
+                    }
+                    return newInput;
+                };
+                return powerFilter;
+            })
+
+    function getData($scope,$http){
+//        $http.get("/admin/manage/adminGroupList/list").success(function(result){
+//            console.log("getData success!");
+//            $scope.data = result;
+//        })
+        $scope.currentPage = 1;
+        $scope.totalPage = 1;
+        $scope.totalItems = 1
+        $scope.limit = 10;
+        $scope.pages = [];
+        $scope.startNum = 1;
+        getPageInfos($scope,$http,"/admin/manage/adminGroupList/listByParam");
+    }
+</script>

@@ -1,0 +1,179 @@
+<!-- BEGIN HEAD -->
+<%- include ../indexHeader %>
+<!-- END HEAD -->
+
+
+<div class="container">
+    <div class="row">
+        <div class="blog-list">
+            <%detaillistData.forEach(function(item){%>
+            <div class="col-md-3 col-sm-3 col-xs-6">
+                <div class="blog-list-item">
+                    <div class="item-Img">
+                        <a target="_blank" href="/details/<%=item._id%>.html">
+                            <img  class="img-responsive" alt="<%=item.title%>"  src="<%=updateFilePath%><%=item.sImg%>"></a>
+                    </div>
+                    <div class="item-des">
+                        <a href="/details/<%=item._id%>.html" target="_blank" class="item-title" title="<%=item.title%>"><%=item.title%></a>
+                        <div class="item-time">
+                            <span><i class="fa fa-clock-o"></i><a><%=myDateFormat(item.date)%></a></span>
+                        </div>
+                        <div class="summary"><%-item.discription%></div>
+                    </div>
+                    <div class="item-more">
+                        <span><i class="fa fa-eye"></i><a><%=item.clickNum%></a></span>
+                        <span><i class="fa fa-comment"></i><a><%=item.commentNum%></a></span>
+                        <span><i class="fa fa-heart"></i><a><%=item.likeNum%></a></span>
+
+                        <%if(item.isTop == 1){%>
+                        <span class="yy-icon yy-tjhs" title="列表推荐"></span>
+                        <%}else{%>
+                        <span class="yy-icon yy-tj" title="列表推荐"></span>
+                        <%}%>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+            <%})%>
+
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="pages" class="">
+                <a id="pagepre" ng-class="{true:'disabled'}[currentPage==1]" href="javascript:void(0);" ng-click="prevPage()">
+                    <span class="fa fa-angle-left" aria-hidden="true"></span>
+                </a>
+                <a ng-repeat="page in pages" ng-class="{true:'pageactive'}[currentPage==page]" href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a>
+                <a id="pagenext" ng-class="{true:'disabled'}[currentPage==totalPage]" href="javascript:void(0);" ng-click="nextPage()">
+                    <span class="fa fa-angle-right" aria-hidden="true"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div> <!-- /container -->
+</div>
+<!-- END BEGIN PAGE CONTAINER -->
+
+<!-- BEGIN FOOTER -->
+<%- include ../footer %>
+
+<!-- END FOOTER -->
+
+<script>
+    doraApp.controller("pagination",function($scope,$http) {
+
+        $scope.currentPage = Number('<%=pageInfo.currentPage%>');
+
+        $scope.totalItems = Number('<%=pageInfo.totalItems%>');
+
+        $scope.limit = Number('<%=pageInfo.limit%>');
+
+        $scope.startNum = Number('<%=pageInfo.startNum%>');
+
+        $scope.totalPage = Math.ceil($scope.totalItems / $scope.limit);
+
+        $scope.pages = [];
+
+        $scope.sort = '<%=pageInfo.sort%>';
+
+        $scope.time = '<%=pageInfo.time%>';
+
+        $scope.searchKey = '<%=pageInfo.searchKey%>';
+
+
+
+        var localUrl =  "/<%=cateInfo.defaultUrl%>___<%=cateInfo._id%>";
+
+        var sortParam = '?sort='+$scope.sort+'&time='+$scope.time+'&search='+$scope.searchKey;
+
+        initPagination($scope,$http,localUrl,sortParam);
+
+        initNavHightlight($scope);
+
+
+        $scope.sort = function(key){
+
+            initPageInfo();
+
+            $scope.sort = key;
+
+            window.location.href = localUrl + '—'+$scope.currentPage+'.html?sort='+$scope.sort+'&time='+$scope.time+'&search='+$scope.searchKey;
+        };
+
+        $scope.time = function(key){
+            initPageInfo();
+
+            $scope.time = key;
+
+            window.location.href = localUrl + '—'+$scope.currentPage+'.html?sort='+$scope.sort+'&time='+$scope.time+'&search='+$scope.searchKey;
+        };
+
+
+        $scope.processSearchForm = function(){
+            initPageInfo();
+
+            $scope.searchKey  = $('#searchByKey').val();
+
+            $scope.currentPage = 1;
+
+            window.location.href = localUrl + '—'+$scope.currentPage+'.html?sort='+$scope.sort+'&time='+$scope.time+'&search='+$scope.searchKey;
+        };
+
+
+        function initPageInfo(){
+
+            $scope.sort = '<%=pageInfo.sort%>';
+
+            $scope.time = '<%=pageInfo.time%>';
+
+            $scope.searchKey = '<%=pageInfo.searchKey%>';
+
+        }
+
+
+        function initNavHightlight($scope){
+            var cateId = '<%=cateInfo._id%>';
+
+            var myParentCateID = '<%=cateInfo.sortPath%>';
+
+//        导航菜单高亮
+            var navObj = $('.soitemcontent > ul > li');
+            var parentId = myParentCateID.split(',')[1];
+            for(var i=0;i<navObj.length;i++){
+                var liObj = $(navObj[i]);
+                var navId = liObj.find('a').eq(0).attr('data-value');
+
+//                针对文章分类的高亮
+                if(navId && navId == cateId){
+                    liObj.find('a').addClass('active').siblings().removeClass('active');
+
+                    liObj.closest('.soitem').find('.soitemlabeltxt').eq(0).text(liObj.find('a').eq(0).text());
+                }
+
+                if(navId && navId == parentId){
+                    liObj.find('a').eq(0).addClass('active');
+                    liObj.siblings().find('a').eq(0).removeClass('active');
+                }
+
+//                针对筛选的高亮
+                if(navId == $scope.sort || navId == $scope.time){
+                    liObj.closest('.soitemcontent').find('a').removeClass('active');
+
+                    liObj.find('a').addClass('active');
+
+                    liObj.closest('.soitem').find('.soitemlabeltxt').eq(0).text(liObj.find('a').eq(0).text());
+                }
+
+
+
+            }
+        }
+
+    })
+</script>
+</body>
+<!-- END BODY -->
+</html>

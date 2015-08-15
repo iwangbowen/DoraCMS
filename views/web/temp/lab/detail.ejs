@@ -1,0 +1,148 @@
+<!-- BEGIN HEAD -->
+<%- include ../indexHeader %>
+<!-- END HEAD -->
+
+
+
+
+
+<!-- BEGIN PAGE CONTAINER -->
+<div class="page-container">
+
+    <!-- BEGIN CONTAINER -->
+    <div class="container min-hight margin-top-20 margin-bottom-20">
+        <!-- BEGIN BLOG -->
+        <div style="background: #fff;margin-bottom: 20px;">
+            <!-- BEGIN LEFT SIDEBAR -->
+            <div class="col-md-12 col-sm-12 blog-posts margin-bottom-40">
+                <div class="row lab_details">
+                    <div class="lab_container">
+                        <h3><%= detailInfo.title%></h3>
+                        <p>
+                            <i class="fa fa-github-alt"></i>
+                            <a href="###" target="_blank"><%= detailInfo.keywords%></a>
+                        </p>
+                        <a class="btn btn-danger" target="_blank" href="<%= detailInfo.previewPath%>">
+                            <i class="fa fa-desktop"></i>&nbsp;查看demo
+                        </a>&nbsp;&nbsp;
+                        <a class="btn btn-default" href="<%= detailInfo.downPath%>" target="_blank" title="下载压缩包">下载</a>
+                    </div>
+                </div>
+
+                <div class="lab_content min-hight margin-bottom-20"><%- detailInfo.comments%></div>
+
+            </div>
+            <!-- END LEFT SIDEBAR -->
+
+            <div class="clearfix"></div>
+        </div>
+        <!-- END BEGIN BLOG -->
+    </div>
+    <!-- END CONTAINER -->
+
+</div>
+<!-- END BEGIN PAGE CONTAINER -->
+
+<!-- BEGIN FOOTER -->
+<link rel="stylesheet" href="<%=staticFilePath%>/plugins/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+<%- include ../footer %>
+<script type="text/javascript" src="<%=staticFilePath%>/plugins/ztree/js/jquery.ztree.all-3.5.js"></script>
+<!-- END FOOTER -->
+
+<script type="text/javascript">
+    $(function() {
+//        App.init();
+        var cateId = '<%=detailInfo.category%>';
+        var myParentCateID = '<%=detailInfo.sortPath%>';
+        var detailID = '<%=detailInfo._id%>';
+        var oldClickNum = '<%=detailInfo.clickNum%>';
+
+
+        //        导航菜单高亮
+        highLightNav(myParentCateID.split(',')[1]);
+
+//        更新访问量
+        updateClickNum(detailID,oldClickNum);
+
+
+//        模态窗口初始化
+        $('.modal').on('show.bs.modal', centerModals);
+        $(window).on('resize', centerModals);
+    });
+</script>
+
+<script>
+    angular.module('detailApp',[])
+            .controller('ctrl',function($scope,$http){
+
+                $scope.msgFormData = {};
+                var detailId = '<%=detailInfo._id%>';
+
+                $scope.msgFormData.contentId = '<%=detailInfo._id%>';
+                $scope.msgFormData.contentTitle = '<%=detailInfo.title%>';
+
+                getMsgData($scope,$http,detailId);
+
+                $scope.sentMsgForm = function(isValid){
+//                    获取登录状态
+                    var loginState = $('.uMessage').find('.userHeader').attr('imgState');
+                    if(loginState == '0'){
+                        $('#userLoginDialog').modal('show');
+                    }else{
+
+                        $scope.msgFormData.uName = $('#uName').val();
+                        $scope.msgFormData.uid =  $('#uid').val();
+                        $scope.msgFormData.ulogo = $('#ulogo').val();
+
+                        $http({
+                            method  : 'POST',
+                            url     : '/users/message/sent',
+                            data    : $.param($scope.msgFormData),  // pass in data as strings
+                            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                        })
+                        .success(function(data) {
+                            if(data === "success"){
+                                getMsgData($scope,$http,detailId);
+                            }else{
+                                alert("未知异常，请稍后重试");
+                            }
+                        });
+                    }
+
+                };
+
+//                回复留言
+                $scope.replyMsg = function(uName,uid){
+
+                    var loginState = $('.uMessage').find('.userHeader').attr('imgState');
+                    if(loginState == '0'){
+                        $('#userLoginDialog').modal('show');
+                    }else{
+
+                        $('#msgTextArea').focus();
+                        $scope.msgFormData.content = "@"+uName+" ";
+                        $scope.msgFormData.relationUid = uid;
+
+                    }
+                }
+            });
+
+
+
+            function getMsgData($scope,$http,detailId){
+                $scope.messageList = {};
+                $('.msgList').hide();
+                $http.get('/users/message/getlist?contentId='+detailId).success(function(result){
+                    if(result.length > 0){
+                        $('.msgList').show();
+                        $scope.messageList = result;
+        //                清空留言信息
+                        $scope.msgFormData.content = "";
+                    }
+                })
+            }
+</script>
+<!-- END PAGE LEVEL JAVASCRIPTS -->
+</body>
+<!-- END BODY -->
+</html>

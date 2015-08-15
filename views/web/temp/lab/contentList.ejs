@@ -1,0 +1,135 @@
+<!-- BEGIN HEAD -->
+<%- include ../indexHeader %>
+<!-- END HEAD -->
+
+<div class="gallayer" style="">
+    <div class="galBj" style="background-image: url(<%=staticFilePath%>/stylesheets/front/images/labbg.jpg);"></div>
+    <div class="galMask"></div>
+</div>
+<!-- BEGIN CONTAINER -->
+<div class="container  gallery-page margin-top-20 margin-bottom-40">
+    <div class="row min-hight plugs-gallery">
+        <%detaillistData.forEach(function(item){%>
+        <div class="col-md-3 col-sm-4 gallery-box">
+            <a class="lab_item" title="<%= item.title%>" href="/details/<%=item._id%>.html">
+                <div style="background-image:url('<%=updateFilePath%><%=item.sImg%>')" class="cover">
+                    <i class="fa fa-link"></i>
+                </div>
+                <div class="info">
+                    <h4 class="title"><%= item.title%></h4>
+                    <p><%= item.discription%></p>
+                </div>
+            </a>
+        </div>
+        <%})%>
+    </div>
+    <div class="clearfix"></div>
+    <div class="row" ng-controller="pagination">
+        <div class="col-md-12">
+            <div id="pages" class="">
+                <a id="pagepre" ng-class="{true:'disabled'}[currentPage==1]" href="javascript:void(0);" ng-click="prevPage()">
+                    <span class="fa fa-angle-left" aria-hidden="true"></span>
+                </a>
+                <a ng-repeat="page in pages" ng-class="{true:'pageactive'}[currentPage==page]" href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a>
+                <a id="pagenext" ng-class="{true:'disabled'}[currentPage==totalPage]" href="javascript:void(0);" ng-click="nextPage()">
+                    <span class="fa fa-angle-right" aria-hidden="true"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+
+</div>
+<!-- END CONTAINER -->
+
+<!-- BEGIN FOOTER -->
+<%- include ../footer %>
+
+<!-- END FOOTER -->
+<script type="text/javascript">
+    $(function() {
+        var cateId = '<%=cateInfo._id%>';
+
+        var myParentCateID = '<%=cateInfo.sortPath%>';
+
+//        导航菜单高亮
+        highLightNav(myParentCateID.split(',')[1]);
+
+
+    })
+</script>
+<!-- END PAGE LEVEL JAVASCRIPTS -->
+<script>
+    doraApp.controller("pagination",function($scope,$http) {
+
+        $scope.currentPage = Number('<%=pageInfo.currentPage%>');
+
+        $scope.totalItems = Number('<%=pageInfo.totalItems%>');
+
+        $scope.limit = Number('<%=pageInfo.limit%>');
+
+        $scope.startNum = Number('<%=pageInfo.startNum%>');
+
+        $scope.totalPage = Math.ceil($scope.totalItems / $scope.limit);
+
+        $scope.pages = [];
+
+        $scope.sort = '<%=pageInfo.sort%>';
+
+        $scope.time = '<%=pageInfo.time%>';
+
+        $scope.searchKey = '<%=pageInfo.searchKey%>';
+
+
+
+        var localUrl =  "/<%=cateInfo.defaultUrl%>___<%=cateInfo._id%>";
+
+        var sortParam = '?sort='+$scope.sort+'&time='+$scope.time+'&search='+$scope.searchKey;
+
+        initPagination($scope,$http,localUrl,sortParam);
+
+
+        $scope.sort = function(key){
+
+            initPageInfo();
+
+            $scope.sort = key;
+
+            window.location.href = localUrl + '—'+$scope.currentPage+'.html?sort='+$scope.sort+'&time='+$scope.time+'&search='+$scope.searchKey;
+        };
+
+        $scope.time = function(key){
+            initPageInfo();
+
+            $scope.time = key;
+
+            window.location.href = localUrl + '—'+$scope.currentPage+'.html?sort='+$scope.sort+'&time='+$scope.time+'&search='+$scope.searchKey;
+        };
+
+
+        $scope.processSearchForm = function(){
+            initPageInfo();
+
+            $scope.searchKey  = $('#searchByKey').val();
+
+            $scope.currentPage = 1;
+
+            window.location.href = localUrl + '—'+$scope.currentPage+'.html?sort='+$scope.sort+'&time='+$scope.time+'&search='+$scope.searchKey;
+        };
+
+
+        function initPageInfo(){
+
+            $scope.sort = '<%=pageInfo.sort%>';
+
+            $scope.time = '<%=pageInfo.time%>';
+
+            $scope.searchKey = '<%=pageInfo.searchKey%>';
+
+        }
+
+    })
+</script>
+</body>
+<!-- END BODY -->
+</html>

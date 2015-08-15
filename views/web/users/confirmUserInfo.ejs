@@ -1,0 +1,46 @@
+<!-- BEGIN BREADCRUMBS -->
+<div class="row breadcrumbs margin-bottom-40">
+    <div class="container">
+        <div class="col-md-4 col-sm-4">
+            <h1>&nbsp;</h1>
+        </div>
+        <div class="col-md-8 col-sm-8 hide">
+            <ul class="pull-right breadcrumb">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="">Pages</a></li>
+                <li class="active">Forgot Psd</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- END BREADCRUMBS -->
+<!-- BEGIN CONTAINER -->
+<div class="container margin-bottom-40">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 login-signup-page">
+            <form name="confirmForm" ng-submit="processConfirmForm(confirmForm.$valid)" novalidate>
+
+                <h2>密码找回</h2>
+                <div class="alert alert-danger" role="alert" id="confirmInfo"><i class="fa fa-exclamation-triangle"></i>&nbsp;用户名或邮箱不匹配</div>
+                <div class="input-group margin-bottom-20" ng-class="{ 'has-error' : confirmForm.userName.$invalid && !confirmForm.userName.$pristine }">
+                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                    <input type="text" class="form-control" name="userName" ng-model="confirmFormData.userName" placeholder="请填写您的用户名" ng-pattern="/^[a-zA-Z][a-zA-Z0-9_]{4,11}$/" required title="5-12个英文字符">
+                </div>
+                <div class="input-group margin-bottom-20" ng-class="{ 'has-error' : confirmForm.email.$invalid && !confirmForm.email.$pristine }">
+                    <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                    <input type="email" class="form-control" name="password" ng-model="confirmFormData.email" placeholder="请输入您的注册邮箱" required>
+
+                    <a href="#" class="login-signup-forgot-link">Forgot?</a>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <button type="submit" class="btn theme-btn pull-right" ng-disabled="confirmForm.$invalid">确认</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+<!-- END CONTAINER -->

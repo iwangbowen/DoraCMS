@@ -1,0 +1,120 @@
+<div class="row">
+    <div class="col-xs-12">
+        <div class="panel">
+            <a href="/admin/manage/emailTemp/add" role="button" class="btn btn-primary btn-sm"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>添加邮件模板</a>
+        </div>
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+                <div class="box-tools">
+                    <form action="/admin/manage/emailTempList" name="searchForm" >
+                        <div class="input-group">
+                            <input type="text" name="searchKey" id="searchInput" class="form-control input-sm pull-right" style="width: 200px;" placeholder="请输入模板标题" value="<%= searchKey%>"/>
+                            <div class="input-group-btn">
+                                <button class="btn btn-sm btn-default"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <tr>
+                        <th>选择</th>
+                        <th>邮件模板标题</th>
+                        <th>邮件类别</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                    </tr>
+                    <tr ng-repeat="content in data">
+                        <td><input type="checkbox" class="mini"/></td>
+                        <td>{{content.title}}</td>
+                        <td>{{content.type}}</td>
+                        <td>{{content.date | date : "M/d/yy h:mm a"}}</td>
+                        <td>
+                            <a href="/admin/manage/emailTemp/edit/{{content._id}}" role="button"  title="编辑" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></a>
+                            <button class="btn btn-default btn-xs" type="button" title="删除" data-whatever="{{content._id}}" data-toggle="modal" data-target="#checkIfDel"><i class="fa fa-trash-o"></i></button>
+                        </td>
+                    </tr>
+                </table>
+            </div><!-- /.box-body -->
+            <div class="box-footer">
+                <!--分页-->
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="dataTables_info" id="example2_info">显示 {{startNum}} 到 {{startNum + limit -1}} 条，共 {{totalItems}} 条记录</div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="dataTables_paginate paging_bootstrap">
+                            <ul class="pagination">
+                                <li ng-class="{true:'disabled'}[currentPage==1]"><a href="javascript:void(0);" ng-click="prevPage()">← 上一页</a></li>
+                                <!--<li ng-class="{true:'active'}[currentPage==1]"><a href="#">1</a></li>-->
+                                <li ng-repeat="page in pages" ng-class="{true:'active'}[currentPage==page]"><a href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a></li>
+                                <li ng-class="{true:'disabled'}[currentPage==totalPage]"><a href="javascript:void(0);" ng-click="nextPage()">下一页 → </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.box -->
+    </div>
+
+
+    <!--信息提示模态窗口-->
+    <div class="modal fade" id="checkIfDel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">系统提示</h4>
+                </div>
+                <div class="modal-body">
+                    <h4><i class="icon fa fa-warning"></i> 确认删除该条记录？</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" ng-click="delContent()">删除</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div>
+
+<script>
+    angular.module("adminApp",[])
+            .controller("adminCtrl",function($scope,$http){
+                $scope.formData = {};
+                //获取邮件模板列表信息
+                getData($scope,$http,$("#searchInput").val());
+                //删除邮件模板
+                $('#checkIfDel').on('show.bs.modal', function (event) {
+                    var obj = $(event.relatedTarget);
+                    $scope.targetID = obj.data('whatever');
+                }).on('hide.bs.modal', function (event) {
+                    $scope.targetID ="";
+                })
+                //确认执行删除
+                $scope.delContent = function () {
+                    var currentID =  $scope.targetID;
+                    $http.get("/admin/manage/emailTempList/del?uid="+currentID).success(function(result){
+                        $('#checkIfDel').modal("hide");
+                        console.log("del success!");
+                        getData($scope,$http,$("#searchInput").val());
+                    })
+                }
+//
+            })
+
+    function getData($scope,$http,keywords){
+        $scope.currentPage = 1;
+        $scope.totalPage = 1;
+        $scope.totalItems = 1
+        $scope.limit = 10;
+        $scope.pages = [];
+        $scope.startNum = 1;
+        $scope.keywords = keywords;
+        getPageInfos($scope,$http,"/admin/manage/emailTempList/listByParam");
+    }
+
+</script>

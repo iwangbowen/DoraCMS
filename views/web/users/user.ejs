@@ -1,0 +1,83 @@
+<div class="row">
+    <!-- BEGIN LEFT SIDEBAR -->
+    <div class="col-md-9 col-sm-9 blog-posts margin-bottom-40 margin-top-50">
+        <div class="row margin-bottom-40">
+            <!-- BEGIN TESTIMONIALS -->
+            <div class="row userInfo">
+                <!-- BEGIN CAROUSEL -->
+                <div class="col-md-2 margin-left-10">
+                    <img class="img-circle userHeader" src="{{formData.logo}}" />
+                </div>
+                <!-- END CAROUSEL -->
+
+                <!-- BEGIN PORTFOLIO DESCRIPTION -->
+                <div class="col-md-8">
+                    <h2>{{formData.userName}}<small><a href="/users/editInfo">完善资料</a></small></h2>
+                    <p>{{formData.comments}}</p>
+                    <br>
+                    <div class="row front-lists-v2 margin-bottom-15">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><label>姓名</label>{{formData.name}}</li>
+                                <li><label>性别</label>{{formData.gender}}</li>
+                                <li><label>城市</label>{{formData.province}}&nbsp;{{formData.city}}</li>
+                                <li><label>出生年</label>{{formData.year}}</li>
+                                <li><label>QQ</label>{{formData.qq}}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><label>邮箱</label>{{formData.email}}</li>
+                                <li><label>电话</label>{{formData.phoneNum}}</li>
+                                <li><label>博客地址</label>{{formData.website}}</li>
+                                <li><label>职位</label>{{formData.position}}</li>
+                                <li><label>公司/大学</label>{{formData.company}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- END PORTFOLIO DESCRIPTION -->
+            </div>
+
+            <div class="col-md-10 myMessage">
+                <h2>我参与的话题</h2>
+                <div class="myMsgList">
+                    <ul>
+                        <li ng-repeat="mgs in msgData">
+                            <a href="/details/{{mgs.contentId}}.html" target="_blank">{{mgs.contentTitle}}</a>&nbsp;
+                            <small class="pull-right">{{mgs.date | date:"yyyy-MM-dd"}}</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- END TESTIMONIALS -->
+        </div>
+
+    </div>
+    <!-- END LEFT SIDEBAR -->
+
+    <!-- BEGIN RIGHT SIDEBAR -->
+    <div class="col-md-3 col-sm-3 blog-sidebar">
+        <!-- CATEGORIES START -->
+        <h2>信息管理</h2>
+        <ul class="nav sidebar-categories margin-bottom-40">
+            <li class="active"><a href="#">个人资料</a></li>
+        </ul>
+        <!-- CATEGORIES END -->
+
+        <!-- BEGIN RECENT NEWS -->
+        <h2>最新文档</h2>
+        <div class="recent-news margin-bottom-10" id="newsByDate"></div>
+        <!-- END RECENT NEWS -->
+        <!-- BEGIN BLOG TAGS -->
+        <div class="blog-tags margin-bottom-20">
+            <h2>标签云</h2>
+            <ul>
+                <ul id="contentTags"></ul>
+            </ul>
+        </div>
+        <!-- END BLOG TAGS -->
+
+    </div>
+    <!-- END RIGHT SIDEBAR -->
+</div>

@@ -1,0 +1,46 @@
+
+<!-- BEGIN CONTAINER -->
+<div class="container margin-bottom-40 min-hight">
+    <!-- BEGIN BREADCRUMBS -->
+    <div class="row">
+        <div class="container">
+            <div class="col-md-9 col-sm-9">
+                <ul class="pull-left breadcrumb">
+                    <li><a href='/'>首页</a></li>
+                    <li>用户登录</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- END BREADCRUMBS -->
+    <div class="row margin-top-50">
+        <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 login-signup-page">
+            <form name="loginForm" ng-submit="processLogForm(loginForm.$valid)" novalidate>
+
+                <h2>用户登录</h2>
+                <div class="alert alert-danger" role="alert" id="loginInfo"><i class="fa fa-exclamation-triangle"></i>&nbsp;<span id="errMsg">用户名或密码不匹配</span></div>
+                <div class="input-group margin-bottom-20" ng-class="{ 'has-error' : loginForm.userName.$invalid && !loginForm.userName.$pristine }">
+                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                    <input type="text" class="form-control" name="userName" ng-model="logFormData.userName" placeholder="请填写用户名"  required title="5-12个英文字符">
+                </div>
+                <div class="input-group margin-bottom-20" ng-class="{ 'has-error' : loginForm.password.$invalid && !loginForm.password.$pristine }">
+                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                    <input type="password" class="form-control" name="password" ng-model="logFormData.password" ng-minlength="6" ng-maxlength="12" placeholder="请输入密码" ng-pattern="/(?!^\\d+$)(?!^[a-zA-Z]+$)(?!^[_#@]+$).{6,}/" title="6-12个有效字符" required>
+
+                    <a href="#" class="login-signup-forgot-link">Forgot?</a>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <label for="" class="text-primary"><a href="/users/findPsd" target="_blank">忘记密码？</a></label>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <button type="submit" class="btn theme-btn pull-right" ng-disabled="loginForm.$invalid">登录</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+<!-- END CONTAINER -->

@@ -1,0 +1,9 @@
+<%newListData.forEach(function(item){%>
+
+<div class="row margin-bottom-10 recentNews" ng-repeat="item in hotNews">
+    <div class="col-md-12">
+        <h3><a href="/details/<%=item._id%>.html" target="_blank"><%=item.stitle%></a></h3>
+    </div>
+</div>
+
+<%})%>
