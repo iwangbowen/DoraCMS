@@ -5,6 +5,8 @@
 #http://www.html-js.cn/details/VkldQTPs.html
 #开发文档链接：
 #http://www.html-js.cn/details/VJpfeMYj.html
+#开发文档下载
+#http://7xkr1n.com1.z0.glb.clouddn.com/@/cms/DoraCMS开发指南.doc
 
 #DoraCMS开发指南
 #一、 DoraCMS 安装	2
