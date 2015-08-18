@@ -6,7 +6,7 @@
                 <div class="blog-list-item">
                     <div class="item-Img">
                         <a target="_blank" href="/details/<%=item._id%>.html">
-                            <img  class="img-responsive" alt="<%=item.title%>"  src="<%=updateFilePath%><%=item.sImg%>"></a>
+                            <img  class="img-responsive" alt="<%=item.title%>"  src="<%=updateFilePath%><%=item.sImg%><%=thumbnailUrl('500x300')%>"></a>
                     </div>
                     <div class="item-des">
                         <a href="/details/<%=item._id%>.html" target="_blank" class="item-title" title="<%=item.title%>"><%=item.title%></a>

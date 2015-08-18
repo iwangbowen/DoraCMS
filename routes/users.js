@@ -341,7 +341,7 @@ router.get('/userInfo', function(req, res, next) {
 
         }else{
 //                针对有密码的记录，需要解密后再返回
-            if(result){
+            if(result && result.password){
                 var decipher = crypto.createDecipher("bf","dora");
                 var oldPsd = "";
                 oldPsd += decipher.update(result.password,"hex","utf8");
