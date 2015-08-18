@@ -1,12 +1,12 @@
 #DoraCMS
 #DoraCMS是基于Nodejs+express+mongodb编写的一套内容管理系统，结构简单，较目前一些开源的cms，doracms易于拓展，特别适合前端开发工程师做二次开发。
-操作文档链接：
+#操作文档链接：
 #http://www.html-js.cn/details/Ey20NbBi.html
 #http://www.html-js.cn/details/VkldQTPs.html
-#开发文档链接：http://www.html-js.cn/details/VJpfeMYj.html
+#开发文档链接：
+#http://www.html-js.cn/details/VJpfeMYj.html
 
 #DoraCMS开发指南
-#DoraCMS开发指南	1
 #一、 DoraCMS 安装	2
 #1.1 安装nodejs	2
 #1.2 安装Mongodb。	2
@@ -50,7 +50,7 @@
 #②、输入 use doracms
 #③、插入用户组数据:
 
-#db.admingroups.insert({
+db.admingroups.insert({
   "_id" : "4yTbsWiI",
   "name" : "超级管理员",
   "power" : "{\"sysTemManage_0_1\":true,\"sysTemManage_0_2\":true,\"sysTemManage_0_3\":true,\"sysTemManage_0_4\":true,\"sysTemManage_0_5\":true,
@@ -62,7 +62,7 @@
 })
 
 #④、插入用户数据：
-#db.adminusers.insert({
+db.adminusers.insert({
   "_id" : "E1jNjZi8",
   "name" : "test",
   "username" : "test",
@@ -88,9 +88,7 @@
 
 
 
-
 #至此，doraCMS就运行起来了
-
 
 
 #1.3.4 访问地址
@@ -264,3 +262,65 @@ Validat.js 后台权限控制（没有授予管理权限(session)会直接过滤
  
 #http://www.html-js.cn  基于DoraCMS 定制的博客系统
 #http://www.dailyads.cn 基于 DoraCMS 定制的视频分享站点
+
+4、为什么上传图片失败？
+
+#DoraCMS 默认在3个地方用到了上传：用户上传头像、添加文档主图、内容详情中文件、图片或附件上传。
+#其中用户上传头像、添加文档主图默认使用七牛，所以如果您没有配置七牛云存储开发者相关信息，就会上传失败，需要在 /models/db/setting.js 下进行配置:
+
+#(七牛免费10G空间，注册账号就可以获取到相关信息了)。
+#当然，有的童鞋不想用七牛，想直接传到网站相关目录，也是可以的。DoraCMS 预留的有通过 uploadify 上传图片或文件，而且上传接口自带了图片缩略图截取功能。您可以通过查看 /public/javascripts/webapp.js 下的 initUploadLogoBtn 方法：
+//初始化用户上传头像按钮
+function initUploadLogoBtn($scope){
+    $("#uploadify").uploadify({
+        //指定swf文件
+        'swf': '/plugins/uploadify/uploadify.swf',
+        //后台处理的页面
+        'uploader': '/system/upload?type=images&key=userlogo',
+        //按钮显示的文字
+        'buttonText': '选择图片',
+        //显示的高度和宽度，默认 height 30；width 120
+        'height': 40,
+        'width': 138,
+        //上传文件的类型  默认为所有文件    'All Files'  ;  '*.*'
+        //在浏览窗口底部的文件类型下拉菜单中显示的文本
+        'fileTypeDesc': 'Image Files',
+        //允许上传的文件后缀
+        'fileTypeExts': '*.gif; *.jpg; *.png',
+        //发送给后台的其他参数通过formData指定
+//                    'formData': { 'type': 'images', 'key': 'ctTopImg' },
+        //上传文件页面中，你想要用来作为文件队列的元素的id, 默认为false  自动生成,  不带#
+        //'queueID': 'fileQueue',
+        //选择文件后自动上传
+        'auto': true,
+        //设置为true将允许多文件上传
+        'multi': true,
+        //上传成功
+        'onUploadSuccess' : function(file, data, response) {
+                alert("上传成功");
+
+//            $('#logoPath').val(data);
+            $scope.logoFormData.logo = data;
+            $("#myImg").attr("src",data);
+            $('#submitLogo').removeClass('disabled');
+        },
+        'onComplete': function(event, queueID, fileObj, response, data) {//当单个文件上传完成后触发
+            //event:事件对象(the event object)
+            //ID:该文件在文件队列中的唯一表示
+            //fileObj:选中文件的对象，他包含的属性列表
+            //response:服务器端返回的Response文本，我这里返回的是处理过的文件名称
+            //data：文件队列详细信息和文件上传的一般数据
+
+            alert("文件:" + fileObj.name + " 上传成功！");
+        },
+        //上传错误
+        'onUploadError' : function(file, errorCode, errorMsg, errorString) {
+            alert('The file ' + file.name + ' could not be uploaded: ' + errorString);
+        },
+        'onError': function(event, queueID, fileObj) {//当单个文件上传出错时触发
+            alert("文件:" + fileObj.name + " 上传失败！");
+        }
+    });
+}
+
+#通过上面的初始化按钮方法，您可以找到后台上传接口和处理方式。这两种上传方式您可以自己选择。
