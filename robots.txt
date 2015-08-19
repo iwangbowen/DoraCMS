@@ -1,0 +1,10 @@
+User-agent:*
+Disallow: /cache/
+Disallow: /api/
+Disallow: /plugins/
+Disallow: /adminlte/
+Disallow: /ueditor/
+Disallow: /*?
+Disallow: /*.html?*
+
+Sitemap:http://www.html-js.cn/sitemap.xml

@@ -37,7 +37,7 @@ function queryCatePage(req, res,folder,cateId){
                 if(temp == 'blog'){
                     isDetail = false;
                 }
-                var q = {};
+                var q = {'sortPath' : { $regex: cateIdKey }};
                 var params = url.parse(req.url,true);
                 if(params){
                     var cateIdKey = new RegExp(result._id, 'i');

@@ -85,8 +85,14 @@ app.use(function(req, res, next){
     next();
 });
 
+//配置站点地图和robots抓取
 app.get('/sitemap.xml',function(req, res, next) {
     var stream=fs.createReadStream('./sitemap.xml',{flags:'r'});
+    stream.pipe(res);
+});
+
+app.get('/robots.txt',function(req, res, next) {
+    var stream=fs.createReadStream('./robots.txt',{flags:'r'});
     stream.pipe(res);
 });
 
