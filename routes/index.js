@@ -37,10 +37,12 @@ function queryCatePage(req, res,folder,cateId){
                 if(temp == 'blog'){
                     isDetail = false;
                 }
+
+				var cateIdKey = new RegExp(result._id, 'i');
+
                 var q = {'sortPath' : { $regex: cateIdKey }};
                 var params = url.parse(req.url,true);
                 if(params){
-                    var cateIdKey = new RegExp(result._id, 'i');
 
                     var sort = params.query.sort;
                     var time = Number(params.query.time);
