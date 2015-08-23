@@ -269,7 +269,7 @@ Validat.js 后台权限控制（没有授予管理权限(session)会直接过滤
 
 - (七牛免费10G空间，注册账号就可以获取到相关信息了)。
 - 当然，有的童鞋不想用七牛，想直接传到网站相关目录，也是可以的。DoraCMS 预留的有通过 uploadify 上传图片或文件，而且上传接口自带了图片缩略图截取功能。您可以通过查看 /public/javascripts/webapp.js 下的 initUploadLogoBtn 方法：
-//初始化用户上传头像按钮
+
 ```
 function initUploadLogoBtn($scope){
     $("#uploadify").uploadify({
