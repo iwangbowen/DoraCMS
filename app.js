@@ -91,23 +91,25 @@ app.get('/sitemap.xml',function(req, res, next) {
     stream.pipe(res);
 });
 
+
 app.get('/robots.txt',function(req, res, next) {
     var stream=fs.createReadStream('./robots.txt',{flags:'r'});
     stream.pipe(res);
 });
 
-//非www跳转到www
-app.get('/*', function (req, res, next) {
-    var haswww = req.headers.host.match(/^www\./)
-        , url = ['http://www.', req.headers.host, req.url].join('');
+//非www跳转到www，上线的时候可以打开注释
+//app.get('/*', function (req, res, next) {
+//    var haswww = req.headers.host.match(/^www\./)
+//        , url = ['http://www.', req.headers.host, req.url].join('');
+//
+//    if((req.headers.host).indexOf('127')>=0){
+//        next();
+//    }else{
+//        haswww ? next() : res.redirect(301, url);
+//    }
+//
+//});
 
-    if((req.headers.host).indexOf('127')>=0){
-        next();
-    }else{
-        haswww ? next() : res.redirect(301, url);
-    }
-
-});
 
 //数据格式化
 app.locals.myDateFormat = function(date){
