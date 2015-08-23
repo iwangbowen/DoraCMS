@@ -8,7 +8,7 @@
 ##开发文档下载
 ##http://7xkr1n.com1.z0.glb.clouddn.com/@/cms/DoraCMS开发指南.doc
 ##注意：开源后陆续发现了一些问题，我都提交了，今后也会持续补充，开发文档或遇到问题请直接参考我博客的文章(http://www.html-js.cn/details/VJpfeMYj.html),
-或者在该版块下留言，这里会不断更新，因为精力有限并不保证word版开发指南会保持最新，
+##或者在该版块下留言，这里会不断更新，因为精力有限并不保证word版开发指南会保持最新，
 
 #DoraCMS开发指南
 - 一、 DoraCMS 安装	2
@@ -105,32 +105,29 @@ db.adminusers.insert({
 ###  2.1 配置文件
 - DoraCMS 的主要配置在 settings.js 中设置（/onlineCMS/models/db/settings.js）:
 ```
-//    数据库配置
     COOKIE_SECRET: 'doramart.com',
     URL: 'mongodb://127.0.0.1:27017/doracms',
     DB: 'doracms',
-    HOST: '127.0.0.1', // 数据库地址
-    PORT: 27017, // 数据库端口号
-    USERNAME: 'doracms', // 数据库用户名
-    PASSWORD: '000000', // 数据库密码
-
-//    站点基础信息配置
-    SITETITLE : '前端开发俱乐部', // 站点名称
-    SITEDOMAIN : 'http://www.html-js.cn', // 站点域名
-    SITEICP : '粤ICP备111111号-2', // 站点备案号
-    SYSTEMMAIL : 'xxxx@163.com', //站点邮箱
-    UPDATEFOLDER : process.cwd()+'/public/upload', // 默认上传文件夹本地路径
-    TEMPSFOLDER : process.cwd()+'/views/web/temp', // 默认模板文件夹本地路径
-    DATAOPERATION : process.cwd()+'/models/db/bat', //数据库操作脚本目录
-    DATABACKFORDER : 'C:/softbak/xxxx/', // 服务端数据库操作脚本目录
+    HOST: '127.0.0.1', 
+    PORT: 27017, 
+    USERNAME: 'doracms', 
+    PASSWORD: '000000', 
+    SITETITLE : '前端开发俱乐部', 
+    SITEDOMAIN : 'http://www.html-js.cn', 
+    SITEICP : '粤ICP备111111号-2', 
+    SYSTEMMAIL : 'xxxx@163.com', 
+    UPDATEFOLDER : process.cwd()+'/public/upload', 
+    TEMPSFOLDER : process.cwd()+'/views/web/temp', 
+    DATAOPERATION : process.cwd()+'/models/db/bat', 
+    DATABACKFORDER : 'C:/softbak/xxxx/', 
     CMSDISCRIPTION : '前端开发俱乐部,分享前端知识,丰富前端技能。汇集国内专业的前端开发文档,为推动业内前端开发水平共同奋斗。html,js,css,nodejs,前端开发,jquery,web前端, web前端开发, 前端开发工程师',
     SITEKEYWORDS : '前端开发俱乐部,前端俱乐部,DoraCMS内容管理系统, 前端开发, web前端, web前端开发, 前端开发工程师, 设计, 开发, 前端资源, angularjs, JavaScript,js, Ajax, jQuery, html,html5,css3,浏览器兼容, 前端开发工具, nodejs , node , boostrap',
-    SITEBASICKEYWORDS : '前端开发俱乐部,前端开发,前端俱乐部,DoraCMS', // 基础关键词
-    STATICFILEPATH : '', // 静态文件空间地址
-    UPDATEFILEPATH : '', // 上传文件空间地址
-    QINIUACCESS_KEY : '',  // 七牛秘钥
-    QINIUSECRET_KEY : '',  // 七牛秘钥
-QINIUCMSBUCKETNAME : '',  // 七牛Bucket_Name
+    SITEBASICKEYWORDS : '前端开发俱乐部,前端开发,前端俱乐部,DoraCMS', 
+    STATICFILEPATH : '', 
+    UPDATEFILEPATH : '', 
+    QINIUACCESS_KEY : '',  
+    QINIUSECRET_KEY : '',  
+	QINIUCMSBUCKETNAME : '',  
 ```
 - 针对上面这些静态参数都进行了详细的注释，如果你设置了数据库账号密码，则需要在这里做相应的配置，同时需要在 Dbopt.js 中做相应的数据库连接设置。
 
