@@ -136,17 +136,18 @@ QINIUCMSBUCKETNAME : '',  // 七牛Bucket_Name
 
 
 ```
-#Settings.js 中有四个参数需要注意一下：
-#UPDATEFOLDER : process.cwd()+'/public/upload', // 默认上传文件夹本地路径
-#TEMPSFOLDER : process.cwd()+'/views/web/temp', // 默认模板文件夹本地路径
-#DATAOPERATION : process.cwd()+'/models/db/bat', //数据库操作脚本目录
+### Settings.js 中有四个参数需要注意一下：
+- UPDATEFOLDER : process.cwd()+'/public/upload', // 默认上传文件夹本地路径
+- TEMPSFOLDER : process.cwd()+'/views/web/temp', // 默认模板文件夹本地路径
+- DATAOPERATION : process.cwd()+'/models/db/bat', //数据库操作脚本目录
 ```
-- 上面三个参数原则上不用修改，UPDATEFOLDER 指定上传文件的目录，TEMPSFOLDER 为指定的模板文件夹，DATAOPERATION 为执行数据备份的脚本目录文件夹
+### 上面三个参数原则上不用修改，UPDATEFOLDER 指定上传文件的目录，TEMPSFOLDER 为指定的模板文件夹，DATAOPERATION 为执行数据备份的脚本目录文件夹
 ```
-#DATABACKFORDER : 'C:/softbak/xxxx/', // 服务端数据库操作脚本目录
-#DATABACKFORDER 指定数据备份的本地路径。
+- DATABACKFORDER : 'C:/softbak/xxxx/', // 服务端数据库操作脚本目录
+- DATABACKFORDER 指定数据备份的本地路径。
 ```
 - 下面的配置都是后台模块的静态参数：
+
 ```
 SYSTEMMANAGE : 'sysTemManage_0',  // 后台模块(系统管理)
     ADMINUSERLIST : 'sysTemManage_0_1',
@@ -170,16 +171,13 @@ SYSTEMMANAGE : 'sysTemManage_0',  // 后台模块(系统管理)
     MESSAGEMANAGE : 'contentManage_1_6', // 留言管理
 
     USERMANAGE : 'userManage_2', // 后台模块(会员管理)
-REGUSERSLIST: 'userManage_2_1'
+	REGUSERSLIST: 'userManage_2_1'
 ```
 - 改参数对应后台模板文件 adminTemp.ejs 中的模块列表的：
 
 
 - 也就是说，如果新增模块，需要在配置文件(settings.js) 和 adminTemp.ejs 中配置相应的cid。
 - 这个属性是权限控制需要的，除此之外，加入新模块后，需要在权限管理模块加入新模块，并配置对应的cid
-
-
-
 
 
 ### 2.2 关于路由
@@ -273,7 +271,6 @@ Validat.js 后台权限控制（没有授予管理权限(session)会直接过滤
 ```
 function initUploadLogoBtn($scope){
     $("#uploadify").uploadify({
-
         'swf': '/plugins/uploadify/uploadify.swf',
         'uploader': '/system/upload?type=images&key=userlogo',
         'buttonText': '选择图片',
