@@ -62,9 +62,8 @@
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-3">缩略图</label>
-                        <div class="col-sm-3" id="upContainer">
-                            <!--<input type="file" name="uploadify" id="uploadify" />-->
-                            <button class="btn btn-gray" role="button" id="pickfiles">选择文章主图</button>
+                        <div class="col-sm-3">
+                            <input type="file" name="uploadify" id="uploadify" />
                             <img src="" alt="" width="120" height="120" class="img-thumbnail" id="myImg">
                         </div>
                     </div>
@@ -126,9 +125,7 @@
 //                初始化文章标签
                 initContentTags($scope,$http);
 //                初始化上传按钮
-//                initUploadBtn($scope);
-
-                initQiniuBtn($scope,'upContainer','pickfiles',afterUpdateContentImg);
+                initUploadBtn($scope);
 //                通过访问地址获取文章id
                 $scope.targetID = window.location.href.split("/")[8];
                 if($scope.targetID){
@@ -137,7 +134,7 @@
                         iniTreeData($scope,$http);
                         initContentTags($scope,$http);
                         $scope.formData = result;
-                        $("#myImg").attr("src",'<%=updateFilePath%>'+$scope.formData.sImg)
+                        $("#myImg").attr("src",$scope.formData.sImg)
                     })
                 }
                 // 添加或修改文章

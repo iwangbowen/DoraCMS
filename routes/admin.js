@@ -759,13 +759,13 @@ router.get('/manage/contentAttributes/listByParam', function(req, res, next) {
 });
 
 //条件查询指定类别的分类，不带分页
-router.get('/manage/contentAttributes/allByParam', function(req, res, next) {
-    var params = url.parse(req.url,true);
-    var keywords = params.query.typeId;
-    var typeList = DbOpt.getContentsByID(Types,req, res,{'type': Number(keywords)})
-    return res.json(typeList)
-
-});
+//router.get('/manage/contentAttributes/allByParam', function(req, res, next) {
+//    var params = url.parse(req.url,true);
+//    var keywords = params.query.typeId;
+//    var typeList = DbOpt.getDatasByParam(Types,req, res,{'type': Number(keywords)})
+//    return res.json(typeList)
+//
+//});
 
 //添加文档属性
 router.post('/manage/addContentAttributes/add', function(req, res, next) {

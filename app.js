@@ -23,8 +23,6 @@ var siteFunc = require("./models/db/siteFunc");
 var fs = require('fs');
 //时间格式化
 var moment = require('moment');
-//七牛云存储
-var qiniu = require('qiniu');
 //引入session插件
 var fk = require('stuwebfk');
 /*模板引擎*/
@@ -45,9 +43,6 @@ app.use('/ueditor/ue', ueditor({//这里的/ueditor/ue是因为文件件重命�
     dynamicPath: '/blogpicture' //动态目录，以/开头，bcs填写buckect名字，开头没有/.路径可以根据req动态变化，可以是一个函数，function(req) { return '/xx'} req.query.action是请求的行为，uploadimage表示上传图片，具体查看config.json.
 }));
 
-//七牛key
-qiniu.conf.ACCESS_KEY = Settings.QINIUACCESS_KEY;
-qiniu.conf.SECRET_KEY = Settings.QINIUSECRET_KEY;
 
 // view engine setup
 //静态压缩
@@ -75,10 +70,8 @@ app.use(function(req, res, next){
     res.locals.adminlogined = req.session.adminlogined;
     res.locals.adminUserInfo = req.session.adminUserInfo;
 
-//    定义静态文件域
-    res.locals.staticFilePath = Settings.STATICFILEPATH;
-//    定义上传文件域
-    res.locals.updateFilePath = Settings.UPDATEFILEPATH;
+
+
 //    指定站点域名
     res.locals.myDomain = req.headers.host;
 
@@ -91,25 +84,23 @@ app.get('/sitemap.xml',function(req, res, next) {
     stream.pipe(res);
 });
 
-
 app.get('/robots.txt',function(req, res, next) {
     var stream=fs.createReadStream('./robots.txt',{flags:'r'});
     stream.pipe(res);
 });
 
-//非www跳转到www，上线的时候可以打开注释
-//app.get('/*', function (req, res, next) {
-//    var haswww = req.headers.host.match(/^www\./)
-//        , url = ['http://www.', req.headers.host, req.url].join('');
-//
-//    if((req.headers.host).indexOf('127')>=0){
-//        next();
-//    }else{
-//        haswww ? next() : res.redirect(301, url);
-//    }
-//
-//});
+//非www跳转到www
+app.get('/*', function (req, res, next) {
+    var haswww = req.headers.host.match(/^www\./)
+        , url = ['http://www.', req.headers.host, req.url].join('');
 
+    if((req.headers.host).indexOf('127')>=0){
+        next();
+    }else{
+        haswww ? next() : res.redirect(301, url);
+    }
+
+});
 
 //数据格式化
 app.locals.myDateFormat = function(date){
@@ -152,7 +143,7 @@ app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
     console.log(err);
-    res.render('web/do404', { siteConfig : siteFunc.siteInfos("页面找不到了") });
+    res.render('web/public/do404', siteFunc.setDataForError(req, res, '找不到页面' ,err.message));
 });
 
 // error handlers
@@ -162,7 +153,7 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('web/do500', { siteConfig : siteFunc.siteInfos("程序内部错误") ,errInfo : err.message,temp:"ui",layout: 'web/temp/errorTemp' });
+    res.render('web/public/do500', siteFunc.setDataForError(req, res, '出错啦！' ,err.message));
   });
 }
 
@@ -170,7 +161,7 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.render('web/do500', { siteConfig : siteFunc.siteInfos("程序内部错误") ,errInfo : err.message,temp:"ui",layout: 'web/temp/errorTemp' });
+  res.render('web/public/do500', siteFunc.setDataForError(req, res, '出错啦！' , err.message));
 });
 
 

@@ -1,58 +1,23 @@
-<!-- BEGIN HEAD -->
-<%- include ../indexHeader %>
-<!-- END HEAD -->
-
-<!-- BEGIN CONTAINER -->
-<div class="container min-hight margin-top-20 margin-bottom-20" ng-app="webApp" ng-controller="content">
-    <!-- BEGIN BLOG -->
-    <div class="row" style="background: #fff;margin-bottom: 20px;">
-
-        <div class="col-md-12 col-sm-12 blog-posts margin-bottom-40" >
-            <div class="min-hight">
-                <%detaillistData.forEach(function(item){%>
-                <div class="row">
-
-                    <div class="col-md-3 col-sm-3 hide">
-                        <img class="img-responsive" alt="<%=item.title%>" src="<%=item.sImg%>">
-                    </div>
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <h2 class="blog-title"><a href="###"><%= item.title%></a></h2>
-                        <p class="blog-des"><%- item.comments%></p>
-                        <ul class="blog-info hide">
-                            <li><i class="fa fa-calendar"></i> <%=myDateFormat(item.date)%></li>
-                            <li><i class="fa fa-eye"></i> <%=item.clickNum%></li>
-                            <li><i class="fa fa-tags"></i> <%=item.tags%></li>
-                        </ul>
-                    </div>
+<!--关于我-->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-9 left-frame">
+                <div class="col-md-12">
+                    <%documentList.forEach(function(item){%>
+                    <article class="post">
+                        <h2 class="post-title"><%=item.title%></h2>
+                        <div class="post-content"><%- item.comments%></div>
+                    </article>
+                    <%})%>
                 </div>
-                <%})%>
             </div>
-
+            <div class="col-md-3 right-frame">
+                <% include ../../public/searchBoard %>
+                <% include ../../public/leftNav %>
+                <% include ../../public/hotNewsList %>
+                <% include ../../public/tagsList %>
+            </div>
         </div>
-        <!-- END LEFT SIDEBAR -->
-
     </div>
-    <!-- END BEGIN BLOG -->
 </div>
-<!-- END CONTAINER -->
-
-<!-- BEGIN FOOTER -->
-<%- include ../footer %>
-
-<!-- END FOOTER -->
-<script type="text/javascript">
-    $(function() {
-//        App.init();
-        var cateId = '<%=cateInfo._id%>';
-
-        var myParentCateID = '<%=cateInfo.sortPath%>';
-
-//        导航菜单高亮
-        highLightNav(myParentCateID.split(',')[1]);
-
-
-    })
-</script>
-</body>
-<!-- END BODY -->
-</html>

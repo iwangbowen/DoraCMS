@@ -44,15 +44,7 @@ var DbOpt = {
             if(err){
 
             }else{
-                console.log(logMsg+" success!")
-//                针对有密码的记录，需要解密后再返回
-//                if(key && result.password){
-//                    var decipher = crypto.createDecipher("bf","dora");
-//                    var oldPsd = "";
-//                    oldPsd += decipher.update(result.password,"hex","utf8");
-//                    oldPsd += decipher.final("utf8");
-//                    result.password = oldPsd;
-//                }
+                console.log(logMsg+" success!");
                 return res.json(result);
             }
         })
@@ -77,15 +69,7 @@ var DbOpt = {
         console.log(logMsg+" success!");
         res.end("success");
     },
-    findListByParams : function(obj,req,res,params){
-        obj.find(params, function (err,result) {
-            if(err){
 
-            }else{
-                return res.json(result);
-            }
-        })
-    },
     pagination : function(obj,req,res,conditions){
 
         var params = url.parse(req.url,true);
@@ -126,26 +110,13 @@ var DbOpt = {
             }
         })
     },
-    findAllSonListByCateId : function (obj,req,res,cateId) {
-//    在nodejs中，必须要使用RegExp，来构建正则表达式对象,参数必须为cateId
-        var query={};
-        if(cateId) {
-            query['sortPath']=new RegExp(cateId);//模糊查询参数
-        }
-        obj.find(query,function(err,result){
-            if(err){
-                console.log(err)
-            }else{
-                return res.json(result);
-            }
-        })
-    },
-    getPaginationResult : function(obj,req,res,q){// 通用查询，带分页，注意参数传递格式
+
+    getPaginationResult : function(obj,req,res,q,filed){// 通用查询，带分页，注意参数传递格式,filed为指定字段
         var searchKey = req.query.searchKey;
         var page = parseInt(req.query.page);
         var limit = parseInt(req.query.limit);
         if (!page) page = 1;
-        if (!limit) limit = 24;
+        if (!limit) limit = 15;
         var order = req.query.order;
         var sq = {}, Str, A = 'problemID', B = 'asc';
         if (order) {    //是否有排序请求
@@ -157,39 +128,52 @@ var DbOpt = {
         }
 
         var startNum = (page - 1)*limit;
-        var resultList = obj.find(q).sort(sq).skip(startNum).limit(limit);
+        var resultList;
+        var resultNum;
+        if(q && q.length > 1){ // 多条件只要其中一条符合
+            resultList = obj.find().or(q,filed).sort(sq).skip(startNum).limit(limit);
+            resultNum = obj.find().or(q,filed).count();
+        }else{
+            resultList = obj.find(q).sort(sq).skip(startNum).limit(limit);
+            resultNum = obj.find(q).count();
+        }
         //        分页参数
         var pageInfo = {
-            "totalItems" : obj.find(q).count(),
+            "totalItems" : resultNum,
             "currentPage" : page,
             "limit" : limit,
             "startNum" : startNum +1,
-            "sort" : req.query.sort,
-            "time" : req.query.time,
             "searchKey" : searchKey
         };
         var datasInfo = {
             docs : resultList,
             pageInfo : pageInfo
-        }
+        };
 
         return datasInfo;
     },
-    getContentsByID : function(obj,req,res,q){// 通用查询list不带分页，注意参数传递格式,通过express-promise去掉了回调方式返回数据
 
-        return obj.find(q).sort({'date': -1}).find();
+    getDatasByParam : function(obj,req,res,q){// 通用查询list不带分页，注意参数传递格式,通过express-promise去掉了回调方式返回数据
+//        默认查询所有记录，有条件顺带排序和查询部分记录
+        var order = req.query.order;
+        var limit = parseInt(req.query.limit);
+        var sq = {}, Str, A = 'problemID', B = 'asc';
+        if (order) {    //是否有排序请求
+            Str = order.split('_');
+            A = Str[0]; B = Str[1];
+            sq[A] = B;    //关联数组增加查询条件，更加灵活，因为A是变量
+        } else {
+            sq.date = -1;    //默认排序查询条件
+        }
+        if(!limit){
+            return obj.find(q).sort(sq);
+        }else{
+            return obj.find(q).sort(sq).skip(0).limit(limit);
+        }
+
 
     },
-    getObjCount : function(obj,conditions){ // 查询指定对象的数量
-        obj.count(conditions, function (err, count) {
-            if (err){
-                console.log(err);
-            }else{
-                return count;
-            }
 
-        });
-    },
     getCount : function(obj,req,res,conditions){ // 查询指定对象的数量
         obj.count(conditions, function (err, count) {
             if (err){

@@ -112,7 +112,7 @@
 
                         iniTreeData($scope,$http);
                         $scope.formData = result;
-                        $("#myImg").attr("src",'<%=updateFilePath%>'+$scope.formData.sImg)
+                        $("#myImg").attr("src",$scope.formData.sImg)
                     })
                 }
                 // 添加或修改插件

@@ -1,0 +1,46 @@
+<!--用户登录模块-->
+<div class="loginBoard" ng-controller="userlogin">
+    <form name="loginForm" ng-submit="processLogForm(loginForm.$valid)" novalidate>
+        <h3>用户登录 &nbsp;<small class="text-danger hide" id="errorInfo">邮箱和密码不匹配</small></h3>
+        <div class="form-group">
+            <input type="email" class="form-control" name="email" ng-model="logFormData.email" placeholder="请填写邮箱"  required>
+            <label for="inputError" class="control-label text-danger" ng-show="loginForm.email.$invalid && !loginForm.email.$pristine"><i class="fa fa-times-circle-o"></i>请填写正确的邮箱地址</label>
+
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" name="password" ng-model="logFormData.password" ng-minlength="6" ng-maxlength="12" placeholder="请输入密码" ng-pattern="/(?!^\\d+$)(?!^[a-zA-Z]+$)(?!^[_#@]+$).{6,}/" title="6-12个有效字符" required>
+            <label for="inputError" class="control-label text-danger" ng-show="loginForm.password.$invalid && !loginForm.password.$pristine"><i class="fa fa-times-circle-o"></i>6-12个ascii字符</label>
+
+        </div>
+        <div id="ul-s5">
+            <button type="submit" class="btn btn-default" ng-disabled="loginForm.$invalid">登录</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    doraApp.controller("userlogin",function($scope,$http) {
+        $scope.processLogForm = function(isValid){
+
+            if(isValid){
+                $http({
+                    method  : 'POST',
+                    url     : "/users/doLogin",
+                    data    : $.param($scope.logFormData),  // pass in data as strings
+                    headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                })
+                .success(function(data) {
+                    if(data === "success"){
+                        alert('登录成功！');
+                        window.location = '/';
+                    }else{
+                        $('#errorInfo').removeClass('hide');
+                    }
+                });
+            }
+            else{
+                alert("error");
+            }
+        };
+    })
+</script>

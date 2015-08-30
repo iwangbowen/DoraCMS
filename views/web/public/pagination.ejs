@@ -1,0 +1,36 @@
+<!--分页模块-->
+<div class="pagenation text-center" ng-controller="pagenation">
+    <ul>
+        <li ng-class="{true:'hide'}[currentPage==1]"><a href="javascript:void(0);" ng-click="prevPage()">上一页</a></li>
+        <li ng-repeat="page in pages" ng-class="{true:'active'}[currentPage==page]"><a href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a></li>
+        <li ng-class="{true:'hide'}[currentPage==totalPage]"><a href="javascript:void(0);" ng-click="nextPage()">下一页</a></li>
+    </ul>
+</div>
+
+<script>
+
+    doraApp.controller("pagenation",function($scope,$http) {
+
+        $scope.currentPage = Number('<%=pageInfo.currentPage%>');
+        $scope.totalItems = Number('<%=pageInfo.totalItems%>');
+        $scope.limit = Number('<%=pageInfo.limit%>');
+        $scope.startNum = Number('<%=pageInfo.startNum%>');
+        $scope.totalPage = Math.ceil($scope.totalItems / $scope.limit);
+        $scope.pages = [];
+
+        var localUrl =  "";
+        var param = "";
+        var pageType = '<%=pageType%>';
+        if(pageType == 'index'){
+            localUrl =  "/page";
+        }else if(pageType == 'cate'){
+            localUrl =  "/<%=cateInfo.defaultUrl%>___<%=cateInfo._id%>";
+        }else if(pageType == 'search'){
+            param = "?searchKey=<%=pageInfo.searchKey%>";
+            localUrl =  "/content/searchResult/items";
+        }
+
+
+        initPagination($scope,$http,localUrl,param);
+    })
+</script>

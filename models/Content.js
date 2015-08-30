@@ -18,7 +18,7 @@ var content = new Schema({
     stitle : String,
     type: { type: String, default: "content" }, // 发布形式 默认为普通文档,约定 singer 为单页面文档
     category : String, //文章类别
-    sortPath : [], //存储所有父节点结构
+    sortPath : String, //存储所有父节点结构
     tags : String, // 标签
     keywords : String,
     sImg : { type: String, default: "/upload/images/defaultImg.jpg" }, // 文章小图

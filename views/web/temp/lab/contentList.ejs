@@ -3,7 +3,7 @@
 <!-- END HEAD -->
 
 <div class="gallayer" style="">
-    <div class="galBj" style="background-image: url(<%=staticFilePath%>/stylesheets/front/images/labbg.jpg);"></div>
+    <div class="galBj" style="background-image: url(/stylesheets/front/images/labbg.jpg);"></div>
     <div class="galMask"></div>
 </div>
 <!-- BEGIN CONTAINER -->
@@ -12,7 +12,7 @@
         <%detaillistData.forEach(function(item){%>
         <div class="col-md-3 col-sm-4 gallery-box">
             <a class="lab_item" title="<%= item.title%>" href="/details/<%=item._id%>.html">
-                <div style="background-image:url('<%=updateFilePath%><%=item.sImg%>')" class="cover">
+                <div style="background-image:url('<%=item.sImg%>')" class="cover">
                     <i class="fa fa-link"></i>
                 </div>
                 <div class="info">
