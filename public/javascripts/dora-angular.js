@@ -78,8 +78,20 @@ function TempsTree(id,name,alias){
     this.alias=alias;
 }
 
-//翻页组件
+//初始化分页
+function initPagination($scope,$http,currentPage,searchKey){
+    $scope.currentPage = 1;
+    $scope.totalPage = 1;
+    $scope.totalItems = 1;
+    $scope.limit = 10;
+    $scope.pages = [];
+    $scope.startNum = 1;
+    $scope.keywords = searchKey;
+    getPageInfos($scope,$http,"/admin/manage/getDocumentList/"+currentPage);
+}
 
+
+//翻页组件
 function getPageInfos($scope,$http,url){
 
 //        定义翻页动作
@@ -102,9 +114,8 @@ function getPageInfos($scope,$http,url){
         }
     };
 
-    $http.get(url+"?limit="+$scope.limit+"&currentPage="+$scope.currentPage+"&keywords="+$scope.keywords).success(function(result){
+    $http.get(url+"?limit="+$scope.limit+"&currentPage="+$scope.currentPage+"&searchKey="+$scope.keywords).success(function(result){
         console.log("getData success!");
-
         $scope.data = result.docs;
         if(result.pageInfo){
             $scope.totalItems = result.pageInfo.totalItems;
@@ -117,13 +128,13 @@ function getPageInfos($scope,$http,url){
             var pageNum =  Number($scope.currentPage);
             if ($scope.currentPage > 1 && $scope.currentPage < $scope.totalPage) {
                 $scope.pages = [
-                        $scope.currentPage - 1,
+                    $scope.currentPage - 1,
                     $scope.currentPage,
-                        $scope.currentPage + 1
+                    $scope.currentPage + 1
                 ];
             }
             else if ($scope.currentPage == 1 && $scope.totalPage == 1) {
-                $scope.pages = [
+                    $scope.pages = [
                     $scope.currentPage
 
                 ];
@@ -131,11 +142,11 @@ function getPageInfos($scope,$http,url){
             else if ($scope.currentPage == 1 && $scope.totalPage > 1) {
                 $scope.pages = [
                     $scope.currentPage,
-                        $scope.currentPage + 1
+                    $scope.currentPage + 1
                 ];
             } else if ($scope.currentPage == $scope.totalPage && $scope.totalPage > 1) {
                 $scope.pages = [
-                        $scope.currentPage - 1,
+                    $scope.currentPage - 1,
                     $scope.currentPage
                 ];
             }
@@ -171,115 +182,4 @@ function getImgInfo(imgUrl,link,width,height,target,details){
     html += "</div>";
 
     return html;
-}
-
-
-//初始化七牛云存储
-function initQiniuBtn($scope,containerId,bottonId,callBack){
-    var uploader = Qiniu.uploader({
-        runtimes: 'html5,flash,html4',    //上传模式,依次退化
-        browse_button: 'pickfiles',       //上传选择的点选按钮，**必需**
-        uptoken_url: '/users/qiniu/upToken',
-        //Ajax请求upToken的Url，**强烈建议设置**（服务端提供）
-        // uptoken : '<Your upload token>',
-        //若未指定uptoken_url,则必须指定 uptoken ,uptoken由其他程序生成
-        // unique_names: true,
-        // 默认 false，key为文件名。若开启该选项，SDK会为每个文件自动生成key（文件名）
-        save_key: true,
-        // 默认 false。若在服务端生成uptoken的上传策略中指定了 `sava_key`，则开启，SDK在前端将不对key进行任何处理
-        domain: 'http://7xkrk4.com1.z0.glb.clouddn.com/',
-        //bucket 域名，下载资源时用到，**必需**
-        container: 'upContainer',           //上传区域DOM ID，默认是browser_button的父元素，
-        max_file_size: '5mb',           //最大文件体积限制
-        flash_swf_url: 'js/plupload/Moxie.swf',  //引入flash,相对路径
-        max_retries: 3,                   //上传失败最大重试次数
-        dragdrop: true,                   //开启可拖曳上传
-        drop_element: 'container',        //拖曳上传区域元素的ID，拖曳文件或文件夹后可触发上传
-        chunk_size: '4mb',                //分块上传时，每片的体积
-        auto_start: true,                 //选择文件后自动上传，若关闭需要自己绑定事件触发上传
-        filters: {
-            mime_types : [
-                {title : "Image files", extensions: "jpg,jpeg,gif,png"}
-            ]
-        },
-        multi_selection : false,
-        init: {
-            'FilesAdded': function(up, files) {
-                plupload.each(files, function(file) {
-                    // 文件添加进队列后,处理相关的事情
-                });
-            },
-            'BeforeUpload': function(up, file) {
-                // 每个文件上传前,处理相关的事情
-            },
-            'UploadProgress': function(up, file) {
-                // 每个文件上传时,处理相关的事情
-            },
-            'FileUploaded': function(up, file, info) {
-                var domain = up.getOption('domain');
-                var res = jQuery.parseJSON(info);
-
-                callBack($scope,domain,res);
-
-            },
-            'Error': function(up, err, errTip) {
-                //上传出错时,处理相关的事情
-            },
-            'UploadComplete': function() {
-                //队列文件处理完毕后,处理相关的事情
-            },
-            'Key': function(up, file) {
-                // 若想在前端对每个文件的key进行个性化处理，可以配置该函数
-                // 该配置必须要在 unique_names: false , save_key: false 时才生效
-                var key = "";
-                // do something with key here
-                return key
-            }
-        }
-    });
-// domain 为七牛空间（bucket)对应的域名，选择某个空间后，可通过"空间设置->基本设置->域名设置"查看获取
-// uploader 为一个plupload对象，继承了所有plupload的方法，参考http://plupload.com/docs
-}
-
-//七牛缩略图参数设置
-function thumbnailStr(size){
-    var imgLink = Qiniu.imageMogr2({
-        strip: true,   // 布尔值，是否去除图片中的元信息
-        thumbnail: size,  // 缩放操作参数
-        quality: 100,  // 图片质量，取值范围1-100
-        format: 'png'// 新图的输出格式，取值范围：jpg，gif，png，webp等
-    });
-
-    return '?'+imgLink;
-}
-
-//用户上传文章主图的回调函数
-function afterUpdateContentImg($scope,domain,res){
-
-
-    var sourceLink = domain + res.key; //获取上传成功后的文件的Url
-
-    alert('上传成功');
-
-    $scope.formData.sImg = '/'+res.key;
-
-
-    $("#myImg").attr("src",sourceLink+thumbnailStr('100x100'));
-
-}
-
-
-//用户上传插件的回调函数
-
-function afterUpdatePlugImg($scope,domain,res){
-
-
-    var sourceLink = domain + res.key; //获取上传成功后的文件的Url
-
-    alert('上传成功');
-
-    $scope.formData.sImg = '/'+res.key;
-
-    $("#myImg").attr("src",sourceLink+thumbnailStr('112x140'));
-
 }

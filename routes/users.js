@@ -249,18 +249,22 @@ router.post('/resetMyPsd', function(req, res, next) {
 router.post('/message/sent', function(req, res, next) {
 
     var contentId = req.body.contentId;
-    var commentNum = Number(req.body.commentNum) + 1;
 
     var newObj = new Message(req.body);
     newObj.save(function(){
 //        更新评论数
-        Content.update({_id : contentId}, {$set:{commentNum:commentNum}}, function (err,result) {
+        Content.findOne({_id : contentId},'commentNum',function(err,result){
             if(err){
                 res.end(err);
             }else{
-                res.end("success");
+                result.commentNum = result.commentNum + 1;
+                result.save(function(err){
+                    if(err) throw err;
+                    res.end("success");
+                });
             }
-        })
+        });
+
     });
 
 });

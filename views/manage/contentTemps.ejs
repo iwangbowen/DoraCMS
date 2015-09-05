@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" ng-controller="contentTemps">
     <div class="col-xs-12">
         <div class="panel">
             <a href="#addContentTemps" role="button" class="btn btn-primary btn-sm" data-toggle="modal"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>增加一个新模板</a>
@@ -36,24 +36,12 @@
                     </tr>
                     </tfoot>
                 </table>
-                <br/>
-                <!--分页-->
-                <div class="row">
-                    <div class="col-xs-6">
-                        <div class="dataTables_info" id="example2_info">显示 {{startNum}} 到 {{startNum + limit -1}} 条，共 {{totalItems}} 条记录</div>
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="dataTables_paginate paging_bootstrap">
-                            <ul class="pagination">
-                                <li ng-class="{true:'disabled'}[currentPage==1]"><a href="javascript:void(0);" ng-click="prevPage()">← 上一页</a></li>
-                                <!--<li ng-class="{true:'active'}[currentPage==1]"><a href="#">1</a></li>-->
-                                <li ng-repeat="page in pages" ng-class="{true:'active'}[currentPage==page]"><a href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a></li>
-                                <li ng-class="{true:'disabled'}[currentPage==totalPage]"><a href="javascript:void(0);" ng-click="nextPage()">下一页 → </a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+
             </div><!-- /.box-body -->
+            <div class="box-footer">
+                <!--分页-->
+                <% include public/pagination %>
+            </div>
         </div><!-- /.box -->
 
     </div><!-- /.col -->
@@ -131,30 +119,30 @@
 
 <script>
     /*targetID:全局对应指定记录的标记，在修改和删除时使用*/
-    angular.module("adminApp",[])
-            .controller("adminCtrl",function($scope,$http){
+
+            doraApp.controller("contentTemps",function($scope,$http){
 //                读取模板文件夹列表
                 getTempFolderList($scope,$http)
 //                初始化名称和权限
                 $scope.formData = {};
                 //获取模板列表
-                getData($scope,$http);
+                initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                 //删除模板
                 $('#checkIfDel').on('show.bs.modal', function (event) {
                     var obj = $(event.relatedTarget);
                     $scope.targetID = obj.data('whatever');
                 }).on('hide.bs.modal', function (event) {
                     $scope.targetID ="";
-                })
+                });
                 //确认执行删除
                 $scope.delTagItem = function () {
                     var currentID =  $scope.targetID;
-                    $http.get("/admin/manage/contentTemps/del?uid="+currentID).success(function(result){
+                    $http.get("/admin/manage/<%=bigCategory%>/del?uid="+currentID).success(function(result){
                         $('#checkIfDel').modal("hide");
                         console.log("del success!");
-                        getData($scope,$http);
+                        initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                     })
-                }
+                };
 
 //                修改模板
                 $('#addContentTemps').on('show.bs.modal', function (event) {
@@ -164,7 +152,7 @@
 //                    如果不为空则为编辑状态
                     if(editId){
                         modalTitle.text("编辑文章模板");
-                        $http.get("/admin/manage/contentTemps/item?uid="+editId).success(function(result){
+                        $http.get("/admin/manage/<%=bigCategory%>/item?uid="+editId).success(function(result){
                             $scope.formData = result;
                             $scope.targetID = editId;
                         })
@@ -178,14 +166,14 @@
                     $scope.targetID ="";
                     $(this).find("input").val("");
                     $("#TempsInfo").addClass("hide");
-                })
+                });
 
 //                添加新模板
                 $scope.processForm = function(isValid){
-                    var curentUrl = "/admin/manage/addContentTemps/add";
+                    var curentUrl = "/admin/manage/<%=bigCategory%>/addOne";
                     if($scope.targetID)
                     {
-                        curentUrl = "/admin/manage/addContentTemps/modify?uid="+$scope.targetID;
+                        curentUrl = "/admin/manage/<%=bigCategory%>/modify?uid="+$scope.targetID;
                     }
                     if(isValid){
                         $http({
@@ -194,15 +182,15 @@
                             data    : $.param($scope.formData),  // pass in data as strings
                             headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
                         })
-                                .success(function(data) {
-                                    if(data === "success"){
-                                        $("#addContentTemps").modal("hide");
-                                        getData($scope,$http);
-                                    }else{
-                                        $("#TempsInfo").removeClass("hide");
-                                        $("#errMsg").text(data);
-                                    }
-                                });
+                        .success(function(data) {
+                            if(data === "success"){
+                                $("#addContentTemps").modal("hide");
+                                initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
+                            }else{
+                                $("#TempsInfo").removeClass("hide");
+                                $("#errMsg").text(data);
+                            }
+                        });
                     }
                     else{
                         alert("error");
@@ -219,17 +207,8 @@
                     return newInput;
                 };
                 return powerFilter;
-            })
+            });
 
-    function getData($scope,$http){
-        $scope.currentPage = 1;
-        $scope.totalPage = 1;
-        $scope.totalItems = 1
-        $scope.limit = 10;
-        $scope.pages = [];
-        $scope.startNum = 1;
-        getPageInfos($scope,$http,"/admin/manage/contentTemps/listByParam");
-    }
 
 
     function getTempFolderList($scope,$http){
@@ -265,7 +244,6 @@
                 var zTree = $.fn.zTree.getZTreeObj("tempForderTree"),
                         nodes = zTree.getSelectedNodes(),
                         v = "";
-
 
                 nodes.sort(function compare(a,b){return a.id-b.id;});
                 for (var i=0, l=nodes.length; i<l; i++) {

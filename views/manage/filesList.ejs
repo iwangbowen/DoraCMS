@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" ng-controller="filesList">
     <div class="col-xs-12">
         <div class="panel hide">
             <a href="###" ng-click="newFolder()" role="button" class="btn btn-primary btn-sm"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>新建文件夹</a>
@@ -169,8 +169,8 @@
     })
 </script>
 <script>
-    angular.module("adminApp",[])
-            .controller("adminCtrl",function($scope,$http){
+
+            doraApp.controller("filesList",function($scope,$http){
                 $scope.formData = {};
 //                $scope.formData.oldName = "";
                 $scope.mdFormData = {};
@@ -282,20 +282,20 @@
                     }else{
                         alert("校验失败")
                     }
-                }
+                };
 
                 $scope.newFolder  = function(){
                     alert("开发中...")
-                }
+                };
 
 //                列表或缩略图切换
                 $scope.listViewShow = function(){
                     $scope.listView = true;
-                }
+                };
 
                 $scope.thumbnailViewShow = function(){
                     $scope.listView = false;
-                }
+                };
 
 //                删除文件或文件夹
                 $scope.delFile = function(){
@@ -339,7 +339,7 @@
 
                 }
 
-            })
+            });
 
 
             function getFolderList($scope,$http,path){

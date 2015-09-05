@@ -1,4 +1,4 @@
-﻿<div class="row">
+﻿<div class="row" ng-controller="mainPanel">
     <div class="col-md-6">
         <div class="box box-solid">
             <div class="box-header with-border">
@@ -9,11 +9,13 @@
 
                 <dl class="dl-horizontal sysSurvey">
                     <dt class="text-info"><i class="fa fa-fw fa-user"></i> 管理员数</dt>
-                    <dd>{{adminCount}}</dd>
+                    <dd>{{mainData.adminUserCount}}</dd>
                     <dt class="text-info"><i class="fa fa-fw fa-users"></i> 注册用户</dt>
-                    <dd>{{regUsersCount}}</dd>
+                    <dd>{{mainData.regUsersCount}}</dd>
                     <dt class="text-info"><i class="fa fa-fw fa-file-text-o"></i> 文档总数</dt>
-                    <dd>{{contentsCount}}</dd>
+                    <dd>{{mainData.contentsCount}}</dd>
+                    <dt class="text-info"><i class="fa fa-fw fa-file-text-o"></i> 留言总数</dt>
+                    <dd>{{mainData.msgCount}}</dd>
                 </dl>
             </div><!-- /.box-body -->
         </div><!-- /.box -->
@@ -27,7 +29,8 @@
             <div class="box-body">
                 <ul class="list-unstyled">
                     <li><a href="/admin/manage/adminUsersList"><i class="fa fa-fw fa-user"></i> 添加管理员</a></li>
-                    <li><a href="/admin/manage/content/add"><i class="fa fa-fw fa-file-text-o"></i> 创建新文档</a></li>
+                    <li><a href="/admin/manage/content/add/content"><i class="fa fa-fw fa-file-text-o"></i> 创建新文档</a></li>
+                    <li><a href="/admin/manage/content/add/plug"><i class="fa fa-fw fa-file-text-o"></i> 添加Jquery插件</a></li>
                 </ul>
 
             </div><!-- /.box-body -->
@@ -36,16 +39,12 @@
 </div>
 
 <script>
-angular.module("adminApp",[])
-.controller("adminCtrl",function($scope,$http){
-            $http.get("/admin/manage/getAdminCount").success(function(result){
-                $scope.adminCount = result.count;
+
+    doraApp.controller("mainPanel",function($scope,$http){
+
+            $http.get("/admin/manage/getMainInfo").success(function(result){
+                $scope.mainData = result;
             });
-            $http.get("/admin/manage/getRegUsersCount").success(function(result){
-                $scope.regUsersCount = result.count;
-            });
-            $http.get("/admin/manage/getContentsCount").success(function(result){
-                $scope.contentsCount = result.count;
-            });
+
 })
 </script>

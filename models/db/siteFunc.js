@@ -44,8 +44,8 @@ var siteFunc = {
         return ContentCategory.find({'parentID': '0','state' : '1'},'name defaultUrl').sort({'sortId': 1}).find();
     },
 
-    getHotItemListData : function(){
-        return Content.find({},'stitle').sort({'clickNum': -1}).skip(0).limit(15);
+    getHotItemListData : function(q){
+        return Content.find(q,'stitle').sort({'clickNum': -1}).skip(0).limit(15);
     },
 
     setDataForIndex: function (req, res, q, title) {
@@ -55,7 +55,7 @@ var siteFunc = {
         return {
             siteConfig: siteFunc.siteInfos("首页"),
             documentList: documentList.docs,
-            hotItemListData: siteFunc.getHotItemListData(),
+            hotItemListData: siteFunc.getHotItemListData({}),
             cateTypes: siteFunc.getCategoryList(),
             cateInfo: '',
             tagsData: tagsData,
@@ -75,7 +75,7 @@ var siteFunc = {
             siteConfig: siteFunc.siteInfos(cateInfo.name, cateInfo.comments, cateInfo.keywords),
             documentList: documentList.docs,
             currentCateList: currentCateList,
-            hotItemListData: siteFunc.getHotItemListData(),
+            hotItemListData: siteFunc.getHotItemListData(dq),
             tagsData: tagsData,
             cateInfo: cateInfo,
             cateTypes: siteFunc.getCategoryList(),
@@ -93,7 +93,7 @@ var siteFunc = {
             siteConfig: siteFunc.siteInfos(docs.title, docs.discription, docs.keywords),
             cateTypes: siteFunc.getCategoryList(),
             currentCateList: currentCateList,
-            hotItemListData: siteFunc.getHotItemListData(),
+            hotItemListData: siteFunc.getHotItemListData({}),
             tagsData: tagsData,
             documentInfo: docs,
             pageType: 'detail',

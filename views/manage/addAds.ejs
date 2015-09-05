@@ -1,10 +1,3 @@
-<script type="text/javascript">
-    $(function () {
-
-    });
-
-
-</script>
 <style>
     .alert-info {
         background-color: #d9edf7 !important;
@@ -12,6 +5,7 @@
         color: #31708f !important;
     }
 </style>
+<div ng-controller="addAds">
 <div class="modal fade" id="addNewAdImg">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -159,33 +153,7 @@
                                             <div class="box-body">
                                                 <p class="text-warning"><i class="fa fa-fw fa-info-circle"></i>点击上传添加广告图片，单张图默认不轮播，多图为轮播显示。最多4张图</p>
                                                 <div id="imgInfolist">
-                                                    <!--<div class="alert alert-info">-->
-                                                        <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
-                                                            <!--<span aria-hidden="true">&times;</span>-->
-                                                        <!--</button>-->
-                                                        <!--<div class="col-sm-3">-->
-                                                            <!--<img src="/metronic/assets/img/posts/img1.jpg" alt="" class="img-thumbnail"/><br/><br/>-->
-                                                            <!--<button class="btn btn-primary btn-xs" data-whatever="" data-toggle="modal" data-target="#addNewAdImg"><span class="fa fa-fw fa-edit" aria-hidden="true"></span></button>-->
-                                                        <!--</div>-->
-                                                        <!--<div class="col-sm-8">-->
-                                                            <!--<div class="form-group">-->
-                                                                <!--<label class="col-sm-3 control-label">图片链接</label>-->
-                                                                <!--<div class="col-sm-8">-->
-                                                                    <!--<p class="form-control-static">email@example.com</p>-->
-                                                                <!--</div>-->
-                                                                <!--<label class="col-sm-3 control-label">图片宽高</label>-->
-                                                                <!--<div class="col-sm-8">-->
-                                                                    <!--<p class="form-control-static">300*400</p>-->
-                                                                <!--</div>-->
-                                                                <!--<label class="col-sm-3 control-label">图片详情</label>-->
-                                                                <!--<div class="col-sm-8">-->
-                                                                    <!--<p class="form-control-static">this is a test</p>-->
 
-                                                                <!--</div>-->
-                                                            <!--</div>-->
-                                                        <!--</div>-->
-                                                        <!--<div class="clearfix"></div>-->
-                                                    <!--</div>-->
                                                 </div>
                                             </div><!-- /.box-body -->
                                         </div>
@@ -198,19 +166,14 @@
                         <button type="submit" class="btn btn-primary" ng-disabled="myForm.$invalid">提交</button>
                     </div>
                 </form>
-                <pre>{{formData}}</pre>
-                <pre>{{formData.content}}</pre>
-                <pre>{{formData.contentItem}}</pre>
-
             </div>
         </div>
     </div>
 </div>
-
+</div>
 <script>
 
-    angular.module("adminApp",[])
-            .controller("adminCtrl",function($scope,$http){
+            doraApp.controller("addAds",function($scope,$http){
                 $scope.formData = {};
                 $scope.formData.type = "0";
                 $scope.formData.content = {};
@@ -240,7 +203,7 @@
                 $scope.targetID = window.location.href.split("/")[7];
                 if($scope.targetID){
 
-                    $http.get("/admin/manage/ads/item?uid="+$scope.targetID).success(function(result){
+                    $http.get("/admin/manage/<%=bigCategory%>/item?uid="+$scope.targetID).success(function(result){
                         $scope.formData = result;
 
                         if(result.type === "0"){ //文字广告
@@ -290,9 +253,9 @@
 
                 $scope.processForm = function(isValid){
 
-                    var url = "/admin/manage/ads/addAdds";
+                    var url = "/admin/manage/<%=bigCategory%>/addOne";
                     if($scope.targetID){
-                        url = "/admin/manage/ads/modify?uid="+$scope.targetID;
+                        url = "/admin/manage/<%=bigCategory%>/modify?uid="+$scope.targetID;
                     }
                     if(isValid){
                         var currentContent = $scope.formData.content;
@@ -305,7 +268,7 @@
                             category : $scope.formData.category,
                             type : $scope.formData.type,
                             content : currentContent
-                        }
+                        };
 
                         $http({
                             method  : 'POST',

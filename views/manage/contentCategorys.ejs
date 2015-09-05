@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" ng-controller="contentCategorys">
     <div class="col-xs-12">
         <div class="panel">
             <a href="#addContentCategory" role="button" class="btn btn-primary btn-sm" data-toggle="modal"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>增加顶级分类</a>
@@ -128,8 +128,8 @@
 
 
 <script>
-    var appModule = angular.module("adminApp",[]);
-    appModule.controller('adminCtrl', function ($scope,$http) {
+
+    doraApp.controller('contentCategorys', function ($scope,$http) {
 //                初始化模板分类
         iniTreeData($scope,$http);
 //        数据初始化
@@ -157,7 +157,7 @@
                 $('#askifdo').modal("show");
             }else{
                 var currentID =  $scope.targetID;
-                $http.get("/admin/manage/contentCategorys/del?uid="+currentID).success(function(result){
+                $http.get("/admin/manage/<%=bigCategory%>/del?uid="+currentID).success(function(result){
                     $('#checkIfDel').modal("hide");
                     console.log("del success!");
                     getData($scope,$http);
@@ -197,7 +197,7 @@
                 }
                 else if(opt === "editNc"){
                     modalTitle.text("编辑分类");
-                    $http.get("/admin/manage/contentCategorys/item?uid="+currentID).success(function(result){
+                    $http.get("/admin/manage/<%=bigCategory%>/item?uid="+currentID).success(function(result){
                         $scope.formData = result;
                         $scope.targetID = currentID;
                     })
@@ -219,10 +219,10 @@
         });
         //                添加类别
         $scope.processForm = function(isValid){
-            var curentUrl = "/admin/manage/contentCategorys/add";
+            var curentUrl = "/admin/manage/<%=bigCategory%>/addOne";
             if($scope.targetID)
             {
-                curentUrl = "/admin/manage/contentCategorys/modify?uid="+$scope.targetID;
+                curentUrl = "/admin/manage/<%=bigCategory%>/modify?uid="+$scope.targetID;
             }
 
             if(isValid){

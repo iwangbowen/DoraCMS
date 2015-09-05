@@ -1,10 +1,4 @@
-<script type="text/javascript">
-    $(function () {
-
-    });
-
-</script>
-<div class="row">
+<div class="row" ng-controller="addEmailTemp">
     <div class="col-xs-12">
         <div class="box box-default">
             <div class="box-header">
@@ -63,13 +57,12 @@
 
 <script>
 
-    angular.module("adminApp",[])
-            .controller("adminCtrl",function($scope,$http){
+            doraApp.controller("addEmailTemp",function($scope,$http){
                 $scope.formData = {};
 
                 $scope.targetID = window.location.href.split("/")[7];
                 if($scope.targetID){
-                    $http.get("/admin/manage/emailTemp/item?uid="+$scope.targetID).success(function(result){
+                    $http.get("/admin/manage/<%=bigCategory%>/item?uid="+$scope.targetID).success(function(result){
 
                         $scope.formData = result;
 
@@ -77,9 +70,9 @@
                 }
                 // 添加或修改邮件模板
                 $scope.processForm = function(isValid){
-                    var url = "/admin/manage/emailTemp/addEmailTemp";
+                    var url = "/admin/manage/<%=bigCategory%>/addOne";
                     if($scope.targetID){
-                        url = "/admin/manage/emailTemp/modify?uid="+$scope.targetID;
+                        url = "/admin/manage/<%=bigCategory%>/modify?uid="+$scope.targetID;
                     }
                     if(isValid){
                         $http({
@@ -88,13 +81,13 @@
                             data    : $.param($scope.formData),  // pass in data as strings
                             headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
                         })
-                                .success(function(data) {
-                                    if(data === "success"){
-                                       window.location = "/admin/manage/emailTempList";
-                                    }else{
-                                        alert("未知异常，请稍后重试");
-                                    }
-                                });
+                        .success(function(data) {
+                            if(data === "success"){
+                               window.location = "/admin/manage/emailTempList";
+                            }else{
+                                alert("未知异常，请稍后重试");
+                            }
+                        });
                     }
                     else{
                         alert("校验失败，请检查");

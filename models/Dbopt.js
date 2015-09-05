@@ -8,8 +8,8 @@ var crypto = require("crypto");
 var mongoose = require('mongoose');
 //站点配置
 var Settings = require("../models/db/settings");
-var db = mongoose.connect('mongodb://localhost/doracms');
-//mongoose.connect('mongodb://'+Settings.USERNAME+':'+Settings.PASSWORD+'@'+Settings.HOST+':'+Settings.PORT+'/'+Settings.DB+'');
+//var db = mongoose.connect('mongodb://localhost/doracms');
+mongoose.connect('mongodb://'+Settings.USERNAME+':'+Settings.PASSWORD+'@'+Settings.HOST+':'+Settings.PORT+'/'+Settings.DB+'');
 
 //信息删除操作
 
@@ -22,7 +22,7 @@ var DbOpt = {
             if(err){
                 res.end(err);
             }else{
-                console.log(logMsg+" success!")
+                console.log(logMsg+" success!");
                 res.end("success");
             }
         })
@@ -32,7 +32,7 @@ var DbOpt = {
             if(err){
 
             }else{
-                console.log(logMsg+" success!")
+                console.log(logMsg+" success!");
                 return res.json(result);
             }
         })

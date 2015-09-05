@@ -1,6 +1,4 @@
-<!-- daterange picker -->
-<link href="/plugins/daterangepicker/daterangepicker-bs3.css" rel="stylesheet" type="text/css" />
-<div class="row">
+<div class="row" ng-controller="addPlugs">
     <div class="col-xs-12">
         <div class="box box-default">
             <div class="box-header">
@@ -23,8 +21,7 @@
                     <div class="form-group">
                         <label class="control-label col-sm-3">主图</label>
                         <div class="col-sm-3" id="upContainer">
-                            <!--<input type="file" name="uploadify" id="uploadify" />-->
-                            <button class="btn btn-gray" role="button" id="pickfiles">选择插件主图</button>
+                            <input type="file" name="uploadify" id="uploadify" />
                             <img src="" alt="" width="120" height="120" class="img-thumbnail" id="myImg">
                         </div>
                     </div>
@@ -87,28 +84,19 @@
         </div>
     </div>
 </div>
-<script src="/plugins/daterangepicker/daterangepicker.js" type="text/javascript"></script>
 
 <script>
 
-    $(function(){
-        //Date range picker
-        $('#reservation').daterangepicker();
-
-    })
-
-    angular.module("adminApp",[])
-            .controller("adminCtrl",function($scope,$http){
+            doraApp.controller("addPlugs",function($scope,$http){
                 $scope.formData = {};
 //                初始化插件分类
                 iniTreeData($scope,$http);
 //                初始化上传按钮
-//                initUploadBtn($scope);
-                initQiniuBtn($scope,'upContainer','pickfiles',afterUpdatePlugImg);
+                initUploadBtn($scope);
 //                通过访问地址获取插件id
                 $scope.targetID = window.location.href.split("/")[8];
                 if($scope.targetID){
-                    $http.get("/admin/manage/content/item?uid="+$scope.targetID).success(function(result){
+                    $http.get("/admin/manage/<%=bigCategory%>/item?uid="+$scope.targetID).success(function(result){
 
                         iniTreeData($scope,$http);
                         $scope.formData = result;
@@ -118,9 +106,9 @@
                 // 添加或修改插件
                 $scope.processForm = function(isValid){
                     $scope.formData.type = "plug";
-                    var url = "/admin/manage/content/addcontent";
+                    var url = "/admin/manage/<%=bigCategory%>/addOne";
                     if($scope.targetID){
-                        url = "/admin/manage/content/modify?uid="+$scope.targetID;
+                        url = "/admin/manage/<%=bigCategory%>/modify?uid="+$scope.targetID;
                     }
                     if(isValid){
                         $http({
@@ -129,13 +117,13 @@
                             data    : $.param($scope.formData),  // pass in data as strings
                             headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
                         })
-                                .success(function(data) {
-                                    if(data === "success"){
-                                       window.location = "/admin/manage/contentList";
-                                    }else{
-                                        alert("未知异常，请稍后重试");
-                                    }
-                                });
+                        .success(function(data) {
+                            if(data === "success"){
+                               window.location = "/admin/manage/contentList";
+                            }else{
+                                alert("未知异常，请稍后重试");
+                            }
+                        });
                     }
                     else{
                         alert("校验失败，请检查");

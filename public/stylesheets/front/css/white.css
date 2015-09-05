@@ -80,7 +80,7 @@ a:hover {
 }
 
 #header .container .col-group .site-name{
-    margin: 5px 0 15px;
+    margin: 5px 0 25px;
 }
 
 .topNav ul li {
@@ -108,7 +108,7 @@ a:hover {
 
 /*文档列表*/
 .post {
-    padding: 0 0 20px;
+    padding: 0 0 40px;
 }
 
 .post img {
@@ -141,7 +141,7 @@ a:hover {
     color: #444;
     font-size: 15px;
     line-height: 1.715;
-    padding-top: 25px;
+    padding-top: 10px;
 }
 
 .post .comment-count {

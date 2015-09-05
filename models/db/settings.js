@@ -9,10 +9,10 @@ module.exports = {
     COOKIE_SECRET: 'doramart.com',
     URL: 'mongodb://127.0.0.1:27017/doracms',
     DB: 'doracms',
-    HOST: '',
+    HOST: '120.25.150.169',
     PORT: 27017,
-    USERNAME: '',
-    PASSWORD: '',
+    USERNAME: 'dora',
+    PASSWORD: '061724116',
 
 
 //    站点基础信息配置
@@ -30,29 +30,25 @@ module.exports = {
     SITEBASICKEYWORDS : '前端开发俱乐部,前端开发,前端俱乐部,DoraCMS', // 基础关键词
 
 
-    SYSTEMMANAGE : 'sysTemManage_0',  // 后台模块(系统管理)
-    ADMINUSERLIST : 'sysTemManage_0_1',
-    ADMINGROUPLIST : 'sysTemManage_0_2',
-    EMAILTEMPLIST : 'sysTemManage_0_3',
-    ADSLIST : 'sysTemManage_0_4',
-    FILESLIST : 'sysTemManage_0_5',
-    DATAMANAGE : 'sysTemManage_0_6', // 数据管理
-    BACKUPDATA : 'sysTemManage_0_6_1', // 数据备份
+    SYSTEMMANAGE : new Array('sysTemManage_0','DoraCMS后台管理'),  // 后台模块(系统管理)
+    ADMINUSERLIST : new Array('sysTemManage_0_1','系统用户管理'),
+    ADMINGROUPLIST : new Array('sysTemManage_0_2','系统用户组管理'),
+    EMAILTEMPLIST : new Array('sysTemManage_0_3','邮件模板管理'),
+    ADSLIST : new Array('sysTemManage_0_4','广告管理'),
+    FILESLIST : new Array('sysTemManage_0_5','文件管理'),
+    DATAMANAGE : new Array('sysTemManage_0_6','数据管理'), // 数据管理
+    BACKUPDATA : new Array('sysTemManage_0_6_1','数据备份'), // 数据备份
 
 
-    CONTENTMANAGE : 'contentManage_1', // 后台模块(内容管理)
-    CONTENTLIST : 'contentManage_1_1',
-    CONTENTCATEGORYS : 'contentManage_1_2',
-    CONTENTTAGS : 'contentManage_1_3', //标签管理
-    CONTENTTEMPS : 'contentManage_1_4', //模板管理
-    CONTENTTYPES : 'contentManage_1_5',  // 内容属性管理
-    CONTENTFILMTYPES : 'contentManage_1_5_1',  // 内容属性管理
-    CONTENTCOUNTRYTYPES : 'contentManage_1_5_2',  // 内容属性管理
-    CONTENTYEARSTYPES : 'contentManage_1_5_3',  // 内容属性管理
-    MESSAGEMANAGE : 'contentManage_1_6', // 留言管理
+    CONTENTMANAGE : new Array('contentManage_1','内容管理'), // 后台模块(内容管理)
+    CONTENTLIST : new Array('contentManage_1_1','文档管理'),
+    CONTENTCATEGORYS : new Array('contentManage_1_2','文档类别管理'),
+    CONTENTTAGS : new Array('contentManage_1_3','文档标签管理'), //标签管理
+    CONTENTTEMPS : new Array('contentManage_1_4','文档模板管理'), //模板管理
+    MESSAGEMANAGE : new Array('contentManage_1_5','留言管理'), // 留言管理
 
-    USERMANAGE : 'userManage_2', // 后台模块(会员管理)
-    REGUSERSLIST: 'userManage_2_1'
+    USERMANAGE : new Array('userManage_2','会员管理'), // 后台模块(会员管理)
+    REGUSERSLIST: new Array('userManage_2_1','注册用户管理')
 
 };
 

@@ -39,11 +39,9 @@
                 var loginState = '<%=logined%>';
                 $scope.msgFormData.contentId = '<%=documentInfo._id%>';
                 $scope.msgFormData.contentTitle = '<%=documentInfo.title%>';
-                $scope.msgFormData.commentNum = '<%=documentInfo.commentNum%>';
                 getMsgData($scope,$http,detailId);
 
                 $scope.sentMsgForm = function(isValid){
-//                    获取登录状态
 
                     if(!loginState){
                         alert('请先登录!');

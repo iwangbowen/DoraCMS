@@ -27,7 +27,7 @@ router.get('/', function (req, res, next) {
 
 //站点地图
 router.get("/sitemap.html", function (req, res, next) {
-
+    req.query.limit = 999;
     res.render('web/sitemap', siteFunc.setDataForIndex(req, res, {}, '网站地图'));
 
 });

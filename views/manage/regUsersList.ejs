@@ -1,4 +1,4 @@
-﻿<div class="row" >
+﻿<div class="row" ng-controller="regUsersList" >
     <div class="col-xs-12">
         <div class="panel">
             <!--<a href="#addNewAdminUser" role="button" class="btn btn-primary btn-sm" data-toggle="modal"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>添加用户</a>-->
@@ -56,24 +56,12 @@
                         </tr>
                     </tfoot>
                 </table>
-                <br/>
-                <!--分页-->
-                <div class="row">
-                    <div class="col-xs-6">
-                        <div class="dataTables_info" id="example2_info">显示 {{startNum}} 到 {{startNum + limit -1}} 条，共 {{totalItems}} 条记录</div>
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="dataTables_paginate paging_bootstrap">
-                            <ul class="pagination">
-                                <li ng-class="{true:'disabled'}[currentPage==1]"><a href="javascript:void(0);" ng-click="prevPage()">← 上一页</a></li>
-                                <!--<li ng-class="{true:'active'}[currentPage==1]"><a href="#">1</a></li>-->
-                                <li ng-repeat="page in pages" ng-class="{true:'active'}[currentPage==page]"><a href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a></li>
-                                <li ng-class="{true:'disabled'}[currentPage==totalPage]"><a href="javascript:void(0);" ng-click="nextPage()">下一页 → </a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+
             </div><!-- /.box-body -->
+            <div class="box-footer">
+                <!--分页-->
+                <% include public/pagination %>
+            </div>
         </div><!-- /.box -->
 
     </div><!-- /.col -->
@@ -170,27 +158,27 @@
 
 
 <script>
-    angular.module("adminApp",[])
-            .controller("adminCtrl",function($scope,$http){
+
+            doraApp.controller("regUsersList",function($scope,$http){
                 $scope.formData = {};
                 //获取注册用户列表信息
-                getData($scope,$http,$("#searchInput").val());
+                initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                 //删除用户
                 $('#checkIfDel').on('show.bs.modal', function (event) {
                     var obj = $(event.relatedTarget);
                     $scope.targetID = obj.data('whatever');
                 }).on('hide.bs.modal', function (event) {
                     $scope.targetID ="";
-                })
+                });
                 //确认执行删除
                 $scope.delUser = function () {
                     var currentID =  $scope.targetID;
-                    $http.get("/admin/manage/regUsersList/del?uid="+currentID).success(function(result){
+                    $http.get("/admin/manage/<%=bigCategory%>/del?uid="+currentID).success(function(result){
                         $('#checkIfDel').modal("hide");
                         console.log("del success!");
-                        getData($scope,$http,$("#searchInput").val());
+                        initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                     })
-                }
+                };
 
 //                修改用户
                 $('#addNewRegUser').on('show.bs.modal', function (event) {
@@ -199,26 +187,26 @@
 
 //                    如果不为空则为编辑状态
                     if(editId){
-                        $http.get("/admin/manage/regUsersList/user?uid="+editId).success(function(result){
+                        $http.get("/admin/manage/<%=bigCategory%>/item?uid="+editId).success(function(result){
                             $scope.formData = result;
                             $scope.targetID = editId;
                         })
                     }else{
                         $scope.formData = {};
                     }
-//                    getAdminGroup($scope,$http);
+
                 }).on('hidden.bs.modal', function (e) {
                     // 清空数据
                     $scope.formData = {};
                     $scope.targetID = "";
                     $(this).find(".form-control").val("");
-                })
+                });
 
 //                添加新用户或修改用户
                 $scope.processForm = function(isValid){
-                    var url = "/admin/manage/addRegUser/add";
+                    var url = "/admin/manage/<%=bigCategory%>/addOne";
                     if($scope.targetID){
-                        url = "/admin/manage/addRegUser/modify?uid="+$scope.targetID;
+                        url = "/admin/manage/<%=bigCategory%>/modify?uid="+$scope.targetID;
                     }
                     if(isValid){
                         $http({
@@ -227,81 +215,21 @@
                             data    : $.param($scope.formData),  // pass in data as strings
                             headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
                         })
-                                .success(function(data) {
+                        .success(function(data) {
 
-                                    if(data === "success"){
-                                        $("#addNewRegUser").modal("hide");
-                                        getData($scope,$http,$("#searchInput").val());
-                                    }else{
-                                        alert("未知异常，请稍后重试");
-                                    }
-                                });
+                            if(data === "success"){
+                                $("#addNewRegUser").modal("hide");
+                                initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
+                            }else{
+                                alert("未知异常，请稍后重试");
+                            }
+                        });
                     }
                     else{
                         alert("error");
                     }
-                }
-//
-            })
+                };
 
-    function getData($scope,$http,keywords){
-        //                初始化分页信息
-        $scope.currentPage = 1;
-        $scope.totalPage = 1;
-        $scope.totalItems = 1
-        $scope.limit = 10;
-        $scope.pages = [];
-        $scope.startNum = 1;
-        $scope.keywords = keywords;
-        getPageInfos($scope,$http,"/admin/manage/regUsersList/listByParam");
-    }
+            });
 
-//    获取用户组信息
-    function getAdminGroup($scope,$http){
-        $http.get("/admin/manage/adminGroupList/list").success(function(result){
-            var categoryName = $("#categoryName");
-            categoryName.html(getCateNameById(result,$scope.formData.group));
-            var arrTree = changeToTreeJson(result);
-            var setting = {
-                view: {
-                    dblClickExpand: false,
-                    selectedMulti: false
-                },
-                data: {
-                    simpleData: {
-                        enable: true
-                    }
-                },
-                callback: {
-                    beforeClick: beforeClick,
-                    onClick: onClick
-                }
-            };
-
-            $.fn.zTree.init($("#groupTree"), setting, arrTree);
-
-            function beforeClick(treeId, treeNode) {
-                var check = (treeNode && !treeNode.isParent);
-                if (!check) alert("不能选择顶级分类");
-                return check;
-            }
-
-            function onClick(e, treeId, treeNode) {
-                var zTree = $.fn.zTree.getZTreeObj("groupTree"),
-                        nodes = zTree.getSelectedNodes(),
-                        v = "",
-                        vid = "";
-
-                nodes.sort(function compare(a,b){return a.id-b.id;});
-                for (var i=0, l=nodes.length; i<l; i++) {
-                    v += nodes[i].name ;
-                    vid += nodes[i].id ;
-                }
-                if (v.length > 0 ) v = v.substring(0, v.length-1);
-
-                categoryName.html(v);
-                $scope.formData.group = vid;
-            }
-        })
-    }
 </script>

@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" ng-controller="contentList">
     <div class="col-xs-12">
         <div class="panel">
             <div class="btn-group">
@@ -10,7 +10,6 @@
                 <ul role="menu" class="dropdown-menu">
                     <li><a href="/admin/manage/content/add/content">普通文档</a></li>
                     <li><a href="/admin/manage/content/add/plug">Jquery插件</a></li>
-                    <!--<li><a href="/admin/manage/content/add/film">影片文档</a></li>-->
                 </ul>
             </div>
         </div>
@@ -38,7 +37,6 @@
                         <th>来源</th>
                         <th>类型</th>
                         <th>推荐</th>
-                        <th>sortPath</th>
                         <th>点击</th>
                         <th>权限</th>
                         <th>发布人</th>
@@ -52,7 +50,6 @@
                         <td>{{content.from}}</td>
                         <td>{{content.type}}</td>
                         <td ng-class="{true:'text-danger'}[content.isTop==1]"><i class="fa fa-fw fa-flag"></i></td>
-                        <td>{{content.sortPath}}</td>
                         <td>{{content.clickNum}}</td>
                         <td><span class="label label-success">{{content.state}}</span></td>
                         <td>{{content.author}}</td>
@@ -60,7 +57,6 @@
                             <a href="/admin/manage/content/edit/{{content.type}}/{{content._id}}" role="button"  title="编辑" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></a>
                             <a href="###" role="button"  title="推荐" ng-click="topContent(content._id,1)" class="btn btn-warning btn-xs" ng-show="content.isTop == 0"><i class="fa fa-thumbs-o-up"></i></a>
                             <a href="###" role="button"  title="取消推荐" ng-click="topContent(content._id,0)" class="btn btn-default btn-xs" ng-show="content.isTop == 1"><i class="fa fa-thumbs-o-down"></i></a>
-                            <!--<button class="btn btn-primary btn-xs" type="button" title="编辑"><i class="fa fa-edit"></i></button>-->
                             <button class="btn btn-default btn-xs" type="button" title="删除" data-whatever="{{content._id}}" data-toggle="modal" data-target="#checkIfDel"><i class="fa fa-trash-o"></i></button>
                         </td>
                     </tr>
@@ -68,20 +64,7 @@
             </div><!-- /.box-body -->
             <div class="box-footer">
                 <!--分页-->
-                <div class="row">
-                    <div class="col-xs-6">
-                        <div class="dataTables_info" id="example2_info">显示 {{startNum}} 到 {{startNum + limit -1}} 条，共 {{totalItems}} 条记录</div>
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="dataTables_paginate paging_bootstrap">
-                            <ul class="pagination">
-                                <li ng-class="{true:'disabled'}[currentPage==1]"><a href="javascript:void(0);" ng-click="prevPage()">← 上一页</a></li>
-                                <li ng-repeat="page in pages" ng-class="{true:'active'}[currentPage==page]"><a href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a></li>
-                                <li ng-class="{true:'disabled'}[currentPage==totalPage]"><a href="javascript:void(0);" ng-click="nextPage()">下一页 → </a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                <% include public/pagination %>
             </div>
         </div><!-- /.box -->
     </div>
@@ -109,12 +92,12 @@
 </div>
 
 <script>
-    angular.module("adminApp",[])
-            .controller("adminCtrl",function($scope,$http){
+
+            doraApp.controller("contentList",function($scope,$http){
                 $scope.formData = {};
 
-                //获取管理员列表信息
-                getData($scope,$http,$("#searchInput").val());
+                //获取文档列表信息
+                initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                 //删除用户
                 $('#checkIfDel').on('show.bs.modal', function (event) {
                     var obj = $(event.relatedTarget);
@@ -125,10 +108,10 @@
                 //确认执行删除
                 $scope.delContent = function () {
                     var currentID =  $scope.targetID;
-                    $http.get("/admin/manage/ContentList/del?uid="+currentID).success(function(result){
+                    $http.get("/admin/manage/<%=bigCategory%>/del?uid="+currentID).success(function(result){
                         $('#checkIfDel').modal("hide");
                         console.log("del success!");
-                        getData($scope,$http,$("#searchInput").val());
+                        initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                     })
                 };
 
@@ -136,29 +119,13 @@
                 $scope.topContent = function(id,m){
 
                     $http.get("/admin/manage/ContentList/topContent?uid="+id+"&isTop="+m).success(function(result){
-                        getData($scope,$http,$("#searchInput").val());
+                        initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                     })
 
                 };
 
-//                文章搜索
-//                $scope.subSearch = function(){
-//                    alert("--clickalert---"+$scope.keywords)
-//                    getPageInfos($scope,$http,"/admin/manage/contentList/listByParam")
-//                }
-
-//
             });
 
-    function getData($scope,$http,keywords){
-        $scope.currentPage = 1;
-        $scope.totalPage = 1;
-        $scope.totalItems = 1
-        $scope.limit = 10;
-        $scope.pages = [];
-        $scope.startNum = 1;
-        $scope.keywords = keywords;
-        getPageInfos($scope,$http,"/admin/manage/contentList/listByParam");
-    }
+
 
 </script>

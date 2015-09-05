@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" ng-controller="backUpData">
     <p class="myInfoBox bg-warning text-warning"><i class="icon fa fa-warning"></i> 下载备份数据请联系超级管理员</p>
     <div class="col-xs-12">
         <div class="panel">
@@ -37,23 +37,12 @@
                     </tr>
                     </tfoot>
                 </table>
-                <br/>
-                <!--分页-->
-                <div class="row">
-                    <div class="col-xs-6">
-                        <div class="dataTables_info" id="example2_info">显示 {{startNum}} 到 {{startNum + limit -1}} 条，共 {{totalItems}} 条记录</div>
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="dataTables_paginate paging_bootstrap">
-                            <ul class="pagination">
-                                <li ng-class="{true:'disabled'}[currentPage==1]"><a href="javascript:void(0);" ng-click="prevPage()">← 上一页</a></li>
-                                <li ng-repeat="page in pages" ng-class="{true:'active'}[currentPage==page]"><a href="javascript:void(0);" ng-click="loadPage(page)">{{ page }}</a></li>
-                                <li ng-class="{true:'disabled'}[currentPage==totalPage]"><a href="javascript:void(0);" ng-click="nextPage()">下一页 → </a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+
             </div><!-- /.box-body -->
+            <div class="box-footer">
+                <!--分页-->
+                <% include public/pagination %>
+            </div>
         </div><!-- /.box -->
 
     </div><!-- /.col -->
@@ -99,13 +88,12 @@
 
 
 <script>
-    /*targetID:全局对应指定记录的标记，在修改和删除时使用*/
-    angular.module("adminApp",[])
-            .controller("adminCtrl",function($scope,$http){
+
+            doraApp.controller("backUpData",function($scope,$http){
 //                初始化名称和权限
                 $scope.formData = {};
-                //获取标签列表
-                getData($scope,$http);
+                //获取备份数据列表
+                initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                 //删除标签
                 $('#checkIfDel').on('show.bs.modal', function (event) {
                     var obj = $(event.relatedTarget);
@@ -124,20 +112,20 @@
                         $('#checkIfBackUp').modal("hide");
                         if(result == "success"){
                             alert("备份成功")
-                            getData($scope,$http);
+                            initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                         }
                     })
-                }
+                };
 
                 //确认执行删除
                 $scope.deloptItem = function () {
                     var currentID =  $scope.targetID;
                     var forderPath =  $scope.filePath;
-                    $http.get("/admin/manage/backupDataManage/del?uid="+currentID+"&filePath="+forderPath).success(function(result){
+                    $http.get("/admin/manage/<%=bigCategory%>/del?uid="+currentID+"&filePath="+forderPath).success(function(result){
                         if(result == "success"){
                             $('#checkIfDel').modal("hide");
                             console.log("del success!");
-                            getData($scope,$http);
+                            initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                         }else{
                             alert("删除操作异常");
                         }
@@ -156,15 +144,6 @@
                     return newInput;
                 };
                 return powerFilter;
-            })
+            });
 
-    function getData($scope,$http){
-        $scope.currentPage = 1;
-        $scope.totalPage = 1;
-        $scope.totalItems = 1
-        $scope.limit = 10;
-        $scope.pages = [];
-        $scope.startNum = 1;
-        getPageInfos($scope,$http,"/admin/manage/backupDataManage/listByParam");
-    }
 </script>
