@@ -9,10 +9,10 @@ module.exports = {
     COOKIE_SECRET: 'doramart.com',
     URL: 'mongodb://127.0.0.1:27017/doracms',
     DB: 'doracms',
-    HOST: '120.25.150.169',
+    HOST: '',
     PORT: 27017,
-    USERNAME: 'dora',
-    PASSWORD: '061724116',
+    USERNAME: '',
+    PASSWORD: '',
 
 
 //    站点基础信息配置
