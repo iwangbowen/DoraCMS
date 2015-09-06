@@ -15,13 +15,13 @@
         </div>
         <div class="form-group">
 
-                <input type="password" class="form-control" id="userPassword" name="password" ng-minlength="6" placeholder="请输入密码" ng-maxlength="12" ng-pattern="/^[x00-x7f]+$/" ng-model="regFormData.password" required/>
-                <label for="inputError" class="control-label text-danger" ng-show="regForm.password.$invalid && !regForm.password.$pristine"><i class="fa fa-times-circle-o"></i>6-12个ascii字符</label>
+                <input type="password" class="form-control" id="userPassword" name="password" ng-minlength="6" placeholder="请输入密码" ng-maxlength="12" ng-pattern="/^[a-zA-Z]\w{6,12}$/" ng-model="regFormData.password" required/>
+                <label for="inputError" class="control-label text-danger" ng-show="regForm.password.$invalid && !regForm.password.$pristine"><i class="fa fa-times-circle-o"></i>6-12位，只能包含字母、数字和下划线</label>
 
         </div>
         <div class="form-group">
 
-                <input type="password" class="form-control" pw-check="userPassword" name="confirmPassword" placeholder="请再次输入密码" ng-model="regFormData.confirmPassword" ng-minlength="6" ng-maxlength="12" ng-pattern="/^[x00-x7f]+$/" required/>
+                <input type="password" class="form-control" pw-check="userPassword" name="confirmPassword" placeholder="请再次输入密码" ng-model="regFormData.confirmPassword" ng-minlength="6" ng-maxlength="12" ng-pattern="/^[a-zA-Z0-9]{6,11}$/" required/>
                 <label for="inputError" class="control-label text-danger" ng-show="regForm.confirmPassword.$invalid && !regForm.confirmPassword.$pristine"><i class="fa fa-times-circle-o"></i>两次输入的密码不匹配</label>
 
         </div>

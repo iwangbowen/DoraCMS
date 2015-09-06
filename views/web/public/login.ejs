@@ -8,8 +8,8 @@
 
         </div>
         <div class="form-group">
-            <input type="password" class="form-control" name="password" ng-model="logFormData.password" ng-minlength="6" ng-maxlength="12" placeholder="请输入密码" ng-pattern="/(?!^\\d+$)(?!^[a-zA-Z]+$)(?!^[_#@]+$).{6,}/" title="6-12个有效字符" required>
-            <label for="inputError" class="control-label text-danger" ng-show="loginForm.password.$invalid && !loginForm.password.$pristine"><i class="fa fa-times-circle-o"></i>6-12个ascii字符</label>
+            <input type="password" class="form-control" name="password" ng-model="logFormData.password" ng-minlength="6" ng-maxlength="12" placeholder="请输入密码" required>
+            <label for="inputError" class="control-label text-danger" ng-show="loginForm.password.$invalid && !loginForm.password.$pristine"><i class="fa fa-times-circle-o"></i>6-12位，只能包含字母、数字和下划线</label>
 
         </div>
         <div id="ul-s5">
