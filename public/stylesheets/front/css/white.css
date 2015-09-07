@@ -156,7 +156,7 @@ a:hover {
 }
 
 /*热门文档*/
-.hotNewsList, .searchBoard, .leftNav, .tagsList, .cateList {
+.hotNewsList, .searchBoard, .leftNav, .tagsList, .cateList, .friendLink {
     margin-bottom: 30px;
 }
 

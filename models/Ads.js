@@ -14,7 +14,7 @@ var ads = new Schema({
     },
     mkey : String, //广告位标识
     title:  String,
-    category:  String,
+    category:  String, // friendlink表示友情链接，默认default为广告
     state : {type : Boolean , default :true},
     type: { type: String, default: "0" }, // 展示形式 0文字 1图片
     date: { type: Date, default: Date.now },

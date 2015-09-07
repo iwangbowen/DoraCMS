@@ -3,7 +3,11 @@
         <div class="col-md-12">
             <div class="col-md-9 left-frame">
                 <article class="post">
-                    <h2 class="post-title"><%=documentInfo.title%></h2>
+                    <h2 class="post-title"><%=documentInfo.title%>
+                        <%if(documentInfo.from == '2'){%>
+                        &nbsp;<span class="badge">转</span>
+                        <%}%>
+                    </h2>
                     <ul class="post-meta">
                         <li><%=myDateFormat(documentInfo.date)%>&nbsp;/&nbsp;<%=documentInfo.clickNum%> 次浏览</li>
                         <li class="comment-count"><a title="<%=documentInfo.title%> 上的评论" href="#"><%=documentInfo.commentNum%> 条评论</a></li>

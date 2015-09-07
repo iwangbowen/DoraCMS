@@ -7,6 +7,8 @@ var Content = require("../Content");
 var ContentCategory = require("../ContentCategory");
 //文章标签对象
 var ContentTags = require("../ContentTags");
+//广告对象
+var Ads = require("../Ads");
 var Settings = require("./settings");
 //数据库操作对象
 var DbOpt = require("../Dbopt");
@@ -48,6 +50,10 @@ var siteFunc = {
         return Content.find(q,'stitle').sort({'clickNum': -1}).skip(0).limit(15);
     },
 
+    getFriendLink : function(){
+       return Ads.find({'category' : 'friendlink'});
+    },
+
     setDataForIndex: function (req, res, q, title) {
         var requireField = 'title date commentNum discription sImg';
         var documentList = DbOpt.getPaginationResult(Content, req, res, q , requireField);
@@ -56,6 +62,7 @@ var siteFunc = {
             siteConfig: siteFunc.siteInfos("首页"),
             documentList: documentList.docs,
             hotItemListData: siteFunc.getHotItemListData({}),
+            friendLinkData : siteFunc.getFriendLink(),
             cateTypes: siteFunc.getCategoryList(),
             cateInfo: '',
             tagsData: tagsData,
@@ -76,6 +83,7 @@ var siteFunc = {
             documentList: documentList.docs,
             currentCateList: currentCateList,
             hotItemListData: siteFunc.getHotItemListData(dq),
+            friendLinkData : siteFunc.getFriendLink(),
             tagsData: tagsData,
             cateInfo: cateInfo,
             cateTypes: siteFunc.getCategoryList(),
@@ -94,6 +102,7 @@ var siteFunc = {
             cateTypes: siteFunc.getCategoryList(),
             currentCateList: currentCateList,
             hotItemListData: siteFunc.getHotItemListData({}),
+            friendLinkData : siteFunc.getFriendLink(),
             tagsData: tagsData,
             documentInfo: docs,
             pageType: 'detail',
