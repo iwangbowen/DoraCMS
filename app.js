@@ -69,14 +69,12 @@ app.use(function(req, res, next){
 //    针对管理员
     res.locals.adminlogined = req.session.adminlogined;
     res.locals.adminUserInfo = req.session.adminUserInfo;
-
-
-
 //    指定站点域名
     res.locals.myDomain = req.headers.host;
 
     next();
 });
+
 
 //配置站点地图和robots抓取
 app.get('/sitemap.xml',function(req, res, next) {
@@ -89,18 +87,6 @@ app.get('/robots.txt',function(req, res, next) {
     stream.pipe(res);
 });
 
-//非www跳转到www
-app.get('/*', function (req, res, next) {
-    var haswww = req.headers.host.match(/^www\./)
-        , url = ['http://www.', req.headers.host, req.url].join('');
-
-    if((req.headers.host).indexOf('127')>=0){
-        next();
-    }else{
-        haswww ? next() : res.redirect(301, url);
-    }
-
-});
 
 //数据格式化
 app.locals.myDateFormat = function(date){
@@ -108,24 +94,6 @@ app.locals.myDateFormat = function(date){
     return moment(date).startOf('hour').fromNow();
 };
 
-app.locals.myDateFormat1 = function(date){
-    return moment(date).format('HH:mm MM-DD-YYYY');
-};
-
-//缩略图生成参数
-app.locals.thumbnailUrl = function(size){
-    return '?imageMogr2/thumbnail/'+size+'/strip/quality/100/format/png';
-};
-
-
-//字符截取
-app.locals.cutMoreWords = function(str,length){
-    var newStr = str;
-    if(str.length > length){
-        newStr = str.substring(0,length) + "..."
-    }
-    return newStr;
-};
 
 app.use(express.static(path.join(__dirname, 'public')));
 
