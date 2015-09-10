@@ -12,6 +12,10 @@ var Ads = require("../Ads");
 var Settings = require("./settings");
 //数据库操作对象
 var DbOpt = require("../Dbopt");
+//时间格式化
+var moment = require('moment');
+//缓存
+var cache = require('../../util/cache');
 function isLogined(req) {
     return req.session.logined;
 }
@@ -138,13 +142,69 @@ var siteFunc = {
         }
     },
 
-    setDataForUser : function (req, res, title) {
+    setDataForUser: function (req, res, title) {
         return {
-            siteConfig : siteFunc.siteInfos(title) ,
-            cateTypes : siteFunc.getCategoryList(),
-            userInfo : req.session.userInfo,
+            siteConfig: siteFunc.siteInfos(title),
+            cateTypes: siteFunc.getCategoryList(),
+            userInfo: req.session.user,
             layout: 'web/public/defaultTemp'
         }
+    },
+
+    setDataForSiteMap: function (req, res) {
+
+        var root_path = 'http://www.html-js.cn/';
+        var priority = 0.8;
+        var freq = 'weekly';
+        var lastMod = moment().format('YYYY-MM-DD');
+        var xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        xml += '<url>';
+        xml += '<loc>' + root_path + '</loc>';
+        xml += '<changefreq>daily</changefreq>';
+        xml += '<lastmod>' + lastMod + '</lastmod>';
+        xml += '<priority>' + 0.8 + '</priority>';
+        xml += '</url>';
+        cache.get('sitemap', function(siteMapData){
+            if(siteMapData){ // 缓存已建立
+                res.end(siteMapData);
+            }else{
+                ContentCategory.find({}, 'defaultUrl', function (err, cates) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        cates.forEach(function (cate) {
+                            xml += '<url>';
+                            xml += '<loc>' + root_path + cate.defaultUrl + '___' + cate._id + '</loc>';
+                            xml += '<changefreq>weekly</changefreq>';
+                            xml += '<lastmod>' + lastMod + '</lastmod>';
+                            xml += '<priority>0.5</priority>';
+                            xml += '</url>';
+                        });
+
+                        Content.find({}, 'title', function (err, contentLists) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                contentLists.forEach(function (post) {
+                                    xml += '<url>';
+                                    xml += '<loc>' + root_path + 'details/' + post._id + '.html</loc>';
+                                    xml += '<changefreq>Monthly</changefreq>';
+                                    xml += '<lastmod>' + lastMod + '</lastmod>';
+                                    xml += '<priority>0.5</priority>';
+                                    xml += '</url>';
+                                });
+                                xml += '</urlset>';
+                                // 缓存一天
+                                cache.set('sitemap', xml, 1000 * 3600 * 2);
+                                res.end(xml);
+                            }
+                        })
+                    }
+
+                })
+            }
+        })
+
     }
 };
 

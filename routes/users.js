@@ -22,8 +22,9 @@ var moment = require('moment');
 //站点配置
 var Settings = require("../models/db/settings");
 var siteFunc = require("../models/db/siteFunc");
+
 //数据校验
-var validator = require('validator');
+var filter = require('../util/filter');
 
 //自定义校验扩展
 validator.extend('isUserName', function (str) {
@@ -52,6 +53,7 @@ router.get('/login', function(req, res, next) {
     if(isLogined(req)){
         res.render('web/index', siteFunc.setDataForIndex(req, res, {'type': 'content'}, '首页'))
     }else{
+        req.session._loginReferer = req.headers.referer;
         res.render('web/users/userLogin', siteFunc.setDataForUser(req, res, '用户登录'))
     }
 
@@ -65,9 +67,8 @@ router.post('/doLogin', function(req, res, next) {
     var newPsd = DbOpt.encrypt(password,"dora");
     User.findOne({email:email,password:newPsd},function(err,user){
         if(user){
-
-            req.session.logined = true;
-            req.session.userInfo = user;
+//            将cookie存入缓存
+            filter.gen_session(user, res);
             console.log('------------登录成功------');
             res.end("success");
         }
@@ -168,8 +169,8 @@ router.get('/setUserPsd', function(req, res, next) {
 
 // 用户退出
 router.get('/logout', function(req, res, next) {
-    req.session.logined = false;
-    req.session.userInfo = "";
+    req.session.destroy();
+    res.clearCookie(Settings.auth_cookie_name, { path: '/' });
     res.end("success");
 });
 

@@ -1,6 +1,8 @@
 ﻿
 /*引用模块*/
 var express = require('express');
+var session = require('express-session');
+var RedisStore = require('connect-redis')(session);
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -23,8 +25,8 @@ var siteFunc = require("./models/db/siteFunc");
 var fs = require('fs');
 //时间格式化
 var moment = require('moment');
-//引入session插件
-var fk = require('stuwebfk');
+var filter = require('./util/filter');
+
 /*模板引擎*/
 var partials = require('express-partials');
 
@@ -56,16 +58,28 @@ app.use(partials());
 app.use(logger('dev'));
 app.use(bodyParser.json({limit: '50mb'})); // 限制上传5M
 app.use(bodyParser.urlencoded({ extended: false , limit: '50mb' }));
-app.use(cookieParser());
+app.use(cookieParser(Settings.session_secret));
 //解决异步层次混乱问题
 app.use(require('express-promise')());
 
-//session设置
-app.use(fk.session);
+
+app.use(session({
+    secret: Settings.session_secret,
+    store: new RedisStore({
+        port: Settings.redis_port,
+        host: Settings.redis_host,
+        ttl: 1800 // 过期时间
+    }),
+    resave: true,
+    saveUninitialized: true
+}));
+
+app.use(filter.authUser);
+
 app.use(function(req, res, next){
 //    针对注册会员
     res.locals.logined = req.session.logined;
-    res.locals.userInfo = req.session.userInfo;
+    res.locals.userInfo = req.session.user;
 //    针对管理员
     res.locals.adminlogined = req.session.adminlogined;
     res.locals.adminUserInfo = req.session.adminUserInfo;
@@ -78,8 +92,9 @@ app.use(function(req, res, next){
 
 //配置站点地图和robots抓取
 app.get('/sitemap.xml',function(req, res, next) {
-    var stream=fs.createReadStream('./sitemap.xml',{flags:'r'});
-    stream.pipe(res);
+
+    siteFunc.setDataForSiteMap(req, res);
+
 });
 
 app.get('/robots.txt',function(req, res, next) {

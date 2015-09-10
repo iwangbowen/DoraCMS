@@ -5,6 +5,11 @@
  */
 
 module.exports = {
+
+    // debug 为 true 时，用于本地调试
+    debug: false,
+    session_secret: 'doracms_secret', // 务必修改
+    auth_cookie_name: 'doracms',
 //    数据库配置
     COOKIE_SECRET: 'doramart.com',
     URL: 'mongodb://127.0.0.1:27017/doracms',
@@ -48,7 +53,12 @@ module.exports = {
     MESSAGEMANAGE : new Array('contentManage_1_5','留言管理'), // 留言管理
 
     USERMANAGE : new Array('userManage_2','会员管理'), // 后台模块(会员管理)
-    REGUSERSLIST: new Array('userManage_2_1','注册用户管理')
+    REGUSERSLIST: new Array('userManage_2_1','注册用户管理'),
+
+//    本地缓存设置
+    redis_host: '127.0.0.1',
+    redis_port: 6379,
+    redis_db: 0
 
 };
 

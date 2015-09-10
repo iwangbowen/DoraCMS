@@ -1,4 +1,0 @@
-stuwebfk
-========
-
-student web framework
