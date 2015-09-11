@@ -14,63 +14,57 @@ var DataOptionLog = require("../models/DataOptionLog");
 //时间格式化
 var moment = require('moment');
 //站点配置
-var Settings = require("../models/db/settings");
+var settings = require("../models/db/settings");
+var siteFunc = require("../models/db/siteFunc");
 //文件压缩
 var fs = require('fs');
 var child = require('child_process');
 var archiver = require('archiver');
-var System = {
+var system = {
 
-    sendEmail : function(key,user){
+    sendEmail : function(key,user,callBack){
 
         var emailTitle = "Hello";
         var emailSubject = "Hello";
         var emailContent = "Hello";
-        var emailLink = "";
-        EmailTemp.findOne({type:key},function(err,temp){
-            if(temp){
-//                设置邮件模板相关参数
-                emailTitle = temp.title;
-                emailSubject = temp.subject;
-                emailContent = temp.comments;
-//                根据用户名和邮箱生成加密链接
-                var oldlink = user.userName + user.email;
-                var newLink = DbOpt.encrypt(oldlink,"dora");
-                emailLink = user._id+"/"+newLink;
 
-                var ec1 = emailContent.replace("euserName",user.userName);
-                var ec2 = ec1.replace("elink",emailLink);
+        var oldLink = user.password +'$'+ user.email +'$'+ settings.session_secret;
+        console.log('-------before send pds------'+user.password)
+        var newLink = DbOpt.encrypt(oldLink,settings.encrypt_key);
+        var tokenLink = newLink;
+
+        if(key == settings.email_findPsd){
+            emailSubject = emailTitle = '通过激活链接找回密码';
+            emailContent = siteFunc.setConfirmPassWordEmailTemp(user.userName,tokenLink);
+        }
 
 //                发送邮件
-                var transporter = nodemailer.createTransport({
-                    service: '163',
-                    auth: {
-                        user: 'doramart@163.com',
-                        pass: 'yoooyu520'
-                    }
-                });
+        var transporter = nodemailer.createTransport({
 
-                var mailOptions = {
-                    from: 'doramart@163.com', // sender address
-                    to: user.email, // list of receivers
-                    subject: emailSubject, // Subject line
-                    text: emailTitle, // plaintext body
-                    html: ec2 // html body
-                };
+            service: '163',
+            auth: {
+                user: settings.site_email,
+                pass: settings.site_email_psd
+            }
 
-                transporter.sendMail(mailOptions, function(error, info){
-                    if(error){
-                        console.log(error);
-                    }else{
-                        console.log('Message sent: ' + info.response);
-                    }
-                });
+        });
+
+        var mailOptions = {
+            from: settings.site_email, // sender address
+            to: user.email, // list of receivers
+            subject: emailSubject, // Subject line
+            text: emailTitle, // plaintext body
+            html: emailContent // html body
+        };
+
+        transporter.sendMail(mailOptions, function(error, info){
+            if(error){
+                console.log('邮件发送失败：'+error);
+            }else{
+                console.log('Message sent: ' + info.response);
+                callBack();
             }
-            else
-            {
-                console.log("邮件模板查询失败，无法正常发送");
-            }
-        })
+        });
 
 
     },
@@ -245,13 +239,13 @@ var System = {
         var date = new Date();
 //        var ms = Date.parse(date);
         var ms = moment(date).format('YYYYMMDDHHmmss').toString();
-        var dataPath = Settings.DATABACKFORDER + ms;
+        var dataPath = settings.DATABACKFORDER + ms;
 //        var cmdstr = 'mongodump -o "'+dataPath+'"';
-        var cmdstr = 'mongodump -u '+Settings.USERNAME+' -p '+Settings.PASSWORD+' -d '+Settings.DB+' -o "'+dataPath+'"';
+        var cmdstr = 'mongodump -u '+settings.USERNAME+' -p '+settings.PASSWORD+' -d '+settings.DB+' -o "'+dataPath+'"';
 
-        var batPath = Settings.DATAOPERATION + '/backupData.bat';
-        if(!fs.existsSync(Settings.DATABACKFORDER)){
-            fs.mkdirSync(Settings.DATABACKFORDER);
+        var batPath = settings.DATAOPERATION + '/backupData.bat';
+        if(!fs.existsSync(settings.DATABACKFORDER)){
+            fs.mkdirSync(settings.DATABACKFORDER);
         }
         if (fs.existsSync(dataPath)) {
 
@@ -277,7 +271,7 @@ var System = {
                                     }else{
                                         console.log('备份成功');
 //                                    生成压缩文件
-                                     var output = fs.createWriteStream(Settings.DATABACKFORDER + ms +'.zip');
+                                     var output = fs.createWriteStream(settings.DATABACKFORDER + ms +'.zip');
                                      var archive = archiver('zip');
 
                                      archive.on('error', function(err){
@@ -314,8 +308,8 @@ var System = {
 
     }
 
-}
+};
 
 
 
-module.exports = System;
+module.exports = system;

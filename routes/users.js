@@ -16,11 +16,11 @@ var DbOpt = require("../models/Dbopt");
 //加密类
 var crypto = require("crypto");
 //系统相关操作
-var System = require("../models/System");
+var system = require("../util/system");
 //时间格式化
 var moment = require('moment');
 //站点配置
-var Settings = require("../models/db/settings");
+var settings = require("../models/db/settings");
 var siteFunc = require("../models/db/siteFunc");
 
 //数据校验
@@ -54,7 +54,7 @@ router.get('/login', function(req, res, next) {
         res.render('web/index', siteFunc.setDataForIndex(req, res, {'type': 'content'}, '首页'))
     }else{
         req.session._loginReferer = req.headers.referer;
-        res.render('web/users/userLogin', siteFunc.setDataForUser(req, res, '用户登录'))
+        res.render('web/users/userLogin', siteFunc.setDataForUser(req, res, '用户登录'));
     }
 
 });
@@ -64,7 +64,7 @@ router.post('/doLogin', function(req, res, next) {
     var email = req.body.email;
     var password = req.body.password;
 
-    var newPsd = DbOpt.encrypt(password,"dora");
+    var newPsd = DbOpt.encrypt(password,settings.encrypt_key);
     User.findOne({email:email,password:newPsd},function(err,user){
         if(user){
 //            将cookie存入缓存
@@ -118,7 +118,7 @@ router.post('/doReg', function(req, res, next) {
             }
             else{
                 //        数据加密
-                var newPsd = DbOpt.encrypt(password,"dora");
+                var newPsd = DbOpt.encrypt(password,settings.encrypt_key);
                 req.body.password = newPsd;
                 DbOpt.addOne(User,req, res,"add a new user")
             }
@@ -127,22 +127,102 @@ router.post('/doReg', function(req, res, next) {
 
 });
 
+//忘记密码页面
+router.get('/lostPassword', function(req, res, next) {
+
+    res.render('web/users/userConfirmEmail', siteFunc.setDataForUser(req, res, '确认邮箱'))
+
+});
 
 
-// 用户主页
-//router.get('/info', function(req, res, next) {
-//    if(isLogined(req)){
-//        res.render('web/users/user', {
-//            siteConfig : siteFunc.siteInfos("用户主页") ,
-//            cateTypes : ContentCategory.find({'parentID' : '0'}).sort({'sortId': 1}),
-//            userInfo : req.session.userInfo,
-//            layout: 'web/temp/user' });
-//    }
-//    else{
-//        res.render('web/do404', { siteConfig : siteFunc.siteInfos("操作失败") , layout: 'web/temp/errorTemp' });
-//    }
-//
-//});
+//提交验证邮箱
+router.post('/sentConfirmEmail',function(req, res, next){
+
+    var targetEmail = req.body.email;
+//    获取当前发送邮件的时间
+    var retrieveTime = new Date().getTime();
+    User.findOne({'email' : targetEmail},function(err,user){
+        if(err){
+            res.end(err)
+        }else{
+            if(user && user._id){
+
+                user.retrieve_time = retrieveTime;
+                user.save(function(err){
+                    if(err){
+                        return next(err);
+                    }else{
+                        system.sendEmail(settings.email_findPsd,user,function(){
+                            console.log('-------邮件发送成功-------');
+                            res.end("success");
+                        });
+                    }
+                })
+
+            }else{
+                res.end('错误：未能通过电子邮件地址找到用户。');
+            }
+        }
+    })
+
+});
+
+//点击找回密码链接跳转页面
+router.get('/reset_pass',function(req,res){
+    var params = url.parse(req.url,true);
+    var tokenId = params.query.key;
+    var newLink = DbOpt.decrypt(tokenId,settings.encrypt_key);
+    var keyArr = newLink.split('$');
+    User.findOne({'email' : keyArr[1]},function(err,user){
+
+        if(err){
+            res.end(err);
+        }else{
+            if(user && user._id){
+                if(user.password == keyArr[0] && keyArr[2] == settings.session_secret){
+//                    校验链接是否过期
+                    var now = new Date().getTime();
+                    var oneDay = 1000 * 60 * 60 * 24;
+                    if (!user.retrieve_time || now - user.retrieve_time > oneDay) {
+//                        res.status(403);
+                        res.render('web/users/userNotice', siteFunc.setDataForInfo('warning','链接超时，密码无法重置。'));
+                    }
+                    res.render('web/users/userResetPsd', siteFunc.setDataForUser(req, res, '重设密码',tokenId))
+                }else{
+                    res.render('web/users/userNotice', siteFunc.setDataForInfo('warning','信息有误，密码无法重置。'));
+                }
+            }
+        }
+
+    })
+
+});
+
+router.post('/updateNewPsd',function(req,res){
+
+    var keyArr = DbOpt.getKeyArrByTokenId(req.body.tokenId);
+    User.findOne({'email' : keyArr[1]},function(err,user){
+        if(err){
+            res.end(err);
+        }else{
+            if(user.password == keyArr[0] && keyArr[2] == settings.session_secret){
+
+                user.password = DbOpt.encrypt(req.body.password,settings.encrypt_key);
+                user.save(function(err){
+                    if(err){
+                        res.end(err)
+                    }else{
+                        user.retrieve_time = null;
+                        res.end('success');
+                    }
+                })
+            }
+        }
+    })
+
+});
+
+
 
 //用户中心
 router.get('/userCenter', function(req, res, next) {
@@ -170,7 +250,7 @@ router.get('/setUserPsd', function(req, res, next) {
 // 用户退出
 router.get('/logout', function(req, res, next) {
     req.session.destroy();
-    res.clearCookie(Settings.auth_cookie_name, { path: '/' });
+    res.clearCookie(settings.auth_cookie_name, { path: '/' });
     res.end("success");
 });
 
@@ -186,7 +266,7 @@ router.get('/userInfo', function(req, res, next) {
         }else{
 //                针对有密码的记录，需要解密后再返回
             if(result && result.password){
-                var decipher = crypto.createDecipher("bf","dora");
+                var decipher = crypto.createDecipher("bf",settings.encrypt_key);
                 var oldPsd = "";
                 oldPsd += decipher.update(result.password,"hex","utf8");
                 oldPsd += decipher.final("utf8");
@@ -202,7 +282,7 @@ router.get('/userInfo', function(req, res, next) {
 //修改用户信息
 router.post('/userInfo/modify', function(req, res, next) {
     var password = req.body.password;
-    var newPsd = DbOpt.encrypt(password,"dora");
+    var newPsd = DbOpt.encrypt(password,settings.encrypt_key);
     req.body.password = newPsd;
     DbOpt.updateOneByID(User,req, res,"modify regUser");
 });
@@ -215,8 +295,8 @@ router.post('/resetMyPsd', function(req, res, next) {
     var oldPassword = req.body.oldPassword;
     var userPsd = req.body.password;
 //    密码加密
-    var oldPsd = DbOpt.encrypt(oldPassword,"dora");
-    var newPsd = DbOpt.encrypt(userPsd,"dora");
+    var oldPsd = DbOpt.encrypt(oldPassword,settings.encrypt_key);
+    var newPsd = DbOpt.encrypt(userPsd,settings.encrypt_key);
     User.findOne({_id:userId},function(err,user){
         if(user){
 //            验证是否是本人操作，提高安全性
@@ -224,7 +304,7 @@ router.post('/resetMyPsd', function(req, res, next) {
 //                更新密码
                 User.update({_id:userId}, {password : newPsd}, function (err,result) {
                     if(err){
-
+                        res.end(err);
                     }else{
                         res.end("success");
                     }

@@ -8,7 +8,7 @@ var router = express.Router();
 var formidable = require('formidable'),
     util = require('util'),fs=require('fs');
 //系统相关操作
-var System = require("../models/System");
+var system = require("../util/system");
 var gm = require('gm');
 var url = require('url');
 /* GET users listing. */
@@ -114,7 +114,7 @@ router.post('/upload', function(req, res, next) {
 //邮件发送
 router.post('/sendEmail', function(req, res, next) {
     console.log("---------begin to sent email-------------");
-    System.sendEmail();
+    system.sendEmail();
 });
 
 module.exports = router;

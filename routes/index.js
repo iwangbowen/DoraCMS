@@ -12,7 +12,7 @@ var shortid = require('shortid');
 //时间格式化
 var moment = require('moment');
 //站点配置
-var Settings = require("../models/db/settings");
+var settings = require("../models/db/settings");
 var siteFunc = require("../models/db/siteFunc");
 var url = require('url');
 

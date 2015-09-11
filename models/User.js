@@ -27,7 +27,8 @@ var User = mongoose.model('User', {
     province : String, // 所在省份
     city : String, // 所在城市
     year : Number, // 出生年
-    openid : String   // 针对qq互联
+    openid : String,   // 针对qq互联
+    retrieve_time : {type: Number} // 用户发送激活请求的时间
 
 });
 

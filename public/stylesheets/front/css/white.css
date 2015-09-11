@@ -156,7 +156,7 @@ a:hover {
 }
 
 /*热门文档*/
-.hotNewsList, .searchBoard, .leftNav, .tagsList, .cateList, .friendLink {
+.hotNewsList, .searchBoard, .leftNav, .tagsList, .cateList, .friendLink ,.reSetPsdBoard {
     margin-bottom: 30px;
 }
 
@@ -260,7 +260,7 @@ a:hover {
 
 
 /*用户登录*/
-.loginBoard h3, .regBoard h3 {
+.loginBoard h3, .regBoard h3 , .conformBoard h3, .reSetPsdBoard h3,.noticeBoard h3 {
     color: #6e7173;
     font-size: 16px;
 }

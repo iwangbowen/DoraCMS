@@ -9,7 +9,7 @@ var ContentCategory = require("../ContentCategory");
 var ContentTags = require("../ContentTags");
 //广告对象
 var Ads = require("../Ads");
-var Settings = require("./settings");
+var settings = require("./settings");
 //数据库操作对象
 var DbOpt = require("../Dbopt");
 //时间格式化
@@ -29,44 +29,56 @@ var siteFunc = {
         if (cmsDescription) {
             discrip = cmsDescription;
         } else {
-            discrip = Settings.CMSDISCRIPTION;
+            discrip = settings.CMSDISCRIPTION;
         }
 
         if (keyWords) {
-            key = keyWords + ',' + Settings.SITEBASICKEYWORDS;
+            key = keyWords + ',' + settings.SITEBASICKEYWORDS;
         } else {
-            key = Settings.SITEKEYWORDS;
+            key = settings.SITEKEYWORDS;
         }
 
         return {
-            title: title + " | " + Settings.SITETITLE,
+            title: title + " | " + settings.SITETITLE,
             cmsDescription: discrip,
             keywords: key,
-            siteIcp: Settings.SITEICP
+            siteIcp: settings.SITEICP
         }
     },
 
-    getCategoryList : function(){
-        return ContentCategory.find({'parentID': '0','state' : '1'},'name defaultUrl').sort({'sortId': 1}).find();
+    setConfirmPassWordEmailTemp : function(name,token){
+
+        var html = '<p>您好：' + name + '</p>' +
+            '<p>我们收到您在' + settings.SITETITLE + '的注册信息，请点击下面的链接来激活帐户：</p>' +
+            '<a href="' + settings.SITEDOMAIN + '/users/reset_pass?key=' + token + '">重置密码链接</a>' +
+            '<p>若您没有在<strong>' + settings.SITETITLE + '</strong>填写过注册信息，说明有人滥用了您的电子邮箱，请忽略或删除此邮件，我们对给您造成的打扰感到抱歉。</p>' +
+            '<p><strong>' + settings.SITETITLE + ' </strong>谨上。</p>';
+
+        return html;
+
     },
 
-    getHotItemListData : function(q){
-        return Content.find(q,'stitle').sort({'clickNum': -1}).skip(0).limit(15);
+    getCategoryList: function () {
+        return ContentCategory.find({'parentID': '0', 'state': '1'}, 'name defaultUrl').sort({'sortId': 1}).find();
     },
 
-    getFriendLink : function(){
-       return Ads.find({'category' : 'friendlink'});
+    getHotItemListData: function (q) {
+        return Content.find(q, 'stitle').sort({'clickNum': -1}).skip(0).limit(15);
+    },
+
+    getFriendLink: function () {
+        return Ads.find({'category': 'friendlink'});
     },
 
     setDataForIndex: function (req, res, q, title) {
         var requireField = 'title date commentNum discription sImg';
-        var documentList = DbOpt.getPaginationResult(Content, req, res, q , requireField);
+        var documentList = DbOpt.getPaginationResult(Content, req, res, q, requireField);
         var tagsData = DbOpt.getDatasByParam(ContentTags, req, res, {});
         return {
             siteConfig: siteFunc.siteInfos("首页"),
             documentList: documentList.docs,
             hotItemListData: siteFunc.getHotItemListData({}),
-            friendLinkData : siteFunc.getFriendLink(),
+            friendLinkData: siteFunc.getFriendLink(),
             cateTypes: siteFunc.getCategoryList(),
             cateInfo: '',
             tagsData: tagsData,
@@ -79,7 +91,7 @@ var siteFunc = {
 
     setDataForCate: function (req, res, dq, cq, cateInfo) {
         var requireField = 'title date commentNum discription sImg';
-        var documentList = DbOpt.getPaginationResult(Content, req, res, dq , requireField);
+        var documentList = DbOpt.getPaginationResult(Content, req, res, dq, requireField);
         var currentCateList = ContentCategory.find(cq).sort({'sortId': 1});
         var tagsData = DbOpt.getDatasByParam(ContentTags, req, res, {});
         return {
@@ -87,7 +99,7 @@ var siteFunc = {
             documentList: documentList.docs,
             currentCateList: currentCateList,
             hotItemListData: siteFunc.getHotItemListData(dq),
-            friendLinkData : siteFunc.getFriendLink(),
+            friendLinkData: siteFunc.getFriendLink(),
             tagsData: tagsData,
             cateInfo: cateInfo,
             cateTypes: siteFunc.getCategoryList(),
@@ -106,7 +118,7 @@ var siteFunc = {
             cateTypes: siteFunc.getCategoryList(),
             currentCateList: currentCateList,
             hotItemListData: siteFunc.getHotItemListData({}),
-            friendLinkData : siteFunc.getFriendLink(),
+            friendLinkData: siteFunc.getFriendLink(),
             tagsData: tagsData,
             documentInfo: docs,
             pageType: 'detail',
@@ -118,7 +130,7 @@ var siteFunc = {
     setDataForSearch: function (req, res, q, searchKey) {
         req.query.searchKey = searchKey;
         var requireField = 'title date commentNum discription sImg';
-        var documentList = DbOpt.getPaginationResult(Content, req, res, q , requireField);
+        var documentList = DbOpt.getPaginationResult(Content, req, res, q, requireField);
         return {
             siteConfig: siteFunc.siteInfos("文档搜索"),
             documentList: documentList.docs,
@@ -142,13 +154,26 @@ var siteFunc = {
         }
     },
 
-    setDataForUser: function (req, res, title) {
+    setDataForUser: function (req, res, title ,tokenId) {
         return {
             siteConfig: siteFunc.siteInfos(title),
             cateTypes: siteFunc.getCategoryList(),
             userInfo: req.session.user,
+            tokenId : tokenId,
             layout: 'web/public/defaultTemp'
         }
+    },
+
+    setDataForInfo : function(infoType,infoContent){
+
+        return {
+            siteConfig: siteFunc.siteInfos('操作提示'),
+            cateTypes: siteFunc.getCategoryList(),
+            infoType : infoType,
+            infoContent : infoContent,
+            layout: 'web/public/defaultTemp'
+        }
+
     },
 
     setDataForSiteMap: function (req, res) {
@@ -206,7 +231,6 @@ var siteFunc = {
         })
 
     }
+
 };
-
-
 module.exports = siteFunc;

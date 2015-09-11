@@ -27,9 +27,9 @@ var Ads = require("../models/Ads");
 //数据校验
 var validator = require('validator');
 //系统操作
-var System = require("../models/System");
+var system = require("../util/system");
 //站点配置
-var Settings = require("../models/db/settings");
+var settings = require("../models/db/settings");
 var adminFunc = require("../models/db/adminFunc");
 //加密类
 var crypto = require("crypto");
@@ -67,7 +67,7 @@ function checkAdminPower(req,key,callBack) {
 
 //管理员登录页面
 router.get('/', function(req, res, next) {
-  res.render('manage/adminLogin', { title: Settings.SITETITLE , description : 'DoraCMS后台管理登录'});
+  res.render('manage/adminLogin', { title: settings.SITETITLE , description : 'DoraCMS后台管理登录'});
 });
 
 // 管理员登录提交请求
@@ -75,7 +75,7 @@ router.post('/doLogin', function(req, res, next) {
     var username = req.body.username;
     var password = req.body.password;
 
-    var newPsd = DbOpt.encrypt(password,"dora");
+    var newPsd = DbOpt.encrypt(password,settings.encrypt_key);
     AdminUser.findOne({username:username,password:newPsd},function(err,user){
         if(user){
             req.session.adminlogined = true;
@@ -98,7 +98,7 @@ router.get('/logout', function(req, res, next) {
 
 //后台用户起始页
 router.get('/manage', function(req, res, next) {
-  res.render('manage/main', adminFunc.setPageInfo(req,res,Settings.SYSTEMMANAGE));
+  res.render('manage/main', adminFunc.setPageInfo(req,res,settings.SYSTEMMANAGE));
 });
 
 
@@ -159,7 +159,7 @@ router.post('/manage/:defaultUrl/modify',function(req,res,next){
     var targetObj = adminFunc.getTargetObj(currentPage);
     if(targetObj == AdminUser || targetObj == User){
         var password = req.body.password;
-        var newPsd = DbOpt.encrypt(password,"dora");
+        var newPsd = DbOpt.encrypt(password,settings.encrypt_key);
         req.body.password = newPsd;
     }
     DbOpt.updateOneByID(targetObj,req, res,"find one obj success")
@@ -222,10 +222,10 @@ function removeMessage(req,res){
 //系统用户管理（list）
 router.get('/manage/adminUsersList', function(req, res, next) {
 
-    checkAdminPower(req,Settings.ADMINUSERLIST,function(state){
+    checkAdminPower(req,settings.ADMINUSERLIST,function(state){
 
         if(state){
-            res.render('manage/adminUsersList', adminFunc.setPageInfo(req,res,Settings.ADMINUSERLIST));
+            res.render('manage/adminUsersList', adminFunc.setPageInfo(req,res,settings.ADMINUSERLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -249,7 +249,7 @@ function addOneAdminUser(req,res){
                 res.end(errors)
             }else{
                 //    密码加密
-                req.body.password = DbOpt.encrypt(req.body.password,"dora");
+                req.body.password = DbOpt.encrypt(req.body.password,settings.encrypt_key);
                 DbOpt.addOne(AdminUser,req, res,"add new adminUser");
             }
         }
@@ -266,10 +266,10 @@ function addOneAdminUser(req,res){
 //系统用户组管理（list）
 router.get('/manage/adminGroupList', function(req, res, next) {
 
-    checkAdminPower(req,Settings.ADMINGROUPLIST,function(state){
+    checkAdminPower(req,settings.ADMINGROUPLIST,function(state){
 
         if(state){
-            res.render('manage/adminGroup', adminFunc.setPageInfo(req,res,Settings.ADMINGROUPLIST));
+            res.render('manage/adminGroup', adminFunc.setPageInfo(req,res,settings.ADMINGROUPLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -296,9 +296,9 @@ router.get('/manage/adminGroupList/list', function(req, res, next) {
 //文件管理界面（list）
 router.get('/manage/filesList', function(req, res, next) {
 
-    checkAdminPower(req,Settings.FILESLIST,function(state){
+    checkAdminPower(req,settings.FILESLIST,function(state){
         if(state){
-            res.render('manage/filesList', adminFunc.setPageInfo(req,res,Settings.FILESLIST));
+            res.render('manage/filesList', adminFunc.setPageInfo(req,res,settings.FILESLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -311,14 +311,14 @@ router.get('/manage/filesList/list', function(req, res, next) {
     var params = url.parse(req.url,true);
     var path = params.query.filePath;
     if(!path){
-        path =  Settings.UPDATEFOLDER;
+        path =  settings.UPDATEFOLDER;
     }
 
-    var filePath = System.scanFolder(path);
+    var filePath = system.scanFolder(path);
 //    对返回结果做初步排序
     filePath.sort(function(a,b){return a.type == "folder" ||  b.type == "folder"});
     return res.json({
-        rootPath : Settings.UPDATEFOLDER,
+        rootPath : settings.UPDATEFOLDER,
         pathsInfo : filePath
     });
 
@@ -330,7 +330,7 @@ router.get('/manage/filesList/fileDel', function(req, res, next) {
     var params = url.parse(req.url,true);
     var path = params.query.filePath;
     if(path){
-        System.deleteFolder(req, res, path);
+        system.deleteFolder(req, res, path);
     }
 });
 
@@ -339,7 +339,7 @@ router.post('/manage/filesList/fileReName', function(req, res, next) {
     var newPath = req.body.newPath;
     var path = req.body.path;
     if(path && newPath){
-        System.reNameFile(req,res,path,newPath);
+        system.reNameFile(req,res,path,newPath);
     }
 });
 
@@ -349,7 +349,7 @@ router.get('/manage/filesList/getFileInfo', function(req, res, next) {
     var params = url.parse(req.url,true);
     var path = params.query.filePath;
     if(path){
-        System.readFile(req,res,path);
+        system.readFile(req,res,path);
     }
 });
 
@@ -359,7 +359,7 @@ router.post('/manage/filesList/updateFileInfo', function(req, res, next) {
     var fileContent = req.body.code;
     var path = req.body.path;
     if(path){
-        System.writeFile(req,res,path,fileContent);
+        system.writeFile(req,res,path,fileContent);
     }
 });
 
@@ -370,9 +370,9 @@ router.post('/manage/filesList/updateFileInfo', function(req, res, next) {
 
 router.get('/manage/dataManage/m/backUpData', function(req, res, next) {
 
-    checkAdminPower(req,Settings.DATAMANAGE,function(state){
+    checkAdminPower(req,settings.DATAMANAGE,function(state){
         if(state){
-            res.render('manage/backUpData', adminFunc.setPageInfo(req,res,Settings.DATAMANAGE));
+            res.render('manage/backUpData', adminFunc.setPageInfo(req,res,settings.DATAMANAGE));
         }else{
             res.redirect("/admin/manage");
         }
@@ -382,7 +382,7 @@ router.get('/manage/dataManage/m/backUpData', function(req, res, next) {
 
 //备份数据库执行
 router.get('/manage/backupDataManage/backUp', function(req, res, next) {
-    System.backUpData(res,req);
+    system.backUpData(res,req);
 });
 
 
@@ -396,7 +396,7 @@ router.get('/manage/backupDataManage/del', function(req, res, next) {
             res.end(err);
         }else{
             if(forderPath){
-                System.deleteFolder(req, res,forderPath);
+                system.deleteFolder(req, res,forderPath);
             }else{
                 res.end("error");
             }
@@ -414,9 +414,9 @@ router.get('/manage/backupDataManage/del', function(req, res, next) {
 router.get('/manage/contentList', function(req, res, next) {
 
 
-    checkAdminPower(req,Settings.CONTENTLIST,function(state){
+    checkAdminPower(req,settings.CONTENTLIST,function(state){
         if(state){
-            res.render('manage/contentList', adminFunc.setPageInfo(req,res,Settings.CONTENTLIST));
+            res.render('manage/contentList', adminFunc.setPageInfo(req,res,settings.CONTENTLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -432,7 +432,7 @@ router.get('/manage/content/add/:key', function(req, res, next) {
 
     var contentType = req.params.key;
     var targetPath;
-    checkAdminPower(req,Settings.CONTENTLIST,function(state){
+    checkAdminPower(req,settings.CONTENTLIST,function(state){
 
         if(contentType == "film"){
             targetPath = 'manage/addProduct';
@@ -443,7 +443,7 @@ router.get('/manage/content/add/:key', function(req, res, next) {
         }
 
         if(state){
-            res.render(targetPath, adminFunc.setPageInfo(req,res,Settings.CONTENTLIST));
+            res.render(targetPath, adminFunc.setPageInfo(req,res,settings.CONTENTLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -456,7 +456,7 @@ router.get('/manage/content/add/:key', function(req, res, next) {
 router.get('/manage/content/edit/:type/:content', function(req, res, next) {
     var contentType = req.params.type;
     var targetPath;
-    checkAdminPower(req,Settings.CONTENTLIST,function(state){
+    checkAdminPower(req,settings.CONTENTLIST,function(state){
 
         if(contentType == "film"){
             targetPath = 'manage/addProduct';
@@ -466,7 +466,7 @@ router.get('/manage/content/edit/:type/:content', function(req, res, next) {
             targetPath = 'manage/addContent';
         }
         if(state){
-            res.render(targetPath, adminFunc.setPageInfo(req,res,Settings.CONTENTLIST));
+            res.render(targetPath, adminFunc.setPageInfo(req,res,settings.CONTENTLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -492,9 +492,9 @@ router.get('/manage/ContentList/topContent', function(req, res, next) {
 //文档类别列表页面
 router.get('/manage/contentCategorys', function(req, res, next) {
 
-    checkAdminPower(req,Settings.CONTENTCATEGORYS,function(state){
+    checkAdminPower(req,settings.CONTENTCATEGORYS,function(state){
         if(state){
-            res.render('manage/contentCategorys', adminFunc.setPageInfo(req,res,Settings.CONTENTCATEGORYS));
+            res.render('manage/contentCategorys', adminFunc.setPageInfo(req,res,settings.CONTENTCATEGORYS));
         }else{
             res.redirect("/admin/manage");
         }
@@ -539,9 +539,9 @@ function addOneCategory(req,res){
 //文档标签管理（list）
 router.get('/manage/contentTags', function(req, res, next) {
 
-    checkAdminPower(req,Settings.CONTENTTAGS,function(state){
+    checkAdminPower(req,settings.CONTENTTAGS,function(state){
         if(state){
-            res.render('manage/contentTags', adminFunc.setPageInfo(req,res,Settings.CONTENTTAGS));
+            res.render('manage/contentTags', adminFunc.setPageInfo(req,res,settings.CONTENTTAGS));
         }else{
             res.redirect("/admin/manage");
         }
@@ -581,9 +581,9 @@ function addOneContentTags(req,res){
 //文档模板管理（list）
 router.get('/manage/contentTemps', function(req, res, next) {
 
-    checkAdminPower(req,Settings.CONTENTTEMPS,function(state){
+    checkAdminPower(req,settings.CONTENTTEMPS,function(state){
         if(state){
-            res.render('manage/contentTemps', adminFunc.setPageInfo(req,res,Settings.CONTENTTEMPS));
+            res.render('manage/contentTemps', adminFunc.setPageInfo(req,res,settings.CONTENTTEMPS));
         }else{
             res.redirect("/admin/manage");
         }
@@ -620,7 +620,7 @@ function addOneContentTemps(req,res){
 //读取模板文件夹信息
 router.get('/manage/contentTemps/forderList', function(req, res, next) {
 
-    var filePath = System.scanJustFolder(Settings.TEMPSFOLDER);
+    var filePath = system.scanJustFolder(settings.TEMPSFOLDER);
 //    对返回结果做初步排序
     filePath.sort(function(a,b){return a.type == "folder" ||  b.type == "folder"});
 
@@ -638,9 +638,9 @@ router.get('/manage/contentTemps/forderList', function(req, res, next) {
 //文档留言管理（list）
 router.get('/manage/contentMsgs', function(req, res, next) {
 
-    checkAdminPower(req,Settings.MESSAGEMANAGE,function(state){
+    checkAdminPower(req,settings.MESSAGEMANAGE,function(state){
         if(state){
-            res.render('manage/messageList', adminFunc.setPageInfo(req,res,Settings.MESSAGEMANAGE));
+            res.render('manage/messageList', adminFunc.setPageInfo(req,res,settings.MESSAGEMANAGE));
         }else{
             res.redirect("/admin/manage");
         }
@@ -657,9 +657,9 @@ router.get('/manage/contentMsgs', function(req, res, next) {
 //注册用户管理（list）
 router.get('/manage/regUsersList', function(req, res, next) {
 
-    checkAdminPower(req,Settings.REGUSERSLIST,function(state){
+    checkAdminPower(req,settings.REGUSERSLIST,function(state){
         if(state){
-            res.render('manage/regUsersList', adminFunc.setPageInfo(req,res,Settings.REGUSERSLIST));
+            res.render('manage/regUsersList', adminFunc.setPageInfo(req,res,settings.REGUSERSLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -673,9 +673,9 @@ router.get('/manage/regUsersList', function(req, res, next) {
 //邮件模板列表页面
 router.get('/manage/emailTempList', function(req, res, next) {
 
-    checkAdminPower(req,Settings.EMAILTEMPLIST,function(state){
+    checkAdminPower(req,settings.EMAILTEMPLIST,function(state){
         if(state){
-            res.render('manage/emailTempList', adminFunc.setPageInfo(req,res,Settings.EMAILTEMPLIST));
+            res.render('manage/emailTempList', adminFunc.setPageInfo(req,res,settings.EMAILTEMPLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -689,9 +689,9 @@ router.get('/manage/emailTempList', function(req, res, next) {
 //邮件模板添加页面
 router.get('/manage/emailTemp/add', function(req, res, next) {
 
-    checkAdminPower(req,Settings.EMAILTEMPLIST,function(state){
+    checkAdminPower(req,settings.EMAILTEMPLIST,function(state){
         if(state){
-            res.render('manage/addEmailTemp', adminFunc.setPageInfo(req,res,Settings.EMAILTEMPLIST));
+            res.render('manage/addEmailTemp', adminFunc.setPageInfo(req,res,settings.EMAILTEMPLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -703,9 +703,9 @@ router.get('/manage/emailTemp/add', function(req, res, next) {
 //邮件模板编辑页面
 router.get('/manage/emailTemp/edit/:content', function(req, res, next) {
 
-    checkAdminPower(req,Settings.EMAILTEMPLIST,function(state){
+    checkAdminPower(req,settings.EMAILTEMPLIST,function(state){
         if(state){
-            res.render('manage/addEmailTemp', adminFunc.setPageInfo(req,res,Settings.EMAILTEMPLIST));
+            res.render('manage/addEmailTemp', adminFunc.setPageInfo(req,res,settings.EMAILTEMPLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -720,9 +720,9 @@ router.get('/manage/emailTemp/edit/:content', function(req, res, next) {
 //广告管理列表页面
 router.get('/manage/adsList', function(req, res, next) {
 
-    checkAdminPower(req,Settings.ADSLIST,function(state){
+    checkAdminPower(req,settings.ADSLIST,function(state){
         if(state){
-            res.render('manage/adsList', adminFunc.setPageInfo(req,res,Settings.ADSLIST));
+            res.render('manage/adsList', adminFunc.setPageInfo(req,res,settings.ADSLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -736,9 +736,9 @@ router.get('/manage/adsList', function(req, res, next) {
 //广告添加页面
 router.get('/manage/ads/add', function(req, res, next) {
 
-    checkAdminPower(req,Settings.ADSLIST,function(state){
+    checkAdminPower(req,settings.ADSLIST,function(state){
         if(state){
-            res.render('manage/addAds', adminFunc.setPageInfo(req,res,Settings.ADSLIST));
+            res.render('manage/addAds', adminFunc.setPageInfo(req,res,settings.ADSLIST));
         }else{
             res.redirect("/admin/manage");
         }
@@ -750,9 +750,9 @@ router.get('/manage/ads/add', function(req, res, next) {
 //广告编辑页面
 router.get('/manage/ads/edit/:content', function(req, res, next) {
 
-    checkAdminPower(req,Settings.ADSLIST,function(state){
+    checkAdminPower(req,settings.ADSLIST,function(state){
         if(state){
-            res.render('manage/addAds', adminFunc.setPageInfo(req,res,Settings.ADSLIST));
+            res.render('manage/addAds', adminFunc.setPageInfo(req,res,settings.ADSLIST));
         }else{
             res.redirect("/admin/manage");
         }

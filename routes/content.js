@@ -15,7 +15,7 @@ var Message = require("../models/Message");
 //广告对象
 var Ads = require("../models/Ads");
 //站点配置
-var Settings = require("../models/db/settings");
+var settings = require("../models/db/settings");
 var siteFunc = require("../models/db/siteFunc");
 
 var url = require('url');

@@ -19,7 +19,7 @@ var validat = require('./routes/validat');
 //系统功能支持
 var system = require('./routes/system');
 //站点配置
-var Settings = require("./models/db/settings");
+var settings = require("./models/db/settings");
 var siteFunc = require("./models/db/siteFunc");
 //文件操作对象
 var fs = require('fs');
@@ -58,16 +58,16 @@ app.use(partials());
 app.use(logger('dev'));
 app.use(bodyParser.json({limit: '50mb'})); // 限制上传5M
 app.use(bodyParser.urlencoded({ extended: false , limit: '50mb' }));
-app.use(cookieParser(Settings.session_secret));
+app.use(cookieParser(settings.session_secret));
 //解决异步层次混乱问题
 app.use(require('express-promise')());
 
 
 app.use(session({
-    secret: Settings.session_secret,
+    secret: settings.session_secret,
     store: new RedisStore({
-        port: Settings.redis_port,
-        host: Settings.redis_host,
+        port: settings.redis_port,
+        host: settings.redis_host,
         ttl: 1800 // 过期时间
     }),
     resave: true,

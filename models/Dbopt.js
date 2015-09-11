@@ -7,9 +7,9 @@ var url = require('url');
 var crypto = require("crypto");
 var mongoose = require('mongoose');
 //站点配置
-var Settings = require("../models/db/settings");
+var settings = require("../models/db/settings");
 var db = mongoose.connect('mongodb://localhost/doracms');
-//mongoose.connect('mongodb://'+Settings.USERNAME+':'+Settings.PASSWORD+'@'+Settings.HOST+':'+Settings.PORT+'/'+Settings.DB+'');
+//mongoose.connect('mongodb://'+settings.USERNAME+':'+settings.PASSWORD+'@'+settings.HOST+':'+settings.PORT+'/'+settings.DB+'');
 
 //信息删除操作
 
@@ -172,6 +172,12 @@ var DbOpt = {
         }
 
 
+    },
+
+    getKeyArrByTokenId : function(tokenId){
+        var newLink = DbOpt.decrypt(tokenId,settings.encrypt_key);
+        var keyArr = newLink.split('$');
+        return keyArr;
     },
 
     getCount : function(obj,req,res,conditions){ // 查询指定对象的数量

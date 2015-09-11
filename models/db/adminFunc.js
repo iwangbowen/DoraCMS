@@ -2,7 +2,7 @@
  * Created by Administrator on 2015/8/31.
  */
 var url = require('url');
-var Settings = require("./settings");
+var settings = require("./settings");
 //数据库操作对象
 var DbOpt = require("../Dbopt");
 
@@ -36,7 +36,7 @@ var adminFunc = {
     siteInfos : function (description) {
 
         return {
-            title : Settings.SITETITLE,
+            title : settings.SITETITLE,
             description : description
         }
     },
@@ -84,29 +84,29 @@ var adminFunc = {
     getTargetObj : function(currentPage){
         var targetObj;
 
-        if(currentPage == Settings.ADMINUSERLIST[0]){
+        if(currentPage == settings.ADMINUSERLIST[0]){
             targetObj = AdminUser;
-        }else if(currentPage == Settings.ADMINGROUPLIST[0]){
+        }else if(currentPage == settings.ADMINGROUPLIST[0]){
             targetObj = AdminGroup;
-        }else if(currentPage == Settings.EMAILTEMPLIST[0]){
+        }else if(currentPage == settings.EMAILTEMPLIST[0]){
             targetObj = EmailTemp;
-        }else if(currentPage == Settings.ADSLIST[0]){
+        }else if(currentPage == settings.ADSLIST[0]){
             targetObj = Ads;
-        }else if(currentPage == Settings.FILESLIST[0]){
+        }else if(currentPage == settings.FILESLIST[0]){
             targetObj = Files;
-        }else if(currentPage == Settings.DATAMANAGE[0]){
+        }else if(currentPage == settings.DATAMANAGE[0]){
             targetObj = DataOptionLog;
-        }else if(currentPage == Settings.CONTENTLIST[0]){
+        }else if(currentPage == settings.CONTENTLIST[0]){
             targetObj = Content;
-        }else if(currentPage == Settings.CONTENTCATEGORYS[0]){
+        }else if(currentPage == settings.CONTENTCATEGORYS[0]){
             targetObj = ContentCategory;
-        }else if(currentPage == Settings.CONTENTTAGS[0]){
+        }else if(currentPage == settings.CONTENTTAGS[0]){
             targetObj = ContentTags;
-        }else if(currentPage == Settings.CONTENTTEMPS[0]){
+        }else if(currentPage == settings.CONTENTTEMPS[0]){
             targetObj = ContentTemplate;
-        }else if(currentPage == Settings.MESSAGEMANAGE[0]){
+        }else if(currentPage == settings.MESSAGEMANAGE[0]){
             targetObj = Message;
-        }else if(currentPage == Settings.REGUSERSLIST[0]){
+        }else if(currentPage == settings.REGUSERSLIST[0]){
             targetObj = User;
         }else{
             targetObj = Content;
