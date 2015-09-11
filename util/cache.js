@@ -14,10 +14,8 @@ var get = function (key, callback) {
     if (!data) {
       return callback();
     }
-    console.log('------data---------'+data)
+
     data = JSON.parse(data);
-      console.log('------newdata---------'+data)
-      console.log('---newdata.title----'+data.title);
     callback(data);
   });
 };
