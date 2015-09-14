@@ -49,13 +49,27 @@ var siteFunc = {
     setConfirmPassWordEmailTemp : function(name,token){
 
         var html = '<p>您好：' + name + '</p>' +
-            '<p>我们收到您在' + settings.SITETITLE + '的注册信息，请点击下面的链接来激活帐户：</p>' +
+            '<p>我们收到您在 <strong>' + settings.SITETITLE + '</strong> 的注册信息，请点击下面的链接来激活帐户：</p>' +
             '<a href="' + settings.SITEDOMAIN + '/users/reset_pass?key=' + token + '">重置密码链接</a>' +
-            '<p>若您没有在<strong>' + settings.SITETITLE + '</strong>填写过注册信息，说明有人滥用了您的电子邮箱，请忽略或删除此邮件，我们对给您造成的打扰感到抱歉。</p>' +
-            '<p><strong>' + settings.SITETITLE + ' </strong>谨上。</p>';
+            '<p>若您没有在 <strong>' + settings.SITETITLE + '</strong> 填写过注册信息，说明有人滥用了您的电子邮箱，请忽略或删除此邮件，我们对给您造成的打扰感到抱歉。</p>' +
+            '<p> <strong>' + settings.SITETITLE + ' </strong> 谨上。</p>';
 
         return html;
 
+    },
+
+    setNoticeToAdminEmailTemp : function(obj){
+        var msgDate = moment(obj.date).format('YYYY-MM-DD HH:mm:ss');
+        var html ='';
+        html += '主人您好，'+obj.uName+'于 '+msgDate +' 在 <strong>' + settings.SITETITLE + '</strong> 的文章 <a href="' + settings.SITEDOMAIN + '/details/'+obj.contentId+'.html">'+obj.contentTitle+'</a> 中留言了';
+        return html;
+    },
+
+    setNoticeToUserEmailTemp : function(obj){
+        var msgDate = moment(obj.date).format('YYYY-MM-DD HH:mm:ss');
+        var html ='';
+        html += '主人您好，'+obj.uName+'于 '+msgDate +' 在 <strong>' + settings.SITETITLE + '</strong> 的文章 <a href="' + settings.SITEDOMAIN + '/details/'+obj.contentId+'.html">'+obj.contentTitle+'</a> 中回复了您';
+        return html;
     },
 
     getCategoryList: function () {
@@ -63,7 +77,11 @@ var siteFunc = {
     },
 
     getHotItemListData: function (q) {
-        return Content.find(q, 'stitle').sort({'clickNum': -1}).skip(0).limit(15);
+        return Content.find(q, 'stitle').sort({'clickNum': -1}).skip(0).limit(10);
+    },
+
+    getNewItemListData : function(q){
+        return Content.find(q, 'stitle').sort({'date': -1}).skip(0).limit(10);
     },
 
     getFriendLink: function () {
@@ -118,8 +136,8 @@ var siteFunc = {
             cateTypes: siteFunc.getCategoryList(),
             currentCateList: currentCateList,
             hotItemListData: siteFunc.getHotItemListData({}),
+            newItemListData: siteFunc.getNewItemListData({}),
             friendLinkData: siteFunc.getFriendLink(),
-            tagsData: tagsData,
             documentInfo: docs,
             pageType: 'detail',
             logined: isLogined(req),

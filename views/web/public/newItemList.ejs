@@ -1,10 +1,11 @@
+<!--近期文章模块-->
 <div class="newItemList">
     <h3>近期文章</h3>
     <ul>
-    <%newItemListData.forEach(function(item){%>
-    <li>
-        <h3><a href="/details/<%=item._id%>.html"><%=item.stitle%></a></h3>
-    </li>
-    <%})%>
+        <%newItemListData.forEach(function(item){%>
+        <li>
+            <a href="/details/<%=item._id%>.html"><%=item.stitle%></a>
+        </li>
+        <%})%>
     </ul>
 </div>

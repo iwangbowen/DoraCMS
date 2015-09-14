@@ -156,7 +156,7 @@ a:hover {
 }
 
 /*热门文档*/
-.hotNewsList, .searchBoard, .leftNav, .tagsList, .cateList, .friendLink ,.reSetPsdBoard {
+.hotNewsList, .searchBoard, .leftNav, .tagsList, .cateList, .friendLink ,.reSetPsdBoard ,.newItemList{
     margin-bottom: 30px;
 }
 

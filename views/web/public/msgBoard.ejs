@@ -2,12 +2,13 @@
 <input type="hidden" value="<%=userInfo._id%>" id="uid"/>
 <input type="hidden" value="<%=userInfo.userName%>" id="uName"/>
 <input type="hidden" value="<%=userInfo.logo%>" id="ulogo"/>
+<input type="hidden" value="<%=userInfo.email%>" id="uEmail"/>
 <%}%>
 <div ng-controller="msgBoard" class="msgBoard">
     <div class="row">
         <div class="col-md-12 col-sm-12 msgList" ng-repeat="msg in messageList">
 
-            <h3 class="media-heading"><a href="###">{{msg.uName}}</a> <span><small>{{msg.date | date:"yyyy-MM-dd" }}</small> <a href="###" ng-click="replyMsg(msg.uName,msg.uid)" class="pull-right reply">回复</a></span></h3>
+            <h3 class="media-heading"><a href="###">{{msg.uName}}</a> <span><small>{{msg.date | date:"yyyy-MM-dd" }}</small> <a href="###" ng-click="replyMsg(msg.uName,msg.uid,msg.uEmail)" class="pull-right reply">回复</a></span></h3>
             <p>{{msg.content}}</p>
 
         </div>
@@ -51,6 +52,7 @@
                         $scope.msgFormData.uName = $('#uName').val();
                         $scope.msgFormData.uid =  $('#uid').val();
                         $scope.msgFormData.ulogo = $('#ulogo').val();
+                        $scope.msgFormData.uEmail = $('#uEmail').val();
 
                         $http({
                             method  : 'POST',
@@ -70,7 +72,7 @@
                 };
 
 //                回复留言
-                $scope.replyMsg = function(uName,uid){
+                $scope.replyMsg = function(uName,uid,email){
 
                     if(!loginState){
                         alert('请先登录!');
@@ -80,6 +82,7 @@
                         $('#msgTextArea').focus();
                         $scope.msgFormData.content = "@"+uName+" ";
                         $scope.msgFormData.relationUid = uid;
+                        $scope.msgFormData.relationEmail = email;
 
                     }
                 }

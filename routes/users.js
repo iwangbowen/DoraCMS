@@ -152,9 +152,13 @@ router.post('/sentConfirmEmail',function(req, res, next){
                     if(err){
                         return next(err);
                     }else{
-                        system.sendEmail(settings.email_findPsd,user,function(){
-                            console.log('-------邮件发送成功-------');
-                            res.end("success");
+                        system.sendEmail(settings.email_findPsd,user,function(err){
+                            if(err){
+                                res.end(err)
+                            }else{
+                                console.log('-------邮件发送成功-------');
+                                res.end("success");
+                            }
                         });
                     }
                 })
@@ -330,9 +334,11 @@ router.post('/resetMyPsd', function(req, res, next) {
 router.post('/message/sent', function(req, res, next) {
 
     var contentId = req.body.contentId;
-
+    var contentTitle = req.body.contentTitle;
+    var relationEmail = req.body.relationEmail;
     var newObj = new Message(req.body);
     newObj.save(function(){
+
 //        更新评论数
         Content.findOne({_id : contentId},'commentNum',function(err,result){
             if(err){
@@ -341,6 +347,27 @@ router.post('/message/sent', function(req, res, next) {
                 result.commentNum = result.commentNum + 1;
                 result.save(function(err){
                     if(err) throw err;
+
+//                    如果被评论用户存在邮箱，则发送提醒邮件
+                    if(relationEmail){
+                        system.sendEmail(settings.email_notice_user_contentMsg,newObj,function(err){
+                            if(err){
+                                res.end(err);
+                            }else{
+                                console.log('-----sent user email success--------')
+                            }
+                        });
+                    }else{
+//                    给管理员发送消息,这里异步就可以，不用等到邮件发送成功再返回结果
+                        system.sendEmail(settings.email_notice_contentMsg,newObj,function(err){
+                            if(err){
+                                res.end(err);
+                            }else{
+                                console.log('-----sent email success--------')
+                            }
+                        });
+                    }
+
                     res.end("success");
                 });
             }

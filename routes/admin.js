@@ -195,25 +195,27 @@ function removeMessage(req,res){
         if(err){
             res.end(err);
         }else{
-            var contentId = result.contentId;
-            Content.findOne({_id : contentId},function(err,contentObj){
-                if(err){
-                    res.end(err);
-                }else{
-                    Message.remove({_id : params.query.uid},function(err){
-                        if(contentObj.commentNum > 0){
-                            contentObj.commentNum = contentObj.commentNum -1 ;
-                            contentObj.save(function(err){
-                                if(err){
-                                    res.end(err);
-                                }else{
-                                    res.end("success");
-                                }
-                            });
-                        }
-                    });
-                }
-            });
+            if(result && result.contentId){
+                var contentId = result.contentId;
+                Content.findOne({_id : contentId},function(err,contentObj){
+                    if(err){
+                        res.end(err);
+                    }else{
+                        Message.remove({_id : params.query.uid},function(err){
+                            if(contentObj.commentNum > 0){
+                                contentObj.commentNum = contentObj.commentNum -1 ;
+                                contentObj.save(function(err){
+                                    if(err){
+                                        res.end(err);
+                                    }else{
+                                        res.end("success");
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
         }
     });
 }

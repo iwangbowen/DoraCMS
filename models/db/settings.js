@@ -25,7 +25,7 @@ module.exports = {
     SITETITLE : '前端开发俱乐部', // 站点名称
     SITEDOMAIN : 'http://www.html-js.cn', // 站点域名
     SITEICP : '粤ICP备15038960号-2', // 站点备案号
-    SYSTEMMAIL : 'doramart@163.com', //站点邮箱
+    SYSTEMMAIL : 'doramart@qq.com', // 管理员个人邮箱
     UPDATEFOLDER : process.cwd()+'/public/upload', // 默认上传文件夹本地路径
     TEMPSFOLDER : process.cwd()+'/views/web/temp', // 默认模板文件夹本地路径
     DATAOPERATION : process.cwd()+'/models/db/bat', //数据库操作脚本目录
@@ -65,6 +65,8 @@ module.exports = {
     site_email_psd : 'xxx',
     email_findPsd : 'findPsd',
     email_reg_active : 'reg_active'
+    email_notice_contentMsg : 'notice_contentMsg',
+    email_notice_user_contentMsg : 'notice_user_contentMsg'
 };
 
 

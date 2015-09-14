@@ -22,20 +22,28 @@ var child = require('child_process');
 var archiver = require('archiver');
 var system = {
 
-    sendEmail : function(key,user,callBack){
+    sendEmail : function(key,obj,callBack){
 
         var emailTitle = "Hello";
         var emailSubject = "Hello";
         var emailContent = "Hello";
-
-        var oldLink = user.password +'$'+ user.email +'$'+ settings.session_secret;
-        console.log('-------before send pds------'+user.password)
-        var newLink = DbOpt.encrypt(oldLink,settings.encrypt_key);
-        var tokenLink = newLink;
+        var toEmail;
 
         if(key == settings.email_findPsd){
-            emailSubject = emailTitle = '通过激活链接找回密码';
-            emailContent = siteFunc.setConfirmPassWordEmailTemp(user.userName,tokenLink);
+            toEmail = obj.email;
+            var oldLink = obj.password +'$'+ obj.email +'$'+ settings.session_secret;
+            var newLink = DbOpt.encrypt(oldLink,settings.encrypt_key);
+
+            emailSubject = emailTitle = '['+settings.SITETITLE +'] 通过激活链接找回密码';
+            emailContent = siteFunc.setConfirmPassWordEmailTemp(obj.userName,newLink);
+        }else if(key == settings.email_notice_contentMsg){
+            emailSubject = emailTitle = '['+settings.SITETITLE +'] 用户留言提醒';
+            emailContent = siteFunc.setNoticeToAdminEmailTemp(obj);
+            toEmail = settings.site_email;
+        }else if(key == settings.email_notice_user_contentMsg){
+            emailSubject = emailTitle = '['+settings.SITETITLE +'] 有人给您留言啦';
+            emailContent = siteFunc.setNoticeToUserEmailTemp(obj);
+            toEmail = obj.relationEmail;
         }
 
 //                发送邮件
@@ -51,7 +59,7 @@ var system = {
 
         var mailOptions = {
             from: settings.site_email, // sender address
-            to: user.email, // list of receivers
+            to: toEmail, // list of receivers
             subject: emailSubject, // Subject line
             text: emailTitle, // plaintext body
             html: emailContent // html body
@@ -60,6 +68,7 @@ var system = {
         transporter.sendMail(mailOptions, function(error, info){
             if(error){
                 console.log('邮件发送失败：'+error);
+                callBack(error);
             }else{
                 console.log('Message sent: ' + info.response);
                 callBack();
