@@ -1,7 +1,5 @@
 <!--用户注册模块-->
 <div class="regBoard" ng-controller="userReg">
-
-
     <form  name="regForm" ng-submit="processRegForm(regForm.$valid)" novalidate>
         <h3>用户注册 &nbsp;<small class="text-danger hide" id="errorInfo">邮箱格式不正确</small></h3>
         <div class="form-group">
@@ -34,6 +32,7 @@
 </div>
 
 <script>
+    var doraApp = angular.module("webApp",[]);
     doraApp.controller("userReg",function($scope,$http) {
 
         $scope.processRegForm = function (isValid) {

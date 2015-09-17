@@ -1,19 +1,23 @@
+<!--留言板模块-->
+<script src="/javascripts/angular.min.js"></script>
 <%if(logined){%>
 <input type="hidden" value="<%=userInfo._id%>" id="uid"/>
 <input type="hidden" value="<%=userInfo.userName%>" id="uName"/>
 <input type="hidden" value="<%=userInfo.logo%>" id="ulogo"/>
 <input type="hidden" value="<%=userInfo.email%>" id="uEmail"/>
 <%}%>
-<div ng-controller="msgBoard" class="msgBoard">
+<div class="msgBoard" ng-app="webApp">
     <div class="row">
-        <div class="col-md-12 col-sm-12 msgList" ng-repeat="msg in messageList">
+        <%messageList.forEach(function(item){%>
+        <div class="col-md-12 col-sm-12 msgList">
 
-            <h3 class="media-heading"><a href="###">{{msg.uName}}</a> <span><small>{{msg.date | date:"yyyy-MM-dd" }}</small> <a href="###" ng-click="replyMsg(msg.uName,msg.uid,msg.uEmail)" class="pull-right reply">回复</a></span></h3>
-            <p>{{msg.content}}</p>
+            <h3 class="media-heading"><a href="###"><%=item.uName%></a> <span><small><%=myDateFormat(item.date)%></small> <a href="###" class="pull-right reply">回复</a></span></h3>
+            <p><%=item.content%></p>
 
         </div>
+        <%})%>
     </div>
-    <div class="row">
+    <div class="row" ng-controller="msgBoard">
         <div class="col-md-12 col-sm-12 giveMsg">
             <h3>添加新评论</h3>
             <div class="txt-area">
@@ -32,15 +36,13 @@
 </div>
 
 <script>
-
+    var doraApp = angular.module("webApp",[]);
     doraApp.controller('msgBoard',function($scope,$http){
 
                 $scope.msgFormData = {};
-                var detailId = '<%=documentInfo._id%>';
                 var loginState = '<%=logined%>';
                 $scope.msgFormData.contentId = '<%=documentInfo._id%>';
                 $scope.msgFormData.contentTitle = '<%=documentInfo.title%>';
-                getMsgData($scope,$http,detailId);
 
                 $scope.sentMsgForm = function(isValid){
 
@@ -62,7 +64,7 @@
                         })
                         .success(function(data) {
                             if(data === "success"){
-                                getMsgData($scope,$http,detailId);
+                                window.location.reload();
                             }else{
                                 alert("未知异常，请稍后重试");
                             }
@@ -88,16 +90,4 @@
                 }
      });
 
-    function getMsgData($scope,$http,detailId){
-        $scope.messageList = {};
-        $('.msgList').hide();
-        $http.get('/users/message/getlist?contentId='+detailId).success(function(result){
-            if(result.length > 0){
-                $('.msgList').show();
-                $scope.messageList = result;
-//                清空留言信息
-                $scope.msgFormData.content = "";
-            }
-        })
-    }
 </script>

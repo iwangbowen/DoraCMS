@@ -86,6 +86,7 @@
 </div>
 
 <script>
+    var doraApp = angular.module("webApp",[]);
     doraApp.controller("userInfo",function($scope,$http) {
         $scope.targetId = "<%= userInfo._id%>";
         if($scope.targetId){

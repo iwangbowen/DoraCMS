@@ -65,7 +65,7 @@ module.exports = {
     site_email : 'xx@163.com',
     site_email_psd : 'xxx',
     email_findPsd : 'findPsd',
-    email_reg_active : 'reg_active'
+    email_reg_active : 'reg_active',
     email_notice_contentMsg : 'notice_contentMsg',
     email_notice_user_contentMsg : 'notice_user_contentMsg'
 };

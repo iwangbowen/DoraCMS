@@ -9,6 +9,8 @@ var ContentCategory = require("../ContentCategory");
 var ContentTags = require("../ContentTags");
 //广告对象
 var Ads = require("../Ads");
+//留言对象
+var Message = require("../Message");
 var settings = require("./settings");
 //数据库操作对象
 var DbOpt = require("../Dbopt");
@@ -88,6 +90,10 @@ var siteFunc = {
         return Ads.find({'category': 'friendlink'});
     },
 
+    getMessageList : function(contentId){
+        return Message.find({'contentId' : contentId})
+    },
+
     setDataForIndex: function (req, res, q, title) {
         var requireField = 'title date commentNum discription sImg';
         var documentList = DbOpt.getPaginationResult(Content, req, res, q, requireField);
@@ -128,17 +134,18 @@ var siteFunc = {
         }
     },
 
-    setDetailInfo: function (req, res, cateQuery, docs) {
+    setDetailInfo: function (req, res, cateQuery, doc) {
         var currentCateList = ContentCategory.find(cateQuery).sort({'sortId': 1});
         var tagsData = DbOpt.getDatasByParam(ContentTags, req, res, {});
         return {
-            siteConfig: siteFunc.siteInfos(docs.title, docs.discription, docs.keywords),
+            siteConfig: siteFunc.siteInfos(doc.title, doc.discription, doc.keywords),
             cateTypes: siteFunc.getCategoryList(),
             currentCateList: currentCateList,
             hotItemListData: siteFunc.getHotItemListData({}),
             newItemListData: siteFunc.getNewItemListData({}),
             friendLinkData: siteFunc.getFriendLink(),
-            documentInfo: docs,
+            documentInfo: doc,
+            messageList : siteFunc.getMessageList(doc._id),
             pageType: 'detail',
             logined: isLogined(req),
             layout: 'web/public/defaultTemp'

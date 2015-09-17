@@ -1,4 +1,4 @@
-<!--用户登录模块-->
+<!--通过邮箱找回密码模块-->
 <div class="conformBoard" ng-controller="confirmEmail">
     <form name="confirmEmailForm" ng-submit="processConfirmEmailForm(confirmEmailForm.$valid)" novalidate>
         <div class="alert alert-info">请输入您的用户名或电子邮箱地址。您会收到一封包含创建新密码链接的电子邮件。</div>
@@ -16,6 +16,7 @@
 </div>
 
 <script>
+    var doraApp = angular.module("webApp",[]);
     doraApp.controller("confirmEmail",function($scope,$http) {
         $scope.processConfirmEmailForm = function(isValid){
 
