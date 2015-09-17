@@ -6,18 +6,18 @@
 <input type="hidden" value="<%=userInfo.logo%>" id="ulogo"/>
 <input type="hidden" value="<%=userInfo.email%>" id="uEmail"/>
 <%}%>
-<div class="msgBoard" ng-app="webApp">
+<div class="msgBoard" ng-app="webApp" ng-controller="msgBoard">
     <div class="row">
         <%messageList.forEach(function(item){%>
         <div class="col-md-12 col-sm-12 msgList">
 
-            <h3 class="media-heading"><a href="###"><%=item.uName%></a> <span><small><%=myDateFormat(item.date)%></small> <a href="###" class="pull-right reply">回复</a></span></h3>
+            <h3 class="media-heading"><a href="###"><%=item.uName%></a> <span><small><%=myDateFormat(item.date)%></small><a href="###" ng-click="replyMsg('<%=item.uName%>','<%=item._id%>','<%=item.uEmail%>')" class="pull-right reply">回复</a></span></h3>
             <p><%=item.content%></p>
 
         </div>
         <%})%>
     </div>
-    <div class="row" ng-controller="msgBoard">
+    <div class="row">
         <div class="col-md-12 col-sm-12 giveMsg">
             <h3>添加新评论</h3>
             <div class="txt-area">
