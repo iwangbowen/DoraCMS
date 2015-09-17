@@ -15,7 +15,8 @@ var moment = require('moment');
 var settings = require("../models/db/settings");
 var siteFunc = require("../models/db/siteFunc");
 var url = require('url');
-
+//缓存
+var cache = require('../util/cache');
 
 
 /* GET home page. */
@@ -25,11 +26,33 @@ router.get('/', function (req, res, next) {
 
 });
 
-//站点地图
+//缓存站点地图
 router.get("/sitemap.html", function (req, res, next) {
-    req.query.limit = 999;
-    res.render('web/sitemap', siteFunc.setDataForIndex(req, res, {}, '网站地图'));
+    var siteMapData;
+    var siteMapNeedData = {
+        siteConfig: siteFunc.siteInfos("网站地图"),
+        documentList: siteMapData,
+        cateTypes: siteFunc.getCategoryList(),
+        logined: req.session.logined,
+        layout: 'web/public/defaultTemp'
+    };
 
+    cache.get('siteMapHtml',function(siteMapHtml){
+       if(siteMapHtml) {
+           siteMapNeedData.documentList = siteMapHtml;
+           res.render('web/sitemap', siteMapNeedData);
+       }else{
+           Content.find({},'title',function(err,docs){
+               if(err){
+                   res.end(err);
+               }else{
+                   siteMapNeedData.documentList = docs;
+                   cache.set('siteMapHtml', docs, 1000 * 3600 * 2);
+                   res.render('web/sitemap', siteMapNeedData);
+               }
+           })
+       }
+    });
 });
 
 

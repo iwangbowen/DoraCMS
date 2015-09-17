@@ -53,7 +53,6 @@ router.get('/login', function(req, res, next) {
     if(isLogined(req)){
         res.render('web/index', siteFunc.setDataForIndex(req, res, {'type': 'content'}, '首页'))
     }else{
-        req.session._loginReferer = req.headers.referer;
         res.render('web/users/userLogin', siteFunc.setDataForUser(req, res, '用户登录'));
     }
 
@@ -374,17 +373,6 @@ router.post('/message/sent', function(req, res, next) {
         });
 
     });
-
-});
-
-
-//根据文章ID获取所有留言
-
-router.get('/message/getlist', function(req, res, next) {
-
-    var params = url.parse(req.url,true);
-    var contentId = params.query.contentId;
-    return res.json(DbOpt.getDatasByParam(Message,req, res,{'contentId' : contentId}));
 
 });
 

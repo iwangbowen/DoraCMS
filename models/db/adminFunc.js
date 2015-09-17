@@ -41,12 +41,17 @@ var adminFunc = {
         }
     },
 
+    getMessageList : function(){
+        return Message.find({}).limit(5).sort({'date' : -1});
+    },
+
     setMainInfos : function(req, res){
         return res.json({
             adminUserCount : AdminUser.count({}),
             regUsersCount : User.count({}),
             contentsCount : Content.count({}),
-            msgCount : Message.count({})
+            msgCount : Message.count({}),
+            msgList : adminFunc.getMessageList()
         })
     },
 
