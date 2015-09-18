@@ -47,7 +47,7 @@ router.get("/sitemap.html", function (req, res, next) {
                    res.end(err);
                }else{
                    siteMapNeedData.documentList = docs;
-                   cache.set('siteMapHtml', docs, 1000 * 3600 * 2);
+                   cache.set('siteMapHtml', docs, 1000 * 60 * 60 * 24); // 缓存一天
                    res.render('web/sitemap', siteMapNeedData);
                }
            })

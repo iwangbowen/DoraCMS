@@ -245,7 +245,7 @@ var siteFunc = {
                                 });
                                 xml += '</urlset>';
                                 // 缓存一天
-                                cache.set('sitemap', xml, 1000 * 3600 * 2);
+                                cache.set('sitemap', xml, 1000 * 60 * 60 * 24);
                                 res.end(xml);
                             }
                         })
