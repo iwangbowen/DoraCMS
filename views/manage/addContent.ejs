@@ -63,7 +63,7 @@
                     <div class="form-group">
                         <label class="control-label col-sm-3">缩略图</label>
                         <div class="col-sm-3">
-                            <input type="file" name="uploadify" id="uploadify" />
+                            <input type="file" name="uploadify" id="uploadContentImg" />
                             <img src="" alt="" width="120" height="120" class="img-thumbnail" id="myImg">
                         </div>
                     </div>
@@ -75,7 +75,7 @@
                                     <i id="categoryName">请选择文章类别</i>
                                     <span class="caret"></span>
                                 </button>
-                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="treeDemo" class="ztree">
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="cateTree" class="ztree">
                                     <li role="presentation"><a href="#">test</a></li>
                                 </ul>
                             </div>
@@ -92,14 +92,12 @@
                         <label class="control-label col-sm-3">内容摘要</label>
                         <div class="col-sm-6">
                             <textarea class="form-control input-sm" name="discription" ng-model="formData.discription" ng-minlength="15" ng-maxlength="140" required id="" cols="30" rows="6"></textarea>
-                            <!--<input type="text" class="form-control input-sm" name="discription" ng-model="formData.discription" ng-minlength="15" ng-maxlength="80" required/>-->
                             <label for="inputError" class="control-label text-danger" ng-show="myForm.discription.$invalid && !myForm.discription.$pristine"><i class="fa fa-times-circle-o"></i> 15-140个非特殊字符</label>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-3">文章详情</label>
                         <div class="col-sm-8">
-                            <!--<script id="container" name="content" type="text/plain" ng-model="formData.comments" ueditor></script>-->
                             <textarea class="" name="comments" ng-model="formData.comments" id="container" ng-minlength="50" placeholder="请输入文章详情" ueditor>{{formData.comments}}</textarea>
                             <label for="inputError" class="control-label text-danger" ng-show="myForm.comments.$invalid && !myForm.comments.$pristine"><i class="fa fa-times-circle-o"></i>内容不得少于50个字</label>
 
@@ -124,15 +122,17 @@
 //                初始化文章标签
                 initContentTags($scope,$http);
 //                初始化上传按钮
-                initUploadBtn($scope);
+                initUploadFyBtn('uploadContentImg',function(data){
+                    $("#myImg").attr("src",data);
+                    $scope.formData.sImg = data;
+                });
 //                通过访问地址获取文章id
                 $scope.targetID = window.location.href.split("/")[8];
                 if($scope.targetID){
                     $http.get("/admin/manage/<%=bigCategory%>/item?uid="+$scope.targetID).success(function(result){
-
+                        $scope.formData = result;
                         iniTreeData($scope,$http);
                         initContentTags($scope,$http);
-                        $scope.formData = result;
                         $("#myImg").attr("src",$scope.formData.sImg)
                     })
                 }
@@ -142,24 +142,10 @@
                     if($scope.targetID){
                         url = "/admin/manage/<%=bigCategory%>/modify?uid="+$scope.targetID;
                     }
-                    if(isValid){
-                        $http({
-                            method  : 'POST',
-                            url     : url,
-                            data    : $.param($scope.formData),  // pass in data as strings
-                            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
-                        })
-                                .success(function(data) {
-                                    if(data === "success"){
-                                       window.location = "/admin/manage/contentList";
-                                    }else{
-                                        alert("未知异常，请稍后重试");
-                                    }
-                                });
-                    }
-                    else{
-                        alert("校验失败，请检查");
-                    }
+
+                    angularHttp($http,isValid,'POST',url,$scope.formData,function(data){
+                        window.location = "/admin/manage/contentList";
+                    });
                 }
             })
             .directive('ueditor', function ($timeout) { //angular绑定ueditor
@@ -187,65 +173,40 @@
             });
 
            function iniTreeData($scope,$http){
-               $http.get("/admin/manage/contentCategorys/list").success(function(result){
-                   var categoryName = $("#categoryName");
-                   categoryName.html(getCateNameById(result,$scope.formData.category));
-                   var arrTree = changeToTreeJson(result);
-                   var setting = {
-                       view: {
-                           dblClickExpand: false,
-                           selectedMulti: false
-                       },
-                       data: {
-                           simpleData: {
-                               enable: true
-                           }
-                       },
-                       callback: {
-                           beforeClick: beforeClick,
-                           onClick: onClick
-                       }
-                   };
 
-                   function beforeClick(treeId, treeNode) {
-                       var check = (treeNode && !treeNode.isParent);
-                       if (!check) alert("不能选择顶级分类");
-                       return check;
+               var currentCate = '';
+               if($scope.formData){
+                   currentCate = $scope.formData.category;
+               }
+
+               iniNormalTree($http,'cateTree',"/admin/manage/contentCategorys/list",'categoryName',currentCate,function(e, treeId, treeNode){
+                   var zTree = $.fn.zTree.getZTreeObj("cateTree"),
+                           nodes = zTree.getSelectedNodes(),
+                           v = "",
+                           vid = "",
+                           sortPath = "",
+                           contentTemp = "";
+
+                   nodes.sort(function compare(a,b){return a.id-b.id;});
+                   for (var i=0, l=nodes.length; i<l; i++) {
+                       v += nodes[i].name ;
+                       vid += nodes[i].id ;
+                       sortPath += nodes[i].sortPath ;
+                       contentTemp += nodes[i].contentTemp ;
                    }
-
-                   function onClick(e, treeId, treeNode) {
-                       var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
-                               nodes = zTree.getSelectedNodes(),
-                               v = "",
-                               vid = "",
-                               sortPath = "",
-                               contentTemp = "";
-
-
-                       nodes.sort(function compare(a,b){return a.id-b.id;});
-                       for (var i=0, l=nodes.length; i<l; i++) {
-                           v += nodes[i].name ;
-                           vid += nodes[i].id ;
-                           sortPath += nodes[i].sortPath ;
-                           contentTemp += nodes[i].contentTemp ;
-                       }
-//                       if (v.length > 0 ) v = v.substring(0, v.length-1);
-
-                       categoryName.html(v);
-                       $scope.formData.category = vid;
-                       $scope.formData.sortPath = sortPath;
+                   $('#categoryName').html(v);
+                   $scope.formData.category = vid;
+                   $scope.formData.sortPath = sortPath;
 //                       设置文章模板
-                       $scope.formData.contentTemp = contentTemp;
+                   $scope.formData.contentTemp = contentTemp;
 //                        针对顶级类别的文章做标记
-                       if(sortPath.split(',').length == 2){
-                           $scope.formData.type = "singer";
-                       }else if(sortPath.split(',').length == 3){
-                           $scope.formData.type = "content";
-                       }
+                   if(sortPath.split(',').length == 2){
+                       $scope.formData.type = "singer";
+                   }else if(sortPath.split(',').length == 3){
+                       $scope.formData.type = "content";
                    }
+               });
 
-                   $.fn.zTree.init($("#treeDemo"), setting, arrTree);
-               })
            }
 
 
@@ -323,54 +284,4 @@
                 }
             }
 
-
-
-            function initUploadBtn($scope){
-                $("#uploadify").uploadify({
-                    //指定swf文件
-                    'swf': '/plugins/uploadify/uploadify.swf',
-                    //后台处理的页面
-                    'uploader': '/system/upload?type=images&key=ctTopImg',
-                    //按钮显示的文字
-                    'buttonText': '上传图片',
-                    //显示的高度和宽度，默认 height 30；width 120
-                    //'height': 15,
-                    //'width': 80,
-                    //上传文件的类型  默认为所有文件    'All Files'  ;  '*.*'
-                    //在浏览窗口底部的文件类型下拉菜单中显示的文本
-                    'fileTypeDesc': 'Image Files',
-                    //允许上传的文件后缀
-                    'fileTypeExts': '*.gif; *.jpg; *.png',
-                    //发送给后台的其他参数通过formData指定
-//                    'formData': { 'type': 'images', 'key': 'ctTopImg' },
-                    //上传文件页面中，你想要用来作为文件队列的元素的id, 默认为false  自动生成,  不带#
-                    //'queueID': 'fileQueue',
-                    //选择文件后自动上传
-                    'auto': true,
-                    //设置为true将允许多文件上传
-                    'multi': true,
-                    //上传成功
-                    'onUploadSuccess' : function(file, data, response) {
-                        alert('上传成功')
-                        $("#myImg").attr("src",data);
-                        $scope.formData.sImg = data;
-                    },
-                    'onComplete': function(event, queueID, fileObj, response, data) {//当单个文件上传完成后触发
-                        //event:事件对象(the event object)
-                        //ID:该文件在文件队列中的唯一表示
-                        //fileObj:选中文件的对象，他包含的属性列表
-                        //response:服务器端返回的Response文本，我这里返回的是处理过的文件名称
-                        //data：文件队列详细信息和文件上传的一般数据
-
-                        alert("文件:" + fileObj.name + " 上传成功！");
-                    },
-                    //上传错误
-                    'onUploadError' : function(file, errorCode, errorMsg, errorString) {
-                        alert('The file ' + file.name + ' could not be uploaded: ' + errorString);
-                    },
-                    'onError': function(event, queueID, fileObj) {//当单个文件上传出错时触发
-                        alert("文件:" + fileObj.name + " 上传失败！");
-                    }
-                });
-            }
 </script>

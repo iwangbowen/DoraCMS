@@ -9,3 +9,8 @@
 
 /*问候语样式*/
 .helloInfo{ font-size: 60%;font-weight: normal;margin-left: 30px;}
+
+/*后台评论显示样式 */
+.dashboard-comment-wrap .comment-meta{font-size: 13px;}
+.dashboard-comment-wrap blockquote{font-size: 13px;}
+

@@ -1,4 +1,5 @@
 <div class="row" ng-controller="contentCategorys">
+	<% include public/modal %>
     <div class="col-xs-12">
         <div class="panel">
             <a href="#addContentCategory" role="button" class="btn btn-primary btn-sm" data-toggle="modal"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>增加顶级分类</a>
@@ -30,7 +31,6 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-
     <!--添加用户组模态窗口-->
     <div class="modal fade" id="addContentCategory">
         <div class="modal-dialog">
@@ -75,7 +75,7 @@
                                         <i id="tempsName">请选择内容模板</i>
                                         <span class="caret"></span>
                                     </button>
-                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="treeDemo" class="ztree">
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="tempTree" class="ztree">
                                         <li role="presentation"><a href="#">test</a></li>
                                     </ul>
                                 </div>
@@ -131,7 +131,7 @@
 
     doraApp.controller('contentCategorys', function ($scope,$http) {
 //                初始化模板分类
-        iniTreeData($scope,$http);
+        iniTempData($scope,$http);
 //        数据初始化
         $scope.warningInfo = {};
         $scope.formData = {};
@@ -149,7 +149,7 @@
         //确认执行删除
         $scope.delCategoryItem = function () {
 
-            if(checkIfPrarent())
+            if(checkIfParent())
             {
                 $('#checkIfDel').modal("hide");
                 $scope.warningInfo.title = "警告";
@@ -157,11 +157,9 @@
                 $('#askifdo').modal("show");
             }else{
                 var currentID =  $scope.targetID;
-                $http.get("/admin/manage/<%=bigCategory%>/del?uid="+currentID).success(function(result){
-                    $('#checkIfDel').modal("hide");
-                    console.log("del success!");
+                angularHttpGet($http,"/admin/manage/<%=bigCategory%>/del?uid="+currentID,function(){
                     getData($scope,$http);
-                })
+                });
             }
         };
 
@@ -174,9 +172,8 @@
             var homePage = obj.data('homepage');
 //            继承父类内容模板
             var contentTemp = obj.data('contenttemp');
-
             var modalTitle = $(this).find('.modal-title');
-//                    如果不为空则为编辑状态
+//          如果不为空则为编辑状态
             if(editId){
 //                子类不用设置模板，继承父类大类模板
                 $("#setCateTemp").addClass("hide");
@@ -217,7 +214,7 @@
             $scope.targetID ="";
             $(this).find("input").val("");
         });
-        //                添加类别
+//                添加类别
         $scope.processForm = function(isValid){
             var curentUrl = "/admin/manage/<%=bigCategory%>/addOne";
             if($scope.targetID)
@@ -225,26 +222,10 @@
                 curentUrl = "/admin/manage/<%=bigCategory%>/modify?uid="+$scope.targetID;
             }
 
-            if(isValid){
-                $http({
-                    method  : 'POST',
-                    url     : curentUrl,
-                    data    : $.param($scope.formData),  // pass in data as strings
-                    headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
-                })
-                .success(function(data) {
-                    if(data === "success"){
-                        $("#addContentCategory").modal("hide");
-                        getData($scope,$http);
+            angularHttp($http,isValid,'POST',curentUrl,$scope.formData,function(data){
+                getData($scope,$http);
+            });
 
-                    }else{
-                        alert("未知异常，请稍后重试");
-                    }
-                });
-            }
-            else{
-                alert("error");
-            }
         }
 
 
@@ -285,7 +266,7 @@
     }
 
 //    判断需要删除的节点是否被选中或者是否有子节点
-    function checkIfPrarent(){
+    function checkIfParent(){
         var treeObj = $.fn.zTree.getZTreeObj("categoryTree");
         var sNodes = treeObj.getSelectedNodes();
         if (sNodes.length > 0) {
@@ -302,52 +283,29 @@
     }
 
 
-    function iniTreeData($scope,$http){
-        $http.get("/admin/manage/contentTemps/list").success(function(result){
-            var tempsName = $("#tempsName");
-            tempsName.html(getCateNameById(result,$scope.formData.contentTemp));
-            var arrTree = changeToTreeJson(result,"temps");
-            var setting = {
-                view: {
-                    dblClickExpand: false,
-                    selectedMulti: false
-                },
-                data: {
-                    simpleData: {
-                        enable: true
-                    }
-                },
-                callback: {
-                    beforeClick: beforeClick,
-                    onClick: onClick
-                }
-            };
+    function iniTempData($scope,$http){
+        var currentCate = '';
+        if($scope.formData){
+            currentCate = $scope.formData.contentTemp;
+        }
 
-            function beforeClick(treeId, treeNode) {
-                var check = (treeNode && !treeNode.isParent);
-                if (!check) alert("不能选择顶级分类");
-                return check;
+        iniNormalTree($http,'tempTree',"/admin/manage/contentTemps/list",'tempsName',currentCate,function(e, treeId, treeNode){
+
+            var zTree = $.fn.zTree.getZTreeObj("tempTree"),
+                    nodes = zTree.getSelectedNodes(),
+                    v = "",
+                    vid = "";
+
+            nodes.sort(function compare(a,b){return a.id-b.id;});
+            for (var i=0, l=nodes.length; i<l; i++) {
+                v += nodes[i].name ;
+                vid += nodes[i].alias ;
             }
 
-            function onClick(e, treeId, treeNode) {
-                var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
-                        nodes = zTree.getSelectedNodes(),
-                        v = "",
-                        vid = "";
+            $('#tempsName').html(v);
+            $scope.formData.contentTemp = vid;
+        });
 
-                nodes.sort(function compare(a,b){return a.id-b.id;});
-                for (var i=0, l=nodes.length; i<l; i++) {
-                    v += nodes[i].name ;
-                    vid += nodes[i].alias ;
-                }
-
-                tempsName.html(v);
-                $scope.formData.contentTemp = vid;
-
-            }
-
-            $.fn.zTree.init($("#treeDemo"), setting, arrTree);
-        })
     }
 
 </script>

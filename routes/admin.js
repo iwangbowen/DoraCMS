@@ -20,8 +20,6 @@ var ContentTemplate = require("../models/ContentTemplate");
 var Message = require("../models/Message");
 //注册用户对象
 var User = require("../models/User");
-//邮件模板对象
-var EmailTemp = require("../models/EmailTemp");
 //广告对象
 var Ads = require("../models/Ads");
 //数据校验
@@ -38,33 +36,6 @@ var DbOpt = require("../models/Dbopt");
 /* GET home page. */
 
 
-//权限校验回调函数
-function checkAdminPower(req,key,callBack) {
-
-    var uGroupId = req.session.adminUserInfo.group;
-    AdminGroup.findOne({_id : uGroupId},function(err,result){
-        if(err){
-            console.log(err)
-        }else{
-            var power = false;
-            if(result){
-                var uPower = result.power;
-                if(uPower){
-                    var newPowers = JSON.parse(uPower);
-                    for(var cateName in newPowers){
-                        if(cateName === key[0] && newPowers[cateName]){
-                            power = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            callBack(power);
-        }
-    })
-}
-
-
 //管理员登录页面
 router.get('/', function(req, res, next) {
   res.render('manage/adminLogin', { title: settings.SITETITLE , description : 'DoraCMS后台管理登录'});
@@ -78,9 +49,20 @@ router.post('/doLogin', function(req, res, next) {
     var newPsd = DbOpt.encrypt(password,settings.encrypt_key);
     AdminUser.findOne({username:username,password:newPsd},function(err,user){
         if(user){
-            req.session.adminlogined = true;
-            req.session.adminUserInfo = user;
-            res.end("success");
+
+//            缓存权限
+            AdminGroup.findOne({_id : user.group},function(err,result){
+                if(err){
+                    console.log(err)
+                }else{
+                    req.session.adminPower = result.power;
+                    req.session.adminlogined = true;
+                    req.session.adminUserInfo = user;
+                    res.end("success");
+                }
+            });
+
+
         }
         else
         {
@@ -93,6 +75,8 @@ router.post('/doLogin', function(req, res, next) {
 // 管理员退出
 router.get('/logout', function(req, res, next) {
     req.session.adminlogined = false;
+    req.session.adminPower = '';
+    req.session.adminUserInfo = '';
     res.redirect("/admin");
 });
 
@@ -105,28 +89,33 @@ router.get('/manage', function(req, res, next) {
 
 //对象列表查询
 router.get('/manage/getDocumentList/:defaultUrl',function(req,res,next){
+
     var currentPage = req.params.defaultUrl;
-    var targetObj = adminFunc.getTargetObj(currentPage);
+    if(adminFunc.checkAdminPower(req,currentPage + '_view')){
 
-    var params = url.parse(req.url,true);
-    var keywords = params.query.searchKey;
-    var keyPr = [];
+        var targetObj = adminFunc.getTargetObj(currentPage);
+        var params = url.parse(req.url,true);
+        var keywords = params.query.searchKey;
+        var keyPr = [];
 
-    if(keywords){
-        var reKey = new RegExp(keywords, 'i');
-        if(targetObj == Content){
-            keyPr.push({'comments' : { $regex: reKey } });
-            keyPr.push({'title' : { $regex: reKey } });
+        if(keywords){
+            var reKey = new RegExp(keywords, 'i');
+            if(targetObj == Content){
+                keyPr.push({'comments' : { $regex: reKey } });
+                keyPr.push({'title' : { $regex: reKey } });
 
-        }else if(targetObj == AdminUser){
-            keyPr = {'username' : { $regex: reKey} };
-        }else if(targetObj == User){
-            keyPr = {'userName' : { $regex: reKey} };
+            }else if(targetObj == AdminUser){
+                keyPr = {'username' : { $regex: reKey} };
+            }else if(targetObj == User){
+                keyPr = {'userName' : { $regex: reKey} };
+            }
+
         }
-
+        DbOpt.pagination(targetObj,req, res,keyPr)
+    }else{
+        return res.json({});
     }
 
-    DbOpt.pagination(targetObj,req, res,keyPr)
 });
 
 
@@ -134,13 +123,26 @@ router.get('/manage/getDocumentList/:defaultUrl',function(req,res,next){
 //对象删除
 router.get('/manage/:defaultUrl/del',function(req,res,next){
     var currentPage = req.params.defaultUrl;
+    var params = url.parse(req.url,true);
     var targetObj = adminFunc.getTargetObj(currentPage);
-
-    if(targetObj == Message){
-        removeMessage(req,res)
+    if(adminFunc.checkAdminPower(req,currentPage + '_del')){
+        if(targetObj == Message){
+            removeMessage(req,res)
+        }else if(targetObj == AdminGroup){
+            if(params.query.uid == req.session.adminUserInfo.group){
+                res.end('当前用户拥有的权限信息不能删除！');
+            }
+        }else if(targetObj == AdminUser){
+            if(params.query.uid == req.session.adminUserInfo._id){
+                res.end('不能删除当前登录的管理员！');
+            }
+        }else{
+            DbOpt.del(targetObj,req,res,"del one obj success");
+        }
     }else{
-        DbOpt.del(targetObj,req,res,"del one obj success");
+        res.end('对不起，您无权执行该操作！');
     }
+
 
 });
 
@@ -148,21 +150,36 @@ router.get('/manage/:defaultUrl/del',function(req,res,next){
 router.get('/manage/:defaultUrl/item',function(req,res,next){
     var currentPage = req.params.defaultUrl;
     var targetObj = adminFunc.getTargetObj(currentPage);
-    DbOpt.findOne(targetObj,req, res,"find one obj success")
+    if(adminFunc.checkAdminPower(req,currentPage + '_view')){
+        DbOpt.findOne(targetObj,req, res,"find one obj success");
+    }else{
+        return res.json({});
+    }
+
 });
 
 
 
-//更新单条记录(获取数据)
+//更新单条记录(执行更新)
 router.post('/manage/:defaultUrl/modify',function(req,res,next){
     var currentPage = req.params.defaultUrl;
     var targetObj = adminFunc.getTargetObj(currentPage);
-    if(targetObj == AdminUser || targetObj == User){
-        var password = req.body.password;
-        var newPsd = DbOpt.encrypt(password,settings.encrypt_key);
-        req.body.password = newPsd;
+    var params = url.parse(req.url,true);
+    if(adminFunc.checkAdminPower(req,currentPage + '_modify')){
+        if(targetObj == AdminUser || targetObj == User){
+            var password = req.body.password;
+            var newPsd = DbOpt.encrypt(password,settings.encrypt_key);
+            req.body.password = newPsd;
+        }else if(targetObj == AdminGroup){
+            if(params.query.uid == req.session.adminUserInfo.group){
+                req.session.adminPower = req.body.power;
+            }
+        }
+        DbOpt.updateOneByID(targetObj,req, res,"update one obj success")
+    }else{
+        res.end('对不起，您无权执行该操作！');
     }
-    DbOpt.updateOneByID(targetObj,req, res,"find one obj success")
+
 });
 
 
@@ -171,18 +188,22 @@ router.post('/manage/:defaultUrl/addOne',function(req,res,next){
 
     var currentPage = req.params.defaultUrl;
     var targetObj = adminFunc.getTargetObj(currentPage);
-
-    if(targetObj == AdminUser){
-        addOneAdminUser(req,res);
-    }else if(targetObj == ContentCategory){
-        addOneCategory(req,res)
-    }else if(targetObj == ContentTags){
-        addOneContentTags(req,res)
-    }else if(targetObj == ContentTemplate){
-        addOneContentTemps(req,res)
+    if(adminFunc.checkAdminPower(req,currentPage + '_add')){
+        if(targetObj == AdminUser){
+            addOneAdminUser(req,res);
+        }else if(targetObj == ContentCategory){
+            addOneCategory(req,res)
+        }else if(targetObj == ContentTags){
+            addOneContentTags(req,res)
+        }else if(targetObj == ContentTemplate){
+            addOneContentTemps(req,res)
+        }else{
+            DbOpt.addOne(targetObj,req, res,"add one obj");
+        }
     }else{
-        DbOpt.addOne(targetObj,req, res,"add one obj");
+        res.end('对不起，您无权执行该操作！');
     }
+
 
 });
 
@@ -224,15 +245,8 @@ function removeMessage(req,res){
 //系统用户管理（list）
 router.get('/manage/adminUsersList', function(req, res, next) {
 
-    checkAdminPower(req,settings.ADMINUSERLIST,function(state){
+    adminFunc.renderToManagePage(req, res,'manage/adminUsersList',settings.ADMINUSERLIST);
 
-        if(state){
-            res.render('manage/adminUsersList', adminFunc.setPageInfo(req,res,settings.ADMINUSERLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-
-    });
 
 });
 
@@ -268,23 +282,17 @@ function addOneAdminUser(req,res){
 //系统用户组管理（list）
 router.get('/manage/adminGroupList', function(req, res, next) {
 
-    checkAdminPower(req,settings.ADMINGROUPLIST,function(state){
-
-        if(state){
-            res.render('manage/adminGroup', adminFunc.setPageInfo(req,res,settings.ADMINGROUPLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-
-    })
-
-
+    adminFunc.renderToManagePage(req, res,'manage/adminGroup',settings.ADMINGROUPLIST);
 
 });
 
 //系统管理员用户组列表
 router.get('/manage/adminGroupList/list', function(req, res, next) {
-    DbOpt.findAll(AdminGroup,req, res,"request adminGroupList")
+    if(adminFunc.checkAdminPower(req,settings.ADMINGROUPLIST[0] + '_view')){
+        DbOpt.findAll(AdminGroup,req, res,"request adminGroupList")
+    }else{
+        return res.json({});
+    }
 });
 
 
@@ -298,13 +306,8 @@ router.get('/manage/adminGroupList/list', function(req, res, next) {
 //文件管理界面（list）
 router.get('/manage/filesList', function(req, res, next) {
 
-    checkAdminPower(req,settings.FILESLIST,function(state){
-        if(state){
-            res.render('manage/filesList', adminFunc.setPageInfo(req,res,settings.FILESLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
+    adminFunc.renderToManagePage(req, res,'manage/filesList',settings.FILESLIST);
+
 });
 
 
@@ -316,13 +319,18 @@ router.get('/manage/filesList/list', function(req, res, next) {
         path =  settings.UPDATEFOLDER;
     }
 
-    var filePath = system.scanFolder(path);
+    if(adminFunc.checkAdminPower(req,settings.FILESLIST[0] + '_view')){
+        var filePath = system.scanFolder(path);
 //    对返回结果做初步排序
-    filePath.sort(function(a,b){return a.type == "folder" ||  b.type == "folder"});
-    return res.json({
-        rootPath : settings.UPDATEFOLDER,
-        pathsInfo : filePath
-    });
+        filePath.sort(function(a,b){return a.type == "folder" ||  b.type == "folder"});
+        return res.json({
+            rootPath : settings.UPDATEFOLDER,
+            pathsInfo : filePath
+        });
+    }else{
+        return res.json({});
+    }
+
 
 });
 
@@ -331,27 +339,49 @@ router.get('/manage/filesList/list', function(req, res, next) {
 router.get('/manage/filesList/fileDel', function(req, res, next) {
     var params = url.parse(req.url,true);
     var path = params.query.filePath;
-    if(path){
-        system.deleteFolder(req, res, path);
+    if(adminFunc.checkAdminPower(req,settings.FILESLIST[0] + '_del')){
+        if(path){
+            system.deleteFolder(req, res, path);
+        }else{
+            res.end('您的请求不正确，请稍后再试');
+        }
+    }else{
+        res.end('对不起，您无权执行该操作！');
     }
+
 });
 
 //文件重命名
 router.post('/manage/filesList/fileReName', function(req, res, next) {
     var newPath = req.body.newPath;
     var path = req.body.path;
-    if(path && newPath){
-        system.reNameFile(req,res,path,newPath);
+    if(adminFunc.checkAdminPower(req,settings.FILESLIST[0] + '_modify')){
+        if(path && newPath){
+            system.reNameFile(req,res,path,newPath);
+        }else{
+            res.end('您的请求不正确，请稍后再试');
+        }
+    }else{
+        res.end('对不起，您无权执行该操作！');
     }
+
 });
 
 //修改文件内容读取文件信息
 router.get('/manage/filesList/getFileInfo', function(req, res, next) {
 
-    var params = url.parse(req.url,true);
-    var path = params.query.filePath;
-    if(path){
-        system.readFile(req,res,path);
+    if(adminFunc.checkAdminPower(req,settings.FILESLIST[0] + '_view')){
+        var params = url.parse(req.url,true);
+        var path = params.query.filePath;
+        if(path){
+            system.readFile(req,res,path);
+        }else{
+            res.end('您的请求不正确，请稍后再试');
+        }
+    }else{
+        return res.json({
+            fileData : {}
+        })
     }
 });
 
@@ -360,8 +390,14 @@ router.post('/manage/filesList/updateFileInfo', function(req, res, next) {
 
     var fileContent = req.body.code;
     var path = req.body.path;
-    if(path){
-        system.writeFile(req,res,path,fileContent);
+    if(adminFunc.checkAdminPower(req,settings.FILESLIST[0] + '_modify')){
+        if(path){
+            system.writeFile(req,res,path,fileContent);
+        }else{
+            res.end('您的请求不正确，请稍后再试');
+        }
+    }else{
+        res.end('对不起，您无权执行该操作！');
     }
 });
 
@@ -372,38 +408,42 @@ router.post('/manage/filesList/updateFileInfo', function(req, res, next) {
 
 router.get('/manage/dataManage/m/backUpData', function(req, res, next) {
 
-    checkAdminPower(req,settings.DATAMANAGE,function(state){
-        if(state){
-            res.render('manage/backUpData', adminFunc.setPageInfo(req,res,settings.DATAMANAGE));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
+    adminFunc.renderToManagePage(req, res,'manage/backUpData',settings.BACKUPDATA);
+
 });
 
 
 //备份数据库执行
 router.get('/manage/backupDataManage/backUp', function(req, res, next) {
-    system.backUpData(res,req);
+    if(adminFunc.checkAdminPower(req,settings.BACKUPDATA[0] + '_backup')) {
+        system.backUpData(res, req);
+    }else{
+        res.end('对不起，您无权执行该操作！');
+    }
 });
 
 
 //备份数据记录删除
-router.get('/manage/backupDataManage/del', function(req, res, next) {
+router.get('/manage/backupDataManage/delItem', function(req, res, next) {
 
     var params = url.parse(req.url,true);
     var forderPath = params.query.filePath;
-    DataOptionLog.remove({_id : params.query.uid},function(err,result){
-        if(err){
-            res.end(err);
-        }else{
-            if(forderPath){
-                system.deleteFolder(req, res,forderPath);
+    if(adminFunc.checkAdminPower(req,settings.BACKUPDATA[0] + '_del')){
+        DataOptionLog.remove({_id : params.query.uid},function(err,result){
+            if(err){
+                res.end(err);
             }else{
-                res.end("error");
+                if(forderPath){
+                    system.deleteFolder(req, res,forderPath);
+                }else{
+                    res.end("删除出错");
+                }
             }
-        }
-    })
+        })
+    }else{
+        res.end('对不起，您无权执行该操作！');
+    }
+
 
 });
 
@@ -415,14 +455,7 @@ router.get('/manage/backupDataManage/del', function(req, res, next) {
 //文档列表页面
 router.get('/manage/contentList', function(req, res, next) {
 
-
-    checkAdminPower(req,settings.CONTENTLIST,function(state){
-        if(state){
-            res.render('manage/contentList', adminFunc.setPageInfo(req,res,settings.CONTENTLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
+    adminFunc.renderToManagePage(req, res,'manage/contentList',settings.CONTENTLIST);
 
 
 });
@@ -434,22 +467,16 @@ router.get('/manage/content/add/:key', function(req, res, next) {
 
     var contentType = req.params.key;
     var targetPath;
-    checkAdminPower(req,settings.CONTENTLIST,function(state){
 
-        if(contentType == "film"){
-            targetPath = 'manage/addProduct';
-        }if(contentType == "plug"){
-            targetPath = 'manage/addPlugs';
-        }else{
-            targetPath = 'manage/addContent';
-        }
+    if(contentType == "plug"){
+        targetPath = 'manage/addPlugs';
+    }else{
+        targetPath = 'manage/addContent';
+    }
 
-        if(state){
-            res.render(targetPath, adminFunc.setPageInfo(req,res,settings.CONTENTLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
+    res.render(targetPath, adminFunc.setPageInfo(req,res,settings.CONTENTLIST));
+
+
 });
 
 
@@ -458,21 +485,14 @@ router.get('/manage/content/add/:key', function(req, res, next) {
 router.get('/manage/content/edit/:type/:content', function(req, res, next) {
     var contentType = req.params.type;
     var targetPath;
-    checkAdminPower(req,settings.CONTENTLIST,function(state){
 
-        if(contentType == "film"){
-            targetPath = 'manage/addProduct';
-        }if(contentType == "plug"){
-            targetPath = 'manage/addPlugs';
-        }else{
-            targetPath = 'manage/addContent';
-        }
-        if(state){
-            res.render(targetPath, adminFunc.setPageInfo(req,res,settings.CONTENTLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
+    if(contentType == "plug"){
+        targetPath = 'manage/addPlugs';
+    }else{
+        targetPath = 'manage/addContent';
+    }
+    res.render(targetPath, adminFunc.setPageInfo(req,res,settings.CONTENTLIST));
+
 });
 
 
@@ -482,10 +502,14 @@ router.get('/manage/ContentList/topContent', function(req, res, next) {
     var params = url.parse(req.url,true);
     var contentId = params.query.uid;
     var isTop = Number(params.query.isTop);
-    Content.update({_id : contentId}, {'isTop' : isTop}, function (err,result) {
-        if(err) throw  err;
-        res.end("success");
-    })
+    if(adminFunc.checkAdminPower(req,settings.CONTENTLIST[0] + '_top')){
+        Content.update({_id : contentId}, {'isTop' : isTop}, function (err,result) {
+            if(err) throw  err;
+            res.end("success");
+        })
+    }else{
+        res.end('对不起，您无权执行该操作！');
+    }
 });
 
 
@@ -494,20 +518,18 @@ router.get('/manage/ContentList/topContent', function(req, res, next) {
 //文档类别列表页面
 router.get('/manage/contentCategorys', function(req, res, next) {
 
-    checkAdminPower(req,settings.CONTENTCATEGORYS,function(state){
-        if(state){
-            res.render('manage/contentCategorys', adminFunc.setPageInfo(req,res,settings.CONTENTCATEGORYS));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
-
+    adminFunc.renderToManagePage(req, res,'manage/contentCategorys',settings.CONTENTCATEGORYS);
 
 });
 
 //文章类别列表
 router.get('/manage/contentCategorys/list', function(req, res, next) {
-    return res.json(ContentCategory.find({}).sort({'sortId': 1}));
+    if(adminFunc.checkAdminPower(req,settings.CONTENTCATEGORYS[0] + '_view')){
+        return res.json(ContentCategory.find({}).sort({'sortId': 1}));
+    }else{
+        return res.json({});
+    }
+
 });
 
 //添加新类别
@@ -541,18 +563,18 @@ function addOneCategory(req,res){
 //文档标签管理（list）
 router.get('/manage/contentTags', function(req, res, next) {
 
-    checkAdminPower(req,settings.CONTENTTAGS,function(state){
-        if(state){
-            res.render('manage/contentTags', adminFunc.setPageInfo(req,res,settings.CONTENTTAGS));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
+    adminFunc.renderToManagePage(req, res,'manage/contentTags',settings.CONTENTTAGS);
+
 });
 
 //所有标签列表
 router.get('/manage/contentTags/list', function(req, res, next) {
-    DbOpt.findAll(ContentTags,req, res,"request ContentTags List")
+    if(adminFunc.checkAdminPower(req,settings.CONTENTTAGS[0] + '_view')){
+        DbOpt.findAll(ContentTags,req, res,"request ContentTags List")
+    }else{
+        return res.json({});
+    }
+
 });
 
 
@@ -583,35 +605,34 @@ function addOneContentTags(req,res){
 //文档模板管理（list）
 router.get('/manage/contentTemps', function(req, res, next) {
 
-    checkAdminPower(req,settings.CONTENTTEMPS,function(state){
-        if(state){
-            res.render('manage/contentTemps', adminFunc.setPageInfo(req,res,settings.CONTENTTEMPS));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
+    adminFunc.renderToManagePage(req, res,'manage/contentTemps',settings.CONTENTTEMPS);
+
 });
 
 //所有模板列表
 router.get('/manage/contentTemps/list', function(req, res, next) {
-    DbOpt.findAll(ContentTemplate,req, res,"request ContentTemps List")
+    if(adminFunc.checkAdminPower(req,settings.CONTENTTEMPS[0] + '_view')){
+        DbOpt.findAll(ContentTemplate,req, res,"request ContentTemps List");
+    }else{
+        return res.json({});
+    }
+
 });
 
 
 
 //添加文档模板
 function addOneContentTemps(req,res){
-    var errors;
     var name = req.body.name;
-    var alias = req.body.alias;
-    var query=ContentTemplate.find().or([{'name' : name},{alias : alias}]);
-//    模板或别名不允许重复
-    query.exec(function(err,Temps){
-        if(Temps.length > 0){
-            errors = "名称或者别名已存在！";
-            res.end(errors);
+    ContentTemplate.find({'name' : name},function(err,temp){
+        if(err){
+            res.end(err);
         }else{
-            DbOpt.addOne(ContentTemplate,req, res,"add new contentTemps");
+            if(temp && temp.length > 0){
+                res.end("名称不可重复！");
+            }else{
+                DbOpt.addOne(ContentTemplate,req, res,"add new contentTemps");
+            }
         }
     });
 }
@@ -640,13 +661,8 @@ router.get('/manage/contentTemps/forderList', function(req, res, next) {
 //文档留言管理（list）
 router.get('/manage/contentMsgs', function(req, res, next) {
 
-    checkAdminPower(req,settings.MESSAGEMANAGE,function(state){
-        if(state){
-            res.render('manage/messageList', adminFunc.setPageInfo(req,res,settings.MESSAGEMANAGE));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
+    adminFunc.renderToManagePage(req, res,'manage/messageList',settings.MESSAGEMANAGE);
+
 });
 
 
@@ -659,62 +675,10 @@ router.get('/manage/contentMsgs', function(req, res, next) {
 //注册用户管理（list）
 router.get('/manage/regUsersList', function(req, res, next) {
 
-    checkAdminPower(req,settings.REGUSERSLIST,function(state){
-        if(state){
-            res.render('manage/regUsersList', adminFunc.setPageInfo(req,res,settings.REGUSERSLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
-
+    adminFunc.renderToManagePage(req, res,'manage/regUsersList',settings.REGUSERSLIST);
 
 });
 
-
-//--------------------邮件模板开始---------------------------
-//邮件模板列表页面
-router.get('/manage/emailTempList', function(req, res, next) {
-
-    checkAdminPower(req,settings.EMAILTEMPLIST,function(state){
-        if(state){
-            res.render('manage/emailTempList', adminFunc.setPageInfo(req,res,settings.EMAILTEMPLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
-
-
-});
-
-
-
-//邮件模板添加页面
-router.get('/manage/emailTemp/add', function(req, res, next) {
-
-    checkAdminPower(req,settings.EMAILTEMPLIST,function(state){
-        if(state){
-            res.render('manage/addEmailTemp', adminFunc.setPageInfo(req,res,settings.EMAILTEMPLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
-
-
-});
-
-//邮件模板编辑页面
-router.get('/manage/emailTemp/edit/:content', function(req, res, next) {
-
-    checkAdminPower(req,settings.EMAILTEMPLIST,function(state){
-        if(state){
-            res.render('manage/addEmailTemp', adminFunc.setPageInfo(req,res,settings.EMAILTEMPLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
-
-
-});
 
 
 
@@ -722,14 +686,7 @@ router.get('/manage/emailTemp/edit/:content', function(req, res, next) {
 //广告管理列表页面
 router.get('/manage/adsList', function(req, res, next) {
 
-    checkAdminPower(req,settings.ADSLIST,function(state){
-        if(state){
-            res.render('manage/adsList', adminFunc.setPageInfo(req,res,settings.ADSLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
-
+    adminFunc.renderToManagePage(req, res,'manage/adsList',settings.ADSLIST);
 
 });
 
@@ -738,27 +695,14 @@ router.get('/manage/adsList', function(req, res, next) {
 //广告添加页面
 router.get('/manage/ads/add', function(req, res, next) {
 
-    checkAdminPower(req,settings.ADSLIST,function(state){
-        if(state){
-            res.render('manage/addAds', adminFunc.setPageInfo(req,res,settings.ADSLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
-
+    adminFunc.renderToManagePage(req, res,'manage/addAds',settings.ADSLIST);
 
 });
 
 //广告编辑页面
 router.get('/manage/ads/edit/:content', function(req, res, next) {
 
-    checkAdminPower(req,settings.ADSLIST,function(state){
-        if(state){
-            res.render('manage/addAds', adminFunc.setPageInfo(req,res,settings.ADSLIST));
-        }else{
-            res.redirect("/admin/manage");
-        }
-    })
+    adminFunc.renderToManagePage(req, res,'manage/addAds',settings.ADSLIST);
 
 });
 

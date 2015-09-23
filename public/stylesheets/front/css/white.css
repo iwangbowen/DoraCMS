@@ -79,7 +79,7 @@ a:hover {
     border-bottom: 1px solid #ddd;
 }
 
-#header .container .col-group .site-name{
+#header .container .col-group .site-name {
     margin: 5px 0 25px;
 }
 
@@ -156,7 +156,7 @@ a:hover {
 }
 
 /*热门文档*/
-.hotNewsList, .searchBoard, .leftNav, .tagsList, .cateList, .friendLink ,.reSetPsdBoard ,.newItemList{
+.hotNewsList, .searchBoard, .leftNav, .tagsList, .cateList, .friendLink, .reSetPsdBoard, .newItemList {
     margin-bottom: 30px;
 }
 
@@ -212,7 +212,7 @@ a:hover {
 .tagsList {
 }
 
-.tagsList ul li {
+.tagsList ul li, .friendLink ul li {
     display: inline-block;
     margin: 0 5px;
     line-height: 30px;
@@ -258,9 +258,8 @@ a:hover {
     margin-bottom: 15px;
 }
 
-
 /*用户登录*/
-.loginBoard h3, .regBoard h3 , .conformBoard h3, .reSetPsdBoard h3,.noticeBoard h3 {
+.loginBoard h3, .regBoard h3, .conformBoard h3, .reSetPsdBoard h3, .noticeBoard h3 {
     color: #6e7173;
     font-size: 16px;
 }
@@ -273,6 +272,12 @@ a:hover {
 /*搜索*/
 .searchBoard .search-input {
     width: 100%
+}
+
+/*参与话题*/
+.replyList li h4, .replyList li blockquote {
+    font-size: 13px;
+    font-weight: normal;
 }
 
 /*footer部分*/

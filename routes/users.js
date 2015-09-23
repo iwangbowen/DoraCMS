@@ -250,6 +250,38 @@ router.get('/setUserPsd', function(req, res, next) {
 
 });
 
+
+//用户参与话题
+router.get('/userReplies', function(req, res, next) {
+    if(isLogined(req)){
+        res.render('web/users/userReplies', siteFunc.setDataForUserReply(req, res, '参与话题'));
+    }
+    else{
+        res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") , layout: 'web/temp/errorTemp' });
+    }
+
+});
+
+//参与话题分页
+router.get('/userReplies/:defaultUrl',function(req, res){
+    if(isLogined(req)){
+        var defaultUrl = req.params.defaultUrl;
+        var replyUrl = defaultUrl.split('—')[0];
+        var replyPage = defaultUrl.split('—')[1];
+        if (replyUrl == 'p') {
+            req.query.page = replyPage;
+            res.render('web/users/userReplies', siteFunc.setDataForUserReply(req, res, '参与话题'));
+        }else{
+            res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") , layout: 'web/temp/errorTemp' });
+        }
+    }
+    else{
+        res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") , layout: 'web/temp/errorTemp' });
+    }
+});
+
+
+
 // 用户退出
 router.get('/logout', function(req, res, next) {
     req.session.destroy();

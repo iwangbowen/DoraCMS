@@ -24,8 +24,6 @@ var ContentTemplate = require("../ContentTemplate");
 var Message = require("../Message");
 //注册用户对象
 var User = require("../User");
-//邮件模板对象
-var EmailTemp = require("../EmailTemp");
 //广告对象
 var Ads = require("../Ads");
 //文件对象
@@ -73,51 +71,72 @@ var adminFunc = {
 
     },
 
-    setDataForManageList: function (req, res, q, title) {
-        var requireField = '';
-        var documentList = DbOpt.getPaginationResult(Content, req, res, q , requireField);
+    setDataForInfo : function(infoType,infoContent){
 
         return {
-
-            documentList: documentList.docs,
-            pageInfo: documentList.pageInfo,
-            pageType: 'index'
-
+            siteInfo : adminFunc.siteInfos('系统操作提示'),
+            bigCategory : 'noticePage',
+            infoType : infoType,
+            infoContent : infoContent,
+            layout: 'manage/public/adminTemp'
         }
-    }
-    ,
+
+    },
+
     getTargetObj : function(currentPage){
         var targetObj;
-
-        if(currentPage == settings.ADMINUSERLIST[0]){
+        if(currentPage.indexOf(settings.ADMINUSERLIST[0]) >=0 ){
             targetObj = AdminUser;
-        }else if(currentPage == settings.ADMINGROUPLIST[0]){
+        }else if(currentPage.indexOf(settings.ADMINGROUPLIST[0]) >=0 ){
             targetObj = AdminGroup;
-        }else if(currentPage == settings.EMAILTEMPLIST[0]){
-            targetObj = EmailTemp;
-        }else if(currentPage == settings.ADSLIST[0]){
+        }else if(currentPage.indexOf(settings.ADSLIST[0]) >=0 ){
             targetObj = Ads;
-        }else if(currentPage == settings.FILESLIST[0]){
+        }else if(currentPage.indexOf(settings.FILESLIST[0]) >=0 ){
             targetObj = Files;
-        }else if(currentPage == settings.DATAMANAGE[0]){
+        }else if(currentPage.indexOf(settings.BACKUPDATA[0]) >=0 ){
             targetObj = DataOptionLog;
-        }else if(currentPage == settings.CONTENTLIST[0]){
+        }else if(currentPage.indexOf(settings.CONTENTLIST[0]) >=0 ){
             targetObj = Content;
-        }else if(currentPage == settings.CONTENTCATEGORYS[0]){
+        }else if(currentPage.indexOf(settings.CONTENTCATEGORYS[0]) >=0 ){
             targetObj = ContentCategory;
-        }else if(currentPage == settings.CONTENTTAGS[0]){
+        }else if(currentPage.indexOf(settings.CONTENTTAGS[0]) >=0 ){
             targetObj = ContentTags;
-        }else if(currentPage == settings.CONTENTTEMPS[0]){
+        }else if(currentPage.indexOf(settings.CONTENTTEMPS[0]) >=0 ){
             targetObj = ContentTemplate;
-        }else if(currentPage == settings.MESSAGEMANAGE[0]){
+        }else if(currentPage.indexOf(settings.MESSAGEMANAGE[0]) >=0 ){
             targetObj = Message;
-        }else if(currentPage == settings.REGUSERSLIST[0]){
+        }else if(currentPage.indexOf(settings.REGUSERSLIST[0]) >=0 ){
             targetObj = User;
         }else{
             targetObj = Content;
         }
 
         return targetObj
+    },
+
+    checkAdminPower : function(req,key){
+        var power = false;
+        var uPower = req.session.adminPower;
+        if(uPower){
+            var newPowers = eval(uPower);
+            for(var i=0;i<newPowers.length;i++) {
+                var checkedId = newPowers[i].split(':')[0];
+//                console.log('------checkedId-------'+checkedId+'-----key------'+key);
+                if(checkedId == key && newPowers[i].split(':')[1]){
+                    power = true;
+                    break;
+                }
+            }
+        }
+        return power;
+    },
+
+    renderToManagePage : function(req,res,url,pageKey){
+        if(adminFunc.checkAdminPower(req,pageKey[0] + '_view')){
+            res.render(url, adminFunc.setPageInfo(req,res,pageKey));
+        }else{
+            res.render("manage/public/notice", adminFunc.setDataForInfo('danger','对不起，您无权操作 <strong>'+pageKey[1]+'</strong> 模块！'));
+        }
     }
 
 

@@ -95,7 +95,7 @@ var siteFunc = {
     },
 
     setDataForIndex: function (req, res, q, title) {
-        var requireField = 'title date commentNum discription sImg';
+        var requireField = 'title date commentNum discription clickNum';
         var documentList = DbOpt.getPaginationResult(Content, req, res, q, requireField);
         var tagsData = DbOpt.getDatasByParam(ContentTags, req, res, {});
         return {
@@ -114,7 +114,7 @@ var siteFunc = {
     },
 
     setDataForCate: function (req, res, dq, cq, cateInfo) {
-        var requireField = 'title date commentNum discription sImg';
+        var requireField = 'title date commentNum discription clickNum comments';
         var documentList = DbOpt.getPaginationResult(Content, req, res, dq, requireField);
         var currentCateList = ContentCategory.find(cq).sort({'sortId': 1});
         var tagsData = DbOpt.getDatasByParam(ContentTags, req, res, {});
@@ -154,7 +154,7 @@ var siteFunc = {
 
     setDataForSearch: function (req, res, q, searchKey) {
         req.query.searchKey = searchKey;
-        var requireField = 'title date commentNum discription sImg';
+        var requireField = 'title date commentNum discription clickNum';
         var documentList = DbOpt.getPaginationResult(Content, req, res, q, requireField);
         return {
             siteConfig: siteFunc.siteInfos("文档搜索"),
@@ -185,6 +185,20 @@ var siteFunc = {
             cateTypes: siteFunc.getCategoryList(),
             userInfo: req.session.user,
             tokenId : tokenId,
+            layout: 'web/public/defaultTemp'
+        }
+    },
+
+    setDataForUserReply: function (req, res, title) {
+        req.query.limit = 5;
+        var documentList = DbOpt.getPaginationResult(Message, req, res, {'uid' : req.session.user._id});
+        return {
+            siteConfig: siteFunc.siteInfos(title),
+            cateTypes: siteFunc.getCategoryList(),
+            userInfo: req.session.user,
+            replyList : documentList.docs,
+            pageInfo: documentList.pageInfo,
+            pageType: 'replies',
             layout: 'web/public/defaultTemp'
         }
     },

@@ -1,4 +1,5 @@
 <div class="row" ng-controller="filesList">
+    <% include public/modal %>
     <div class="col-xs-12">
         <div class="panel hide">
             <a href="###" ng-click="newFolder()" role="button" class="btn btn-primary btn-sm"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>新建文件夹</a>
@@ -45,7 +46,7 @@
                             <td>
                                 <a href="#" data-whatever="{{file.name}},{{file.path}}"data-toggle="modal" data-target="#modifyFile" title="修改"  class="text-info" ng-show="file.type == 'html' || file.type == 'js' || file.type == 'css'" class="text-info">修改</a>&nbsp;&nbsp;
                                 <a href="#" data-whatever="{{file.name}},{{file.path}}"data-toggle="modal" data-target="#reNameFile" title="重命名" class="text-warning">重命名</a>&nbsp;&nbsp;
-                                <a href="#" data-whatever="{{file.path}}" data-toggle="modal" data-target="#checkIfDel" title="删除" class="text-danger">删除</a>
+                                <a href="#" ng-click="delFilesItem(file.path)" title="删除" class="text-danger">删除</a>
                             </td>
                         </tr>
                     </table>
@@ -143,25 +144,6 @@
     </div><!-- /.row -->
 
 
-    <!--信息提示模态窗口-->
-    <div class="modal fade" id="checkIfDel">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">系统提示</h4>
-                </div>
-                <div class="modal-body">
-                    <h4 class="text-danger"><i class="icon fa fa-warning"></i> 该操作无法撤销，确认删除？</h4>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" ng-click="delFile()">删除</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-
 </div>
 <script>
     $(function(){
@@ -170,201 +152,163 @@
 </script>
 <script>
 
-            doraApp.controller("filesList",function($scope,$http){
-                $scope.formData = {};
-//                $scope.formData.oldName = "";
-                $scope.mdFormData = {};
-                $scope.fileData = {};
+    doraApp.controller("filesList",function($scope,$http){
+        $scope.formData = {};
+        $scope.mdFormData = {};
+        $scope.fileData = {};
 
 //                初始化显示方式
-                $scope.listView = true;
+        $scope.listView = true;
 
 
-                getFolderList($scope,$http,"");
+        getFolderList($scope,$http,"");
 
 //                监听确认删除弹窗，传递参数
-                $('#checkIfDel').on('show.bs.modal', function (event) {
-                    var obj = $(event.relatedTarget);
-                    $scope.targetPath = obj.data('whatever');
-                }).on('hide.bs.modal', function (event) {
-                    $scope.targetPath ="";
+        $scope.delFilesItem = function(path){
+            initCheckIfDo($scope,'','您确认要删除该文件吗？',function(path){
+                angularHttpGet($http,"/admin/manage/filesList/fileDel?filePath="+path,function(){
+                    getFolderList($scope,$http,$scope.rootPath +$scope.currentPath);
                 });
+            });
+        };
 
 //                重命名弹窗参数传递
-                $('#reNameFile').on('show.bs.modal', function (event) {
-                    var obj = $(event.relatedTarget);
-                    var editPath = obj.data('whatever');
+        $('#reNameFile').on('show.bs.modal', function (event) {
+            var obj = $(event.relatedTarget);
+            var editPath = obj.data('whatever');
 //                    如果不为空则为编辑状态
-                    if(editPath){
-                        $scope.formData.oldName = (editPath.split(","))[0];
-                        $scope.formData.path = (editPath.split(","))[1];
-                        $scope.targetPath = (editPath.split(","))[1];
-                    }else{
+            if(editPath){
+                $scope.formData.oldName = (editPath.split(","))[0];
+                $scope.formData.path = (editPath.split(","))[1];
+                $scope.targetID = (editPath.split(","))[1];
+            }else{
 
-                    }
-                }).on('hidden.bs.modal', function (e) {
-                    // 清空数据
-                    $scope.formData = {};
-                    $scope.targetPath ="";
+            }
+        }).on('hidden.bs.modal', function (e) {
+            // 清空数据
+            $scope.formData = {};
+            $scope.targetID ="";
 
-                });
-
+        });
 
 //                修改html代码参数传递
-                $('#modifyFile').on('show.bs.modal', function (event) {
-                    var obj = $(event.relatedTarget);
-                    var editPath = obj.data('whatever');
+        $('#modifyFile').on('show.bs.modal', function (event) {
+            var obj = $(event.relatedTarget);
+            var editPath = obj.data('whatever');
 //                    如果不为空则为编辑状态
-                    if(editPath){
-                        $scope.mdFormData.name = (editPath.split(","))[0];
-                        $scope.mdFormData.path = (editPath.split(","))[1];
-                        $scope.targetPath = (editPath.split(","))[1];
-                        $http.get("/admin/manage/filesList/getFileInfo?filePath="+$scope.mdFormData.path).success(function(result){
-                            $scope.mdFormData.code = result.fileData;
-                        })
+            if(editPath){
+                $scope.mdFormData.name = (editPath.split(","))[0];
+                $scope.mdFormData.path = (editPath.split(","))[1];
+                $scope.targetID = (editPath.split(","))[1];
+                $http.get("/admin/manage/filesList/getFileInfo?filePath="+$scope.mdFormData.path).success(function(result){
+                    $scope.mdFormData.code = result.fileData;
+                })
 
-                    }else{
+            }else{
 
-                    }
-                }).on('hidden.bs.modal', function (e) {
-                    // 清空数据
-                    $scope.mdFormData = {};
-                    $scope.targetPath ="";
+            }
+        }).on('hidden.bs.modal', function (e) {
+            // 清空数据
+            $scope.mdFormData = {};
+            $scope.targetID ="";
 
-                });
+        });
 
-                $scope.processForm = function(isValid){
-                    var curentUrl = "/admin/manage/filesList/addFolder";
-                    if($scope.targetPath)
-                    {
-                        $scope.formData.newPath = $scope.rootPath +$scope.currentPath +"/"+ $scope.formData.newName;
-                        curentUrl = "/admin/manage/filesList/fileReName";
-                    }
-                    if(isValid){
-                        $http({
-                            method  : 'POST',
-                            url     : curentUrl,
-                            data    : $.param($scope.formData),  // pass in data as strings
-                            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
-                        })
-                        .success(function(data) {
-                            if(data === "success"){
-                                $("#reNameFile").modal("hide");
-                                getFolderList($scope,$http,$scope.rootPath +$scope.currentPath);
+        $scope.processForm = function(isValid){
+            var curentUrl = "/admin/manage/filesList/addFolder";
+            if($scope.targetID)
+            {
+                $scope.formData.newPath = $scope.rootPath +$scope.currentPath +"/"+ $scope.formData.newName;
+                curentUrl = "/admin/manage/filesList/fileReName";
+            }
 
-                            }else{
-                                alert("未知异常，请稍后重试");
-                            }
-                        });
-                    }else{
-                        alert("校验失败")
-                    }
-                };
-
-//                提交更新后的文件
-                $scope.processMdForm = function(isValid){
-                    if(isValid){
-                        $http({
-                            method  : 'POST',
-                            url     : "/admin/manage/filesList/updateFileInfo",
-                            data    : $.param($scope.mdFormData),  // pass in data as strings
-                            headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
-                        })
-                        .success(function(data) {
-                            if(data === "success"){
-                                $("#modifyFile").modal("hide");
-                                getFolderList($scope,$http,$scope.rootPath +$scope.currentPath);
-
-                            }else{
-                                alert("未知异常，请稍后重试");
-                            }
-                        });
-                    }else{
-                        alert("校验失败")
-                    }
-                };
-
-                $scope.newFolder  = function(){
-                    alert("开发中...")
-                };
-
-//                列表或缩略图切换
-                $scope.listViewShow = function(){
-                    $scope.listView = true;
-                };
-
-                $scope.thumbnailViewShow = function(){
-                    $scope.listView = false;
-                };
-
-//                删除文件或文件夹
-                $scope.delFile = function(){
-                    $http.get("/admin/manage/filesList/fileDel?filePath="+$scope.targetPath).success(function(result){
-                        $('#checkIfDel').modal("hide");
-                        console.log("del success!");
-//                        重载数据
-                        getFolderList($scope,$http,$scope.rootPath +$scope.currentPath);
-                    })
-                };
-
-//                进入点击的目录
-                $scope.getFiles = function(type,name,path){
-                    if(type === "folder"){
-                        //                    记录前一路径
-
-                        getFolderList($scope,$http,path);
-
-                    }else if(type === "image" && $scope.listView){
-//                        var obj = this;
-//                        console.log(this)
-                    }
-                };
-
-                $scope.getAllFiles = function(){
-                    getFolderList($scope,$http,"")
-                };
-
-//                进入上级目录
-                $scope.getPrePath = function(){
-
-//                    找到上级目录
-                    var currentPathArr = ($scope.currentPath).split("/");
-                    if(currentPathArr.length > 0){
-                        var currentFolderLength = (currentPathArr[currentPathArr.length-1]).length + 1;
-                        var prePath = ($scope.currentPath).substring(0,($scope.currentPath).length - currentFolderLength);
-                        $scope.prePath = $scope.rootPath + prePath;
-                    }
-
-                    getFolderList($scope,$http,$scope.prePath);
-
-                }
-
+            angularHttp($http,isValid,'POST',curentUrl,$scope.formData,function(data){
+                getFolderList($scope,$http,$scope.rootPath +$scope.currentPath);
             });
 
+        };
 
-            function getFolderList($scope,$http,path){
-                $("#dataLoading").removeClass("hide");
-                $http.get("/admin/manage/filesList/list?filePath="+path).success(function(result){
+//                提交更新后的文件
+        $scope.processMdForm = function(isValid){
 
-                    $scope.fileData = result.pathsInfo;
-                    $scope.rootPath = result.rootPath;
-                    $scope.currentPath =  getCurrentPath($scope,$http,path);
+            angularHttp($http,isValid,'POST','/admin/manage/filesList/updateFileInfo',$scope.mdFormData,function(data){
+                getFolderList($scope,$http,$scope.rootPath +$scope.currentPath);
+            });
 
-                    $("#dataLoading").addClass("hide");
+        };
 
-                })
+        $scope.newFolder  = function(){
+            alert("开发中...")
+        };
+
+//                列表或缩略图切换
+        $scope.listViewShow = function(){
+            $scope.listView = true;
+        };
+
+        $scope.thumbnailViewShow = function(){
+            $scope.listView = false;
+        };
+
+
+//                进入点击的目录
+        $scope.getFiles = function(type,name,path){
+            if(type === "folder"){
+                //                    记录前一路径
+
+                getFolderList($scope,$http,path);
+
+            }else if(type === "image" && $scope.listView){
+//                        var obj = this;
+//                        console.log(this)
+            }
+        };
+
+        $scope.getAllFiles = function(){
+            getFolderList($scope,$http,"")
+        };
+
+//                进入上级目录
+        $scope.getPrePath = function(){
+
+//                    找到上级目录
+            var currentPathArr = ($scope.currentPath).split("/");
+            if(currentPathArr.length > 0){
+                var currentFolderLength = (currentPathArr[currentPathArr.length-1]).length + 1;
+                var prePath = ($scope.currentPath).substring(0,($scope.currentPath).length - currentFolderLength);
+                $scope.prePath = $scope.rootPath + prePath;
             }
 
-//            获取当前文件目录
-            function getCurrentPath($scope,$http,path){
-                if(path){
-                    var cutLength = ($scope.rootPath).length;
-                    var currentPath  = path.substring(cutLength,path.length);
-                    return currentPath;
-                }else{
-                    return "";
-                }
-            }
+            getFolderList($scope,$http,$scope.prePath);
+
+        }
+
+    });
+
+
+    function getFolderList($scope,$http,path){
+        $("#dataLoading").removeClass("hide");
+        $http.get("/admin/manage/filesList/list?filePath="+path).success(function(result){
+
+            $scope.fileData = result.pathsInfo;
+            $scope.rootPath = result.rootPath;
+            $scope.currentPath =  getCurrentPath($scope,$http,path);
+
+            $("#dataLoading").addClass("hide");
+
+        })
+    }
+
+    //            获取当前文件目录
+    function getCurrentPath($scope,$http,path){
+        if(path){
+            var cutLength = ($scope.rootPath).length;
+            var currentPath  = path.substring(cutLength,path.length);
+            return currentPath;
+        }else{
+            return "";
+        }
+    }
 
 
 </script>

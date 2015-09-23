@@ -134,8 +134,8 @@ var DbOpt = {
             resultList = obj.find().or(q,filed).sort(sq).skip(startNum).limit(limit);
             resultNum = obj.find().or(q,filed).count();
         }else{
-            resultList = obj.find(q).sort(sq).skip(startNum).limit(limit);
-            resultNum = obj.find(q).count();
+            resultList = obj.find(q,filed).sort(sq).skip(startNum).limit(limit);
+            resultNum = obj.find(q,filed).count();
         }
         //        分页参数
         var pageInfo = {

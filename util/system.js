@@ -3,8 +3,6 @@
  */
 //邮件发送插件
 var nodemailer  = require("nodemailer");
-//邮件模板对象
-var EmailTemp = require("../models/EmailTemp");
 //文件操作对象
 var fs = require('fs');
 //数据库操作对象
@@ -49,7 +47,7 @@ var system = {
 //                发送邮件
         var transporter = nodemailer.createTransport({
 
-            service: '163',
+            service: 'QQ',
             auth: {
                 user: settings.site_email,
                 pass: settings.site_email_psd
@@ -152,7 +150,7 @@ var system = {
                     "type" : "folder",
                     "size" : stats.size,
                     "date" : stats.mtime
-                }
+                };
                 folderList.push(fileInfo);
             }
         });
@@ -161,32 +159,24 @@ var system = {
     },
     deleteFolder : function(req, res,path){
         var files = [];
-        console.log("---del path--"+path)
+        console.log("---del path--"+path);
         if( fs.existsSync(path) ) {
-            console.log("---begin to del--")
-
+            console.log("---begin to del--");
             if(fs.statSync(path).isDirectory()) {
                 var walk = function(path){
                     files = fs.readdirSync(path);
                     files.forEach(function(file,index){
-
                         var curPath = path + "/" + file;
-
                         if(fs.statSync(curPath).isDirectory()) { // recurse
-
                             walk(curPath);
-
                         } else { // delete file
-
                             fs.unlinkSync(curPath);
-
                         }
                     });
-
                     fs.rmdirSync(path);
-                }
+                };
                 walk(path);
-                console.log("---del folder success----")
+                console.log("---del folder success----");
                 res.end("success");
             }else{
                 fs.unlink(path, function(err){
@@ -199,6 +189,8 @@ var system = {
                 }) ;
             }
 
+        }else{
+            res.end("success");
         }
     },
     reNameFile : function(req,res,path,newPath){
