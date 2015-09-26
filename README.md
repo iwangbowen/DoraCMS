@@ -6,8 +6,10 @@
 
 #DoraCMS
 ## DoraCMS是基于Nodejs+express+mongodb编写的一套内容管理系统，结构简单，较目前一些开源的cms，doracms易于拓展，特别适合前端开发工程师做二次开发。
-### 代码演示1：http://www.html-js.cn
-### 代码演示2：http://www.dailyads.cn
+
+### 代码演示1.[基于DoraCMS 定制的博客系统](http://www.html-js.cn) 
+### 代码演示2.[基于 DoraCMS 定制的视频分享站点](http://www.dailyads.cn)
+
 ## 操作文档链接：
 ## http://www.html-js.cn/details/Ey20NbBi.html
 ## http://www.html-js.cn/details/VkldQTPs.html
@@ -320,8 +322,8 @@ Validat.js 后台权限控制（没有授予管理权限(session)会直接过滤
 
 ### 3、演示地址在哪里?
  
-- http://www.html-js.cn  基于DoraCMS 定制的博客系统
-- http://www.dailyads.cn 基于 DoraCMS 定制的视频分享站点
+### 代码演示1.[基于DoraCMS 定制的博客系统](http://www.html-js.cn) 
+### 代码演示2.[基于 DoraCMS 定制的视频分享站点](http://www.dailyads.cn)
 
 ### 4、为什么上传图片失败？
 
