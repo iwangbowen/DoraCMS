@@ -119,20 +119,17 @@
 - ①、找到Mongodb安装目录(MongoDB\Server\3.0\bin) 执行 mongo.exe
 - ②、输入 use doracms
 - ③、插入用户组数据:
-```
+```js
 db.admingroups.insert({
   "_id" : "4yTbsWiI",
   "name" : "超级管理员",
-  "power" : "{\"sysTemManage_0_1\":true,\"sysTemManage_0_2\":true,\"sysTemManage_0_3\":true,\"sysTemManage_0_4\":true,\"sysTemManage_0_5\":true,
-\"contentManage_1_1\":true,\"contentManage_1_2\":true,\"contentManage_1_3\":true,\"userManage_2_1\":true,\"projectManage_3_1\":true,
-\"projectManage_3_2\":true,\"projectManage_3_3\":true,\"contentManage_1_4\":true,\"contentManage_1_5\":true,\"sysTemManage_0_6\":true,
-\"contentManage_1_6\":true}",
+  "power" : "[\"sysTemManage:true\",\"sysTemManage_user:true\",\"sysTemManage_user_add:true\",\"sysTemManage_user_view:true\",\"sysTemManage_user_modify:true\",\"sysTemManage_user_del:true\",\"sysTemManage_uGroup:true\",\"sysTemManage_uGroup_add:true\",\"sysTemManage_uGroup_view:true\",\"sysTemManage_uGroup_modify:true\",\"sysTemManage_uGroup_del:true\",\"sysTemManage_ads:true\",\"sysTemManage_ads_add:true\",\"sysTemManage_ads_view:true\",\"sysTemManage_ads_modify:true\",\"sysTemManage_ads_del:true\",\"sysTemManage_files:true\",\"sysTemManage_files_view:true\",\"sysTemManage_data:true\",\"sysTemManage_data_1:true\",\"sysTemManage_data_1_view:true\",\"sysTemManage_data_1_backup:true\",\"sysTemManage_data_1_del:true\",\"contentManage:true\",\"contentManage_content:true\",\"contentManage_content_add:true\",\"contentManage_content_view:true\",\"contentManage_content_top:true\",\"contentManage_content_modify:true\",\"contentManage_content_del:true\",\"contentManage_cateGory:true\",\"contentManage_cateGory_add:true\",\"contentManage_cateGory_view:true\",\"contentManage_cateGory_modify:true\",\"contentManage_cateGory_del:true\",\"contentManage_tag:true\",\"contentManage_tag_add:true\",\"contentManage_tag_view:true\",\"contentManage_tag_modify:true\",\"contentManage_tag_del:true\",\"contentManage_temp:true\",\"contentManage_temp_add:true\",\"contentManage_temp_view:true\",\"contentManage_temp_modify:true\",\"contentManage_temp_del:true\",\"contentManage_msg:true\",\"contentManage_msg_view:true\",\"contentManage_msg_modify:true\",\"contentManage_msg_del:true\",\"userManage:true\",\"userManage_user:true\",\"userManage_user_view:true\",\"userManage_user_modify:true\",\"userManage_user_del:true\"]",
   "date" : ISODate("2015-06-30T08:04:46.092Z"),
   "__v" : 0
 })
 ```
 - ④、插入用户数据：
-```
+```js
 db.adminusers.insert({
   "_id" : "E1jNjZi8",
   "name" : "test",
