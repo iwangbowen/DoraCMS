@@ -7,7 +7,7 @@
 #DoraCMS
 ## DoraCMS是基于Nodejs+express+mongodb编写的一套内容管理系统，结构简单，较目前一些开源的cms，doracms易于拓展，特别适合前端开发工程师做二次开发。
 
-### 代码演示1.[基于DoraCMS 定制的博客系统](http://www.html-js.cn) 
+### 代码演示1.[基于DoraCMS 定制的博客系统](http://www.html-js.cn) 管理地址：http://www.html-js.cn/admin  （账号:testuser,密码：doracms）
 ### 代码演示2.[基于 DoraCMS 定制的视频分享站点](http://www.dailyads.cn)
 
 ## 操作文档链接：
