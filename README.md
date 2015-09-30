@@ -4,7 +4,7 @@
 
 ###问题：
 - 1、redis connection to 127.0.0.1:6379 failed 这个是redis连接不上的问题，请看这篇文章[DoraCMS redis报错问题](http://www.html-js.cn/details/4yyl6O7A.html)
-- 2、failed to load c++ bson extension 这个问题不用管,node自己的问题
+- 2、failed to load c++ bson extension 这个问题不用管,node自己的问题,不影响程序运行
 
 ###-------------------------------------------------------------------------------------------------
 
