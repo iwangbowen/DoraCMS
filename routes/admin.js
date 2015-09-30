@@ -179,15 +179,15 @@ router.get('/manage/:defaultUrl/batchDel',function(req,res,next){
                 res.end('对不起，该模块不允许批量删除！');
             }else{
 
-                var batchDel = function(targetId){
+                var batchDel = function(targetId,n){
                     targetObj.remove({'_id':targetId},function(err){
                         if(err){
                             res.end(err);
                         }else{
-                            idsArr.splice(i,1);
+                            idsArr.splice(n,1);
                             if(idsArr.length > 0){
                                 for(var i=0;i<idsArr.length;i++){
-                                    batchDel(idsArr[i]);
+                                    batchDel(idsArr[i],i);
                                 }
                             }else{
                                 res.end("success");
@@ -196,7 +196,7 @@ router.get('/manage/:defaultUrl/batchDel',function(req,res,next){
                         }
                     });
                 };
-                batchDel(idsArr[0]);
+                batchDel(idsArr[0],0);
             }
         }else{
             res.end('请选择至少一项后再执行删除操作！');
