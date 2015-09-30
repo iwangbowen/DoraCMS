@@ -1,9 +1,37 @@
+$(function(){
+//    全选
+   $(':checkbox').prop('checked',false);
+   $('#targetIds').val('');
+   $('#selectAll').click(function(){
+       if($(this).prop('checked')){
+           $('.datalist > td > input[name=listItem]').prop('checked',true);
+       }else{
+           $('.datalist > td > input[name=listItem]').prop('checked',false);
+       }
+       getSelectIds();
+   });
+
+});
+
+function getSelectIds(){
+    var checkBoxList = $(".datalist td input[name='listItem']:checkbox");
+    var ids = '';
+    if(checkBoxList.length>0){
+        $(checkBoxList).each(function(i){
+            if (true == $(this).prop("checked")) {
+                ids += $(this).prop('value') + ',';
+            }
+        });
+
+        $('#targetIds').val(ids.substring(0,ids.length - 1));
+    }
+}
 
 //字符串转换函数
 //adminUser=true&adminGroup=true 转json对象
 function changeDataTOJson(obj){
     var oldVal = obj.toString();
-    var cg1 = oldVal.replace(/=/g, "':")
+    var cg1 = oldVal.replace(/=/g, "':");
     var changeObj = "{'"+cg1 .replace(/&/g, ",'")+"}";
     return eval("(" + changeObj + ")");
 }
@@ -105,6 +133,7 @@ function cancelTreeCheckBoxSelect(id){
 //初始化分页
 function initPagination($scope,$http,currentPage,searchKey){
 
+    $("#dataLoading").removeClass("hide");
     $scope.selectPage = [
         {name:'10',value : '10'},
         {name:'20',value : '20'},
@@ -191,6 +220,8 @@ function getPageInfos($scope,$http,url){
         }else{
             console.log("获取分页信息失败")
         }
+
+        $("#dataLoading").addClass("hide");
 
     })
 }
@@ -291,6 +322,39 @@ function initCheckIfDo($scope,targetId,msg,callBack){
         callBack(currentID);
     };
 }
+
+
+//初始化删除操作
+function initDelOption($scope,$http,currentPage,searchKey,info){
+//    单条记录删除
+    $scope.delOneItem = function(id){
+        initCheckIfDo($scope,id,info,function(currentID){
+            angularHttpGet($http,"/admin/manage/"+currentPage+"/del?uid="+currentID,function(){
+                initPagination($scope,$http,currentPage,searchKey);
+            });
+        });
+    };
+
+    $scope.getNewIds = function(){
+        getSelectIds();
+    };
+
+//    批量删除
+    $scope.batchDel = function(){
+        var targetIds = $('#targetIds').val();
+        if(targetIds && targetIds.split(',').length > 0){
+            initCheckIfDo($scope,$('#targetIds').val(),info,function(currentID){
+                angularHttpGet($http,"/admin/manage/"+currentPage+"/batchDel?ids="+currentID,function(){
+                    initPagination($scope,$http,currentPage,searchKey);
+                });
+            });
+        }else{
+            alert('请至少选择一项')
+        }
+    }
+
+}
+
 
 //初始化上传图片按钮
 function initUploadFyBtn(id,callBack){
@@ -412,6 +476,10 @@ function setAdminPowerTreeData(){
         { id:'sysTemManage_data_1_backup', pId:'sysTemManage_data_1', name:"执行备份"},
         { id:'sysTemManage_data_1_del', pId:'sysTemManage_data_1', name:"删除"},
 
+        { id:'sysTemManage_logs', pId:'sysTemManage', name:"系统日志管理", open:true},
+        { id:'sysTemManage_logs_view', pId:'sysTemManage_logs', name:"查看"},
+        { id:'sysTemManage_logs_del', pId:'sysTemManage_logs', name:"删除"},
+
         { id:'contentManage', pId:0, name:"内容管理", open:true},
         { id:'contentManage_content', pId:'contentManage', name:"文档管理", open:true},
         { id:'contentManage_content_add', pId:'contentManage_content', name:"新增"},
@@ -451,3 +519,5 @@ function setAdminPowerTreeData(){
 
     ]
 }
+
+

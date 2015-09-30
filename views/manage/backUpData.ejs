@@ -6,9 +6,8 @@
             <a ng-click="backUpData()" role="button" class="btn btn-primary btn-sm"><span class="fa fa-fw fa-cloud" aria-hidden="true">&nbsp;</span>执行数据备份</a>
         </div>
         <div class="box">
-            <div class="box-body" >
-                <table id="" class="table table-bordered table-striped">
-                    <thead>
+            <div class="box-body table-responsive no-padding" >
+                <table class="table table-hover">
                     <tr>
                         <th>选择</th>
                         <th>文件名</th>
@@ -16,33 +15,24 @@
                         <th>备份时间</th>
                         <th>操作</th>
                     </tr>
-                    </thead>
-                    <tbody>
                     <tr ng-repeat="opt in data">
                         <td><input type="checkbox" class="mini"/></td>
                         <td><i class="fa fa-fw fa-table"></i> {{opt.fileName}}</td>
                         <td class="  sorting_1">{{opt.logs}}</td>
-                        <td class=" ">{{opt.date}}</td>
+                        <td class=" ">{{opt.date | date : "yyyy-MM-dd HH:mm:ss"}}</td>
                         <td class=" ">
                             <button class="btn btn-default btn-xs" ng-click="delDataItem(opt._id,opt.path)"><span class="fa fa-fw fa-trash-o" aria-hidden="true"></span>删除</button>
                         </td>
                     </tr>
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <th>选择</th>
-                        <th>文件名</th>
-                        <th>行为</th>
-                        <th>备份时间</th>
-                        <th>操作</th>
-                    </tr>
-                    </tfoot>
                 </table>
 
             </div><!-- /.box-body -->
             <div class="box-footer">
                 <!--分页-->
                 <% include public/pagination %>
+            </div>
+            <div class="overlay hide" id="dataLoading">
+                <i class="fa fa-refresh fa-spin"></i>
             </div>
         </div><!-- /.box -->
 

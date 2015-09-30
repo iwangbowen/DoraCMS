@@ -233,7 +233,7 @@ router.get('/userCenter', function(req, res, next) {
         res.render('web/users/userCenter', siteFunc.setDataForUser(req, res, '用户中心'));
     }
     else{
-        res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") , layout: 'web/temp/errorTemp' });
+        res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") });
     }
 
 });
@@ -245,7 +245,7 @@ router.get('/setUserPsd', function(req, res, next) {
         res.render('web/users/userSetPsd', siteFunc.setDataForUser(req, res, '密码重置'));
     }
     else{
-        res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") , layout: 'web/temp/errorTemp' });
+        res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") });
     }
 
 });
@@ -257,7 +257,7 @@ router.get('/userReplies', function(req, res, next) {
         res.render('web/users/userReplies', siteFunc.setDataForUserReply(req, res, '参与话题'));
     }
     else{
-        res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") , layout: 'web/temp/errorTemp' });
+        res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") });
     }
 
 });
@@ -272,11 +272,11 @@ router.get('/userReplies/:defaultUrl',function(req, res){
             req.query.page = replyPage;
             res.render('web/users/userReplies', siteFunc.setDataForUserReply(req, res, '参与话题'));
         }else{
-            res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") , layout: 'web/temp/errorTemp' });
+            res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") });
         }
     }
     else{
-        res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") , layout: 'web/temp/errorTemp' });
+        res.render('web/public/do404', { siteConfig : siteFunc.siteInfos("操作失败") });
     }
 });
 

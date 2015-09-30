@@ -30,7 +30,7 @@ var DbOpt = {
     findAll : function(obj,req,res,logMsg){//查找指定对象所有记录
         obj.find({}, function (err,result) {
             if(err){
-
+                res.next(err);
             }else{
                 console.log(logMsg+" success!");
                 return res.json(result);
@@ -42,7 +42,7 @@ var DbOpt = {
         var currentId = (params.query.uid).split('.')[0];
         obj.findOne({_id : currentId}, function (err,result) {
             if(err){
-
+                res.next(err);
             }else{
                 console.log(logMsg+" success!");
                 return res.json(result);
@@ -56,7 +56,7 @@ var DbOpt = {
         var update = {$set : req.body};
         obj.update(conditions, update, function (err,result) {
             if(err){
-
+                res.end(err);
             }else{
                 console.log(logMsg+" success!");
                 res.end("success");
@@ -65,9 +65,14 @@ var DbOpt = {
     },
     addOne : function(obj,req,res,logMsg){
         var newObj = new obj(req.body);
-        newObj.save();
-        console.log(logMsg+" success!");
-        res.end("success");
+        newObj.save(function(err){
+            if(err){
+                res.end(err);
+            }else{
+                console.log(logMsg+" success!");
+                res.end("success");
+            }
+        });
     },
 
     pagination : function(obj,req,res,conditions){

@@ -3,46 +3,40 @@
 <div class="col-xs-12">
     <div class="panel">
         <a href="#addContentTags" role="button" class="btn btn-primary btn-sm" data-toggle="modal"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>增加一个新标签</a>
+        <% include public/tableTool %>
+        <div class="pull-right">
+            <% include public/searchBox %>
+        </div>
     </div>
     <div class="box">
-        <div class="box-body" >
-            <table id="" class="table table-bordered table-striped">
-                <thead>
+        <div class="box-body table-responsive no-padding" >
+            <table class="table table-hover">
                 <tr>
-                    <th>选择</th>
+                    <th><input type="checkbox" class="mini" id="selectAll"/></th>
                     <th>标签名称</th>
                     <th>别名</th>
                     <th>备注</th>
                     <th>管理</th>
                 </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="tag in data">
-                    <td><input type="checkbox" class="mini"/></td>
+                <tr class="datalist" ng-repeat="tag in data">
+                    <td><input type="checkbox" name="listItem" class="mini" value="{{tag._id}}" ng-click="getNewIds()"/></td>
                     <td class="  sorting_1">{{tag.name}}</td>
                     <td class=" ">{{tag.alias}}</td>
                     <td class=" ">{{tag.comments}}</td>
                     <td class=" ">
                         <button class="btn btn-primary btn-xs" data-whatever="{{tag._id}}" data-toggle="modal" data-target="#addContentTags"><span class="fa fa-fw fa-edit" aria-hidden="true"></span>编辑</button>&nbsp;
-                        <button class="btn btn-default btn-xs" ng-click="delTagsItem(tag._id)"><span class="fa fa-fw fa-trash-o" aria-hidden="true"></span>删除</button>
+                        <button class="btn btn-default btn-xs" ng-click="delOneItem(tag._id)"><span class="fa fa-fw fa-trash-o" aria-hidden="true"></span>删除</button>
                     </td>
                 </tr>
-                </tbody>
-                <tfoot>
-                <tr>
-                    <th>选择</th>
-                    <th>标签名称</th>
-                    <th>别名</th>
-                    <th>备注</th>
-                    <th>管理</th>
-                </tr>
-                </tfoot>
             </table>
 
         </div><!-- /.box-body -->
         <div class="box-footer">
             <!--分页-->
             <% include public/pagination %>
+        </div>
+        <div class="overlay hide" id="dataLoading">
+            <i class="fa fa-refresh fa-spin"></i>
         </div>
     </div><!-- /.box -->
 
@@ -102,13 +96,7 @@
                 //获取标签列表
                 initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                 //删除标签
-                $scope.delTagsItem = function(id){
-                    initCheckIfDo($scope,id,'您确认要删除该标签吗？',function(currentID){
-                        angularHttpGet($http,"/admin/manage/<%=bigCategory%>/del?uid="+currentID,function(){
-                            initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
-                        });
-                    });
-                };
+                initDelOption($scope,$http,"<%=bigCategory%>","<%=searchKey%>",'您确认要删除选中的标签吗？');
 
 //                修改标签
                 $('#addContentTags').on('show.bs.modal', function (event) {

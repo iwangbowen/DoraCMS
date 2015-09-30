@@ -13,4 +13,6 @@
 /*后台评论显示样式 */
 .dashboard-comment-wrap .comment-meta{font-size: 13px;}
 .dashboard-comment-wrap blockquote{font-size: 13px;}
-
+.dashboard-comment-wrap blockquote p {
+    word-break: break-all;
+}

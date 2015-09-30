@@ -3,8 +3,8 @@
     <div class="col-xs-12">
         <div class="panel">
             <div class="btn-group">
-                <button class="btn btn-primary" type="button"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>添加文档</button>
-                <button data-toggle="dropdown" class="btn btn-primary dropdown-toggle" type="button" aria-expanded="false">
+                <button class="btn btn-primary btn-sm" type="button"><span class="fa fa-plus-square" aria-hidden="true">&nbsp;</span>添加文档</button>
+                <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle" type="button" aria-expanded="false">
                     <span class="caret"></span>
                     <span class="sr-only">请选择文档类型</span>
                 </button>
@@ -13,25 +13,16 @@
                     <li><a href="/admin/manage/content/add/plug">Jquery插件</a></li>
                 </ul>
             </div>
+            <% include public/tableTool %>
+            <div class="pull-right">
+                <% include public/searchBox %>
+            </div>
         </div>
         <div class="box">
-            <div class="box-header">
-                <h3 class="box-title"></h3>
-                <div class="box-tools">
-                    <form action="/admin/manage/contentList" name="searchForm" >
-                        <div class="input-group">
-                            <input type="text" name="searchKey" id="searchInput" class="form-control input-sm pull-right" style="width: 200px;" placeholder="请输入关键字" value="<%= searchKey%>"/>
-                            <div class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="submit"><i class="fa fa-search"></i></button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div><!-- /.box-header -->
             <div class="box-body table-responsive no-padding">
                 <table class="table table-hover">
                     <tr>
-                        <th>选择</th>
+                        <th><input type="checkbox" class="mini" id="selectAll"/></th>
                         <th>文章标题</th>
                         <th>创建时间</th>
                         <th>类目</th>
@@ -43,10 +34,10 @@
                         <th>发布人</th>
                         <th>操作</th>
                     </tr>
-                    <tr ng-repeat="content in data">
-                        <td><input type="checkbox" class="mini"/></td>
+                    <tr class="datalist" ng-repeat="content in data">
+                        <td><input type="checkbox" name="listItem" class="mini" value="{{content._id}}" ng-click="getNewIds()"/></td>
                         <td>{{content.title}}</td>
-                        <td>{{content.date | date : "yyyy-MM-dd hh:mm:ss"}}</td>
+                        <td>{{content.date | date : "yyyy-MM-dd HH:mm:ss"}}</td>
                         <td>{{content.category}}</td>
                         <td ng-switch on="content.from">
                             <span ng-switch-when="1">原创</span>
@@ -65,7 +56,7 @@
                             <a href="/admin/manage/content/edit/{{content.type}}/{{content._id}}" role="button"  title="编辑" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></a>
                             <a href="###" role="button"  title="推荐" ng-click="topContent(content._id,1)" class="btn btn-warning btn-xs" ng-show="content.isTop == 0"><i class="fa fa-thumbs-o-up"></i></a>
                             <a href="###" role="button"  title="取消推荐" ng-click="topContent(content._id,0)" class="btn btn-default btn-xs" ng-show="content.isTop == 1"><i class="fa fa-thumbs-o-down"></i></a>
-                            <button class="btn btn-default btn-xs" type="button" title="删除" ng-click="delContentItem(content._id)"><i class="fa fa-trash-o"></i></button>
+                            <button class="btn btn-default btn-xs" type="button" title="删除" ng-click="delOneItem(content._id)"><i class="fa fa-trash-o"></i></button>
                         </td>
                     </tr>
                 </table>
@@ -73,6 +64,9 @@
             <div class="box-footer">
                 <!--分页-->
                 <% include public/pagination %>
+            </div>
+            <div class="overlay hide" id="dataLoading">
+                <i class="fa fa-refresh fa-spin"></i>
             </div>
         </div><!-- /.box -->
     </div>
@@ -88,13 +82,7 @@
                 //获取文档列表信息
                 initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
                 //删除文档
-                $scope.delContentItem = function(id){
-                    initCheckIfDo($scope,id,'您确认要删除该文档吗？',function(currentID){
-                        angularHttpGet($http,"/admin/manage/<%=bigCategory%>/del?uid="+currentID,function(){
-                            initPagination($scope,$http,"<%=bigCategory%>","<%=searchKey%>");
-                        });
-                    });
-                };
+                initDelOption($scope,$http,"<%=bigCategory%>","<%=searchKey%>",'您确认要删除选中的文档吗？');
 
 //                文章推荐
                 $scope.topContent = function(id,m){

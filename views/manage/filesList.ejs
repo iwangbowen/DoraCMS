@@ -42,7 +42,7 @@
                                 <a href="###" ng-click="getFiles(file.type,file.name,file.path)">{{file.name}}</a>
                             </td>
                             <td>{{file.size}}</td>
-                            <td>{{file.date | date : "M/d/yy h:mm a"}}</td>
+                            <td>{{file.date | date : "yyyy-MM-dd HH:mm:ss"}}</td>
                             <td>
                                 <a href="#" data-whatever="{{file.name}},{{file.path}}"data-toggle="modal" data-target="#modifyFile" title="修改"  class="text-info" ng-show="file.type == 'html' || file.type == 'js' || file.type == 'css'" class="text-info">修改</a>&nbsp;&nbsp;
                                 <a href="#" data-whatever="{{file.name}},{{file.path}}"data-toggle="modal" data-target="#reNameFile" title="重命名" class="text-warning">重命名</a>&nbsp;&nbsp;

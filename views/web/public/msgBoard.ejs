@@ -23,7 +23,8 @@
             <div class="txt-area">
                 <form role="form" class="form-horizontal" name="msgForm" ng-submit="sentMsgForm(msgForm.$valid)" novalidate>
                     <div class="">
-                        <textarea rows="3" class="form-control" id="msgTextArea" ng-model="msgFormData.content" required></textarea>
+                        <textarea rows="3" class="form-control" name="content" id="msgTextArea" ng-model="msgFormData.content"  ng-minlength="15" ng-maxlength="500" required></textarea>
+                        <label for="inputError" class="control-label text-danger" ng-show="msgForm.content.$invalid && !msgForm.content.$pristine"><i class="glyphicon glyphicon-info-sign"></i> 15-500个非特殊字符</label>
                     </div>
                     <p class="sent-btn">
                         <button class="btn btn-default theme-btn pull-right"  ng-disabled="msgForm.$invalid">发表评论</button>

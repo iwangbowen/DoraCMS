@@ -1,5 +1,6 @@
 ﻿
 <div class="row" ng-controller="mainPanel">
+    <% include public/modal %>
     <div class="col-md-12">
         <div class="col-md-6">
             <div class="box box-solid">
@@ -50,7 +51,7 @@
                     <ul class="list-unstyled">
                         <li>
                             <div class="dashboard-comment-wrap" ng-repeat="msg in mainData.msgList">
-                                <small class="pull-right">{{msg.date | date : "yyyy-MM-dd hh:mm:ss"}}</small>
+                                <small class="pull-right">{{msg.date | date : "yyyy-MM-dd HH:mm:ss"}}</small>
                                 <h4 class="comment-meta">
                                     由 <cite class="comment-author"><a class="url" rel="external nofollow" href="#">{{msg.uName}}</a></cite> 发表在《<a href="/details/{{msg.contentId}}.html" target="_blank">{{msg.contentTitle}}</a>》</h4>
                                 <blockquote><p>{{msg.content}}</p></blockquote>

@@ -42,6 +42,7 @@ module.exports = {
     FILESLIST : new Array('sysTemManage_files','文件管理'),
     DATAMANAGE : new Array('sysTemManage_data','数据管理'), // 数据管理
     BACKUPDATA : new Array('sysTemManage_data_1','数据备份'), // 数据备份
+    SYSTEMLOGS : new Array('sysTemManage_logs','操作日志'), // 系统操作日志
 
 
     CONTENTMANAGE : new Array('contentManage','内容管理'), // 后台模块(内容管理)
@@ -66,6 +67,7 @@ module.exports = {
     email_findPsd : 'findPsd',
     email_reg_active : 'reg_active',
     email_notice_contentMsg : 'notice_contentMsg',
+    email_notice_contentBug : 'notice_contentBug',
     email_notice_user_contentMsg : 'notice_user_contentMsg'
 };
 

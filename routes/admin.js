@@ -33,6 +33,8 @@ var adminFunc = require("../models/db/adminFunc");
 var crypto = require("crypto");
 //数据库操作对象
 var DbOpt = require("../models/Dbopt");
+//系统日志对象
+var SystemOptionLog = require("../models/SystemOptionLog");
 /* GET home page. */
 
 
@@ -58,10 +60,18 @@ router.post('/doLogin', function(req, res, next) {
                     req.session.adminPower = result.power;
                     req.session.adminlogined = true;
                     req.session.adminUserInfo = user;
+//                    存入操作日志
+                    var loginLog = new SystemOptionLog();
+                    loginLog.type = 'login';
+                    loginLog.logs = user.username + ' 登录，IP:' + adminFunc.getClienIp(req);
+                    loginLog.save(function(err){
+                        if(err){
+                            res.end(err);
+                        }
+                    });
                     res.end("success");
                 }
             });
-
 
         }
         else
@@ -103,14 +113,20 @@ router.get('/manage/getDocumentList/:defaultUrl',function(req,res,next){
             if(targetObj == Content){
                 keyPr.push({'comments' : { $regex: reKey } });
                 keyPr.push({'title' : { $regex: reKey } });
-
             }else if(targetObj == AdminUser){
                 keyPr = {'username' : { $regex: reKey} };
             }else if(targetObj == User){
-                keyPr = {'userName' : { $regex: reKey} };
+                keyPr.push({'userName' : { $regex: reKey } });
+                keyPr.push({'name' : { $regex: reKey } });
+            }else if(targetObj == ContentTags){
+                keyPr.push({'alias' : { $regex: reKey } });
+                keyPr.push({'name' : { $regex: reKey } });
+            }else if(targetObj == Ads){
+                keyPr.push({'mkey' : { $regex: reKey } });
+                keyPr.push({'title' : { $regex: reKey } });
             }
-
         }
+
         DbOpt.pagination(targetObj,req, res,keyPr)
     }else{
         return res.json({});
@@ -131,10 +147,14 @@ router.get('/manage/:defaultUrl/del',function(req,res,next){
         }else if(targetObj == AdminGroup){
             if(params.query.uid == req.session.adminUserInfo.group){
                 res.end('当前用户拥有的权限信息不能删除！');
+            }else{
+                DbOpt.del(targetObj,req,res,"del one obj success");
             }
         }else if(targetObj == AdminUser){
             if(params.query.uid == req.session.adminUserInfo._id){
                 res.end('不能删除当前登录的管理员！');
+            }else{
+                DbOpt.del(targetObj,req,res,"del one obj success");
             }
         }else{
             DbOpt.del(targetObj,req,res,"del one obj success");
@@ -143,6 +163,48 @@ router.get('/manage/:defaultUrl/del',function(req,res,next){
         res.end('对不起，您无权执行该操作！');
     }
 
+});
+
+//批量删除对象
+router.get('/manage/:defaultUrl/batchDel',function(req,res,next){
+    var currentPage = req.params.defaultUrl;
+    var params = url.parse(req.url,true);
+    var targetObj = adminFunc.getTargetObj(currentPage);
+    var ids = params.query.ids;
+    if(adminFunc.checkAdminPower(req,currentPage + '_del')){
+        var idsArr = ids.split(',');
+        if(idsArr.length > 0){
+
+            if(targetObj == Message || targetObj == AdminGroup || targetObj == AdminUser){
+                res.end('对不起，该模块不允许批量删除！');
+            }else{
+
+                var batchDel = function(targetId){
+                    targetObj.remove({'_id':targetId},function(err){
+                        if(err){
+                            res.end(err);
+                        }else{
+                            idsArr.splice(i,1);
+                            if(idsArr.length > 0){
+                                for(var i=0;i<idsArr.length;i++){
+                                    batchDel(idsArr[i]);
+                                }
+                            }else{
+                                res.end("success");
+                            }
+
+                        }
+                    });
+                };
+                batchDel(idsArr[0]);
+            }
+        }else{
+            res.end('请选择至少一项后再执行删除操作！');
+        }
+
+    }else{
+        res.end('对不起，您无权执行该操作！');
+    }
 
 });
 
@@ -450,6 +512,17 @@ router.get('/manage/backupDataManage/delItem', function(req, res, next) {
 //------------------------------------------数据管理结束
 
 
+//------------------------------------------系统日志管理开始
+
+router.get('/manage/systemLogs', function(req, res, next) {
+
+    adminFunc.renderToManagePage(req, res,'manage/systemLogs',settings.SYSTEMLOGS);
+
+});
+
+//------------------------------------------系统日志管理结束
+
+
 
 //------------------------------------------文档管理面开始
 //文档列表页面
@@ -715,6 +788,25 @@ router.get('/manage/getMainInfo', function(req, res, next) {
     adminFunc.setMainInfos(req, res);
 });
 
+
+//用户bug反馈
+router.post('/message/sent', function(req, res, next) {
+
+    var newObj = {
+        contentFrom : req.body.contentFrom,
+        email : req.body.email,
+        content : req.body.content
+    };
+
+    system.sendEmail(settings.email_notice_contentBug,newObj,function(err){
+        if(err){
+            res.end(err);
+        }else{
+            res.end("success");
+        }
+    });
+
+});
 
 
 module.exports = router;

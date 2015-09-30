@@ -42,6 +42,10 @@ var system = {
             emailSubject = emailTitle = '['+settings.SITETITLE +'] 有人给您留言啦';
             emailContent = siteFunc.setNoticeToUserEmailTemp(obj);
             toEmail = obj.relationEmail;
+        }else if(key == settings.email_notice_contentBug){
+            emailSubject = emailTitle = '['+settings.SITETITLE +'] 有人给您提bug啦';
+            emailContent = siteFunc.setBugToAdminEmailTemp(obj);
+            toEmail = settings.site_email;
         }
 
 //                发送邮件

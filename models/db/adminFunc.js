@@ -28,6 +28,8 @@ var User = require("../User");
 var Ads = require("../Ads");
 //文件对象
 var Files = require("../Files");
+//系统日志对象
+var SystemOptionLog = require("../SystemOptionLog");
 
 var adminFunc = {
 
@@ -43,6 +45,15 @@ var adminFunc = {
         return Message.find({}).limit(5).sort({'date' : -1});
     },
 
+    getClienIp : function(req){
+
+        return req.headers['x-forwarded-for'] ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            req.connection.socket.remoteAddress;
+
+    },
+
     setMainInfos : function(req, res){
         return res.json({
             adminUserCount : AdminUser.count({}),
@@ -53,7 +64,7 @@ var adminFunc = {
         })
     },
 
-    setPageInfo : function(req,res,module){
+    setPageInfo : function(req,res,module,currentLink){
 
         var searchKey = '';
 
@@ -66,6 +77,7 @@ var adminFunc = {
             siteInfo : adminFunc.siteInfos(module[1]),
             bigCategory : module[0],
             searchKey : searchKey,
+            currentLink : currentLink,
             layout : 'manage/public/adminTemp'
         }
 
@@ -95,6 +107,8 @@ var adminFunc = {
             targetObj = Files;
         }else if(currentPage.indexOf(settings.BACKUPDATA[0]) >=0 ){
             targetObj = DataOptionLog;
+        }else if(currentPage.indexOf(settings.SYSTEMLOGS[0]) >=0 ){
+            targetObj = SystemOptionLog;
         }else if(currentPage.indexOf(settings.CONTENTLIST[0]) >=0 ){
             targetObj = Content;
         }else if(currentPage.indexOf(settings.CONTENTCATEGORYS[0]) >=0 ){
@@ -133,7 +147,7 @@ var adminFunc = {
 
     renderToManagePage : function(req,res,url,pageKey){
         if(adminFunc.checkAdminPower(req,pageKey[0] + '_view')){
-            res.render(url, adminFunc.setPageInfo(req,res,pageKey));
+            res.render(url, adminFunc.setPageInfo(req,res,pageKey,'/admin/'+url));
         }else{
             res.render("manage/public/notice", adminFunc.setDataForInfo('danger','对不起，您无权操作 <strong>'+pageKey[1]+'</strong> 模块！'));
         }

@@ -74,6 +74,13 @@ var siteFunc = {
         return html;
     },
 
+    setBugToAdminEmailTemp : function(obj){
+        var msgDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+        var html ='';
+        html += '主人您好，测试管理员（'+obj.email+')于 '+msgDate +' 在 <strong>' + settings.SITETITLE + '</strong> 的后台模块 <strong>'+obj.contentFrom+'</strong> 中说：<br>'+obj.content;
+        return html;
+    },
+
     getCategoryList: function () {
         return ContentCategory.find({'parentID': '0', 'state': '1'}, 'name defaultUrl').sort({'sortId': 1}).find();
     },
