@@ -5,6 +5,7 @@
 ###问题：
 - 1、redis connection to 127.0.0.1:6379 failed 这个是redis连接不上的问题，请看这篇文章[DoraCMS redis报错问题](http://www.html-js.cn/details/4yyl6O7A.html)
 - 2、failed to load c++ bson extension 这个问题不用管,node自己的问题,不影响程序运行
+- 3、今天正式去掉了node_modules，运行前需要在代码根目录下执行 npm install 来安装，不然会导致不同node或系统兼容性问题（感谢[@faceair](https://cnodejs.org/user/faceair)的建议）
 
 ###-------------------------------------------------------------------------------------------------
        
