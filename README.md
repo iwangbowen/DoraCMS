@@ -1,8 +1,5 @@
 
-##我错了
-- 关于很多兄弟运行DoraCMS报诸如cannot find module ###'ms'类的问题，我这两天专门在看这个，装虚拟机，装各种版本node，用最新代码去运行，各种折腾，终于发现还是自己错了，依赖包居然不全，太大意了，合代码的时候估计漏了而每次合功能代码也没有对比依赖包里的东西，本能的以为是没新增就没变动，好了，重新删除又重新上传了，有任何疑问，请issue me ,万分抱歉，耽误了大伙宝贵的时间，拿钱包重重的砸我吧！
-
-###问题：
+##问题：
 - 1、redis connection to 127.0.0.1:6379 failed 这个是redis连接不上的问题，请看这篇文章[DoraCMS redis报错问题](http://www.html-js.cn/details/4yyl6O7A.html)
 - 2、failed to load c++ bson extension 这个问题不用管,node自己的问题,不影响程序运行
 - 3、今天正式去掉了node_modules，运行前需要在代码根目录下执行 npm install 来安装，不然会导致不同node或系统兼容性问题（感谢[@faceair](https://cnodejs.org/user/faceair)的建议）
