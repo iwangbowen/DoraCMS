@@ -95,8 +95,9 @@ router.get('/:defaultUrl', function (req, res, next) {
     var url = defaultUrl.split('___')[1];
 
     var indexUrl = defaultUrl.split('—')[0];
-    var indexPage = defaultUrl.split('—')[1];
+
     if (indexUrl == 'page') { // 首页的分页
+        var indexPage = defaultUrl.split('—')[1].split(".")[0];
         if(indexPage && validator.isNumeric(indexPage)){
             req.query.page = indexPage;
         }
@@ -105,7 +106,7 @@ router.get('/:defaultUrl', function (req, res, next) {
         var currentUrl = url;
         if (url.indexOf("—") >= 0) {
             currentUrl = url.split("—")[0];
-            var catePageNo = (url.split("—")[1]).split(".")[0]
+            var catePageNo = (url.split("—")[1]).split(".")[0];
             if(catePageNo && validator.isNumeric(catePageNo)){
                 req.query.page = catePageNo;
             }
