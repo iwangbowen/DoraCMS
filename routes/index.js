@@ -9,6 +9,8 @@ var Content = require("../models/Content");
 var ContentCategory = require("../models/ContentCategory");
 //短id
 var shortid = require('shortid');
+//校验
+var validator = require("validator");
 //时间格式化
 var moment = require('moment');
 //站点配置
@@ -61,23 +63,28 @@ router.get('/details/:url', function (req, res, next) {
 
     var url = req.params.url;
     var currentId = url.split('.')[0];
-    Content.findOne({ '_id': currentId }, function (err, result) {
-        if (err) {
-            console.log(err)
-        } else {
-            if (result) {
-//                更新访问量
-                result.clickNum = result.clickNum + 1;
-                result.save(function(){
-                    var cateParentId = result.sortPath.split(',')[1];
-                    var cateQuery = {'sortPath': { $regex: new RegExp(cateParentId, 'i') }};
-                    res.render('web/temp/' + result.contentTemp + '/detail', siteFunc.setDetailInfo(req, res, cateQuery, result));
-                })
+    if(shortid.isValid(currentId)){
+        Content.findOne({ '_id': currentId }, function (err, result) {
+            if (err) {
+                console.log(err)
             } else {
-                res.render('web/public/do404', { siteConfig: siteFunc.siteInfos("操作失败")});
+                if (result) {
+//                更新访问量
+                    result.clickNum = result.clickNum + 1;
+                    result.save(function(){
+                        var cateParentId = result.sortPath.split(',')[1];
+                        var cateQuery = {'sortPath': { $regex: new RegExp(cateParentId, 'i') }};
+                        res.render('web/temp/' + result.contentTemp + '/detail', siteFunc.setDetailInfo(req, res, cateQuery, result));
+                    })
+                } else {
+                    res.render('web/public/do404', { siteConfig: siteFunc.siteInfos("页面未找到")});
+                }
             }
-        }
-    });
+        });
+    }else{
+        res.render('web/public/do404', { siteConfig: siteFunc.siteInfos("页面未找到")});
+    }
+
 });
 
 
@@ -85,21 +92,25 @@ router.get('/details/:url', function (req, res, next) {
 router.get('/:defaultUrl', function (req, res, next) {
 
     var defaultUrl = req.params.defaultUrl;
-    var folder = defaultUrl.split('___')[0];
     var url = defaultUrl.split('___')[1];
 
     var indexUrl = defaultUrl.split('—')[0];
     var indexPage = defaultUrl.split('—')[1];
     if (indexUrl == 'page') { // 首页的分页
-        req.query.page = indexPage;
+        if(indexPage && validator.isNumeric(indexPage)){
+            req.query.page = indexPage;
+        }
         res.render('web/index', siteFunc.setDataForIndex(req, res, {'type': 'content'}, '首页'));
     } else {
         var currentUrl = url;
         if (url.indexOf("—") >= 0) {
             currentUrl = url.split("—")[0];
-            req.query.page = (url.split("—")[1]).split(".")[0];
+            var catePageNo = (url.split("—")[1]).split(".")[0]
+            if(catePageNo && validator.isNumeric(catePageNo)){
+                req.query.page = catePageNo;
+            }
         }
-        queryCatePage(req, res, folder, currentUrl);
+        queryCatePage(req, res, currentUrl);
     }
 
 });
@@ -108,40 +119,45 @@ router.get('/:defaultUrl', function (req, res, next) {
 router.get('/:forder/:defaultUrl', function (req, res, next) {
 
     var defaultUrl = req.params.defaultUrl;
-
-    var folder = defaultUrl.split('___')[0];
     var url = defaultUrl.split('___')[1];
 
     var currentUrl = url;
     if (url.indexOf("—") >= 0) {
         currentUrl = url.split("—")[0];
-        req.query.page = (url.split("—")[1]).split(".")[0];
+        var catePageNo = (url.split("—")[1]).split(".")[0]
+        if(catePageNo && validator.isNumeric(catePageNo)){
+            req.query.page = catePageNo;
+        }
     }
 
-    queryCatePage(req, res, folder, currentUrl);
+    queryCatePage(req, res, currentUrl);
 
 });
 
 //分类页面路由设置
-function queryCatePage(req, res, folder, cateId) {
+function queryCatePage(req, res, cateId) {
 
-    ContentCategory.findOne({"_id": cateId}, function (err, result) {
-        if (err) {
-            res.render('web/public/do404', { siteConfig: siteFunc.siteInfos("操作失败")});
-        } else {
+    if(shortid.isValid(cateId)){
+        ContentCategory.findOne({"_id": cateId}, function (err, result) {
+            if (err) {
+                res.render('web/public/do404', { siteConfig: siteFunc.siteInfos("操作失败")});
+            } else {
+                if (result) {
+                    var contentQuery = {'sortPath': { $regex: new RegExp(result._id, 'i') }};
+                    var cateParentId = result.sortPath.split(',')[1];
+                    var cateQuery = {'sortPath': { $regex: new RegExp(cateParentId, 'i') }};
+                    res.render('web/temp/' + result.contentTemp + '/contentList', siteFunc.setDataForCate(req, res, contentQuery, cateQuery ,result));
 
-            if (result) {
-                var contentQuery = {'sortPath': { $regex: new RegExp(result._id, 'i') }};
-                var cateParentId = result.sortPath.split(',')[1];
-                var cateQuery = {'sortPath': { $regex: new RegExp(cateParentId, 'i') }};
-                res.render('web/temp/' + result.contentTemp + '/contentList', siteFunc.setDataForCate(req, res, contentQuery, cateQuery ,result));
-
+                }
+                else {
+                    res.render('web/public/do404', { siteConfig: siteFunc.siteInfos("操作失败") });
+                }
             }
-            else {
-                res.render('web/public/do404', { siteConfig: siteFunc.siteInfos("操作失败") });
-            }
-        }
-    })
+        })
+    }else{
+        res.render('web/public/do404', { siteConfig: siteFunc.siteInfos("页面未找到") });
+    }
+
 }
 
 module.exports = router;

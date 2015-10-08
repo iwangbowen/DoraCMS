@@ -24,6 +24,8 @@ var User = require("../models/User");
 var Ads = require("../models/Ads");
 //数据校验
 var validator = require('validator');
+//短id
+var shortid = require('shortid');
 //系统操作
 var system = require("../util/system");
 //站点配置
@@ -49,37 +51,42 @@ router.post('/doLogin', function(req, res, next) {
     var password = req.body.password;
 
     var newPsd = DbOpt.encrypt(password,settings.encrypt_key);
-    AdminUser.findOne({username:username,password:newPsd},function(err,user){
-        if(user){
+    if(validator.isUserName(username) && validator.isPsd(password)){
+        AdminUser.findOne({username:username,password:newPsd},function(err,user){
+            if(user){
 
 //            缓存权限
-            AdminGroup.findOne({_id : user.group},function(err,result){
-                if(err){
-                    console.log(err)
-                }else{
-                    req.session.adminPower = result.power;
-                    req.session.adminlogined = true;
-                    req.session.adminUserInfo = user;
+                AdminGroup.findOne({_id : user.group},function(err,result){
+                    if(err){
+                        console.log(err)
+                    }else{
+                        req.session.adminPower = result.power;
+                        req.session.adminlogined = true;
+                        req.session.adminUserInfo = user;
 //                    存入操作日志
-                    var loginLog = new SystemOptionLog();
-                    loginLog.type = 'login';
-                    loginLog.logs = user.username + ' 登录，IP:' + adminFunc.getClienIp(req);
-                    loginLog.save(function(err){
-                        if(err){
-                            res.end(err);
-                        }
-                    });
-                    res.end("success");
-                }
-            });
+                        var loginLog = new SystemOptionLog();
+                        loginLog.type = 'login';
+                        loginLog.logs = user.username + ' 登录，IP:' + adminFunc.getClienIp(req);
+                        loginLog.save(function(err){
+                            if(err){
+                                res.end(err);
+                            }
+                        });
+                        res.end("success");
+                    }
+                });
 
-        }
-        else
-        {
-            console.log("登录失败");
-            res.end("error");
-        }
-    })
+            }
+            else
+            {
+                console.log("登录失败");
+                res.end("error");
+            }
+        })
+    }else{
+        res.end(settings.system_illegal_param)
+    }
+
 });
 
 // 管理员退出
@@ -179,24 +186,14 @@ router.get('/manage/:defaultUrl/batchDel',function(req,res,next){
                 res.end('对不起，该模块不允许批量删除！');
             }else{
 
-                var batchDel = function(targetId,n){
-                    targetObj.remove({'_id':targetId},function(err){
-                        if(err){
-                            res.end(err);
-                        }else{
-                            idsArr.splice(n,1);
-                            if(idsArr.length > 0){
-                                for(var i=0;i<idsArr.length;i++){
-                                    batchDel(idsArr[i],i);
-                                }
-                            }else{
-                                res.end("success");
-                            }
+                targetObj.remove({'_id':{$in: idsArr}},function(err){
+                    if(err){
+                        res.end(err);
+                    }else{
+                        res.end("success");
+                    }
+                });
 
-                        }
-                    });
-                };
-                batchDel(idsArr[0],0);
             }
         }else{
             res.end('请选择至少一项后再执行删除操作！');
@@ -274,33 +271,39 @@ router.post('/manage/:defaultUrl/addOne',function(req,res,next){
 //删除留言
 function removeMessage(req,res){
     var params = url.parse(req.url,true);
-    Message.findOne({_id : params.query.uid},'contentId',function(err,result){
-        if(err){
-            res.end(err);
-        }else{
-            if(result && result.contentId){
-                var contentId = result.contentId;
-                Content.findOne({_id : contentId},function(err,contentObj){
-                    if(err){
-                        res.end(err);
-                    }else{
-                        Message.remove({_id : params.query.uid},function(err){
-                            if(contentObj.commentNum > 0){
-                                contentObj.commentNum = contentObj.commentNum -1 ;
-                                contentObj.save(function(err){
-                                    if(err){
-                                        res.end(err);
-                                    }else{
-                                        res.end("success");
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
+    var targetId = params.query.uid;
+    if(shortid.isValid(targetId)){
+        Message.findOne({_id : targetId},'contentId',function(err,result){
+            if(err){
+                res.end(err);
+            }else{
+                if(result && result.contentId){
+                    var contentId = result.contentId;
+                    Content.findOne({_id : contentId},function(err,contentObj){
+                        if(err){
+                            res.end(err);
+                        }else{
+                            Message.remove({_id : params.query.uid},function(err){
+                                if(contentObj.commentNum > 0){
+                                    contentObj.commentNum = contentObj.commentNum -1 ;
+                                    contentObj.save(function(err){
+                                        if(err){
+                                            res.end(err);
+                                        }else{
+                                            res.end("success");
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
             }
-        }
-    });
+        });
+    }else{
+        res.end(settings.system_illegal_param);
+    }
+
 }
 
 
@@ -318,20 +321,26 @@ router.get('/manage/adminUsersList', function(req, res, next) {
 
 function addOneAdminUser(req,res){
     var errors;
-    AdminUser.findOne({username:req.body.username},function(err,user){
-        if(user){
-            errors = "该用户名已存在！";
-            res.end(errors);
-        }else{
-            if(errors){
-                res.end(errors)
+    var username = req.body.username;
+    if(validator.isUserName(username)){
+        AdminUser.findOne({username:req.body.username},function(err,user){
+            if(user){
+                errors = "该用户名已存在！";
+                res.end(errors);
             }else{
-                //    密码加密
-                req.body.password = DbOpt.encrypt(req.body.password,settings.encrypt_key);
-                DbOpt.addOne(AdminUser,req, res,"add new adminUser");
+                if(errors){
+                    res.end(errors)
+                }else{
+                    //    密码加密
+                    req.body.password = DbOpt.encrypt(req.body.password,settings.encrypt_key);
+                    DbOpt.addOne(AdminUser,req, res,"add new adminUser");
+                }
             }
-        }
-    })
+        })
+    }else{
+        res.end(settings.system_illegal_param)
+    }
+
 }
 
 
@@ -490,21 +499,27 @@ router.get('/manage/backupDataManage/delItem', function(req, res, next) {
 
     var params = url.parse(req.url,true);
     var forderPath = params.query.filePath;
-    if(adminFunc.checkAdminPower(req,settings.BACKUPDATA[0] + '_del')){
-        DataOptionLog.remove({_id : params.query.uid},function(err,result){
-            if(err){
-                res.end(err);
-            }else{
-                if(forderPath){
-                    system.deleteFolder(req, res,forderPath);
+    var targetId = params.query.uid;
+    if(shortid.isValid(targetId)){
+        if(adminFunc.checkAdminPower(req,settings.BACKUPDATA[0] + '_del')){
+            DataOptionLog.remove({_id : targetId},function(err,result){
+                if(err){
+                    res.end(err);
                 }else{
-                    res.end("删除出错");
+                    if(forderPath){
+                        system.deleteFolder(req, res,forderPath);
+                    }else{
+                        res.end("删除出错");
+                    }
                 }
-            }
-        })
+            })
+        }else{
+            res.end('对不起，您无权执行该操作！');
+        }
     }else{
-        res.end('对不起，您无权执行该操作！');
+        res.end(settings.system_illegal_param);
     }
+
 
 
 });
@@ -575,14 +590,19 @@ router.get('/manage/ContentList/topContent', function(req, res, next) {
     var params = url.parse(req.url,true);
     var contentId = params.query.uid;
     var isTop = Number(params.query.isTop);
-    if(adminFunc.checkAdminPower(req,settings.CONTENTLIST[0] + '_top')){
-        Content.update({_id : contentId}, {'isTop' : isTop}, function (err,result) {
-            if(err) throw  err;
-            res.end("success");
-        })
+    if(shortid.isValid(contentId)){
+        if(adminFunc.checkAdminPower(req,settings.CONTENTLIST[0] + '_top')){
+            Content.update({_id : contentId}, {'isTop' : isTop}, function (err,result) {
+                if(err) throw  err;
+                res.end("success");
+            })
+        }else{
+            res.end('对不起，您无权执行该操作！');
+        }
     }else{
-        res.end('对不起，您无权执行该操作！');
+        res.end(settings.system_illegal_param);
     }
+
 });
 
 

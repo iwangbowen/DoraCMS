@@ -2,7 +2,7 @@
 body {
     background-color: #FFF;
     color: #444;
-    font-family: "TIBch", "Classic Grotesque W01", "Helvetica Neue", Arial, "Hiragino Sans GB", "STHeiti", "Microsoft YaHei", "WenQuanYi Micro Hei", SimSun, sans-serif;
+    font-family: "Microsoft Yahei","冬青黑体简体中文 w3";
     -webkit-font-smoothing: antialiased;
     font-size: 14px;
 }
@@ -26,7 +26,7 @@ h2 {
 }
 
 h1, h2, h3 {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Microsoft Yahei","冬青黑体简体中文 w3";
     font-weight: 700;
 }
 

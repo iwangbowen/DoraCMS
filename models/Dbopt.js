@@ -6,6 +6,7 @@ var url = require('url');
 //加密类
 var crypto = require("crypto");
 var mongoose = require('mongoose');
+var shortid = require('shortid');
 //站点配置
 var settings = require("../models/db/settings");
 var db = mongoose.connect('mongodb://localhost/doracms');
@@ -18,14 +19,20 @@ var DbOpt = {
 
     del : function(obj,req,res,logMsg){
         var params = url.parse(req.url,true);
-        obj.remove({_id : params.query.uid},function(err,result){
-            if(err){
-                res.end(err);
-            }else{
-                console.log(logMsg+" success!");
-                res.end("success");
-            }
-        })
+        var targetId = params.query.uid;
+        if(shortid.isValid(targetId)){
+            obj.remove({_id : params.query.uid},function(err,result){
+                if(err){
+                    res.end(err);
+                }else{
+                    console.log(logMsg+" success!");
+                    res.end("success");
+                }
+            })
+        }else{
+            res.end("参数非法");
+        }
+
     },
     findAll : function(obj,req,res,logMsg){//查找指定对象所有记录
         obj.find({}, function (err,result) {
@@ -39,29 +46,40 @@ var DbOpt = {
     },
     findOne : function(obj,req,res,logMsg,key){ //根据ID查找单条记录
         var params = url.parse(req.url,true);
-        var currentId = (params.query.uid).split('.')[0];
-        obj.findOne({_id : currentId}, function (err,result) {
-            if(err){
-                res.next(err);
-            }else{
-                console.log(logMsg+" success!");
-                return res.json(result);
-            }
-        })
+        var targetId = params.query.uid;
+        if(shortid.isValid(targetId)){
+            obj.findOne({_id : targetId}, function (err,result) {
+                if(err){
+                    res.next(err);
+                }else{
+                    console.log(logMsg+" success!");
+                    return res.json(result);
+                }
+            })
+        }else{
+            res.end("参数非法");
+        }
+
     },
     updateOneByID : function(obj,req,res,logMsg){
         var params = url.parse(req.url,true);
-        var conditions = {_id : params.query.uid};
-        req.body.updateDate = new Date();
-        var update = {$set : req.body};
-        obj.update(conditions, update, function (err,result) {
-            if(err){
-                res.end(err);
-            }else{
-                console.log(logMsg+" success!");
-                res.end("success");
-            }
-        })
+        var targetId = params.query.uid;
+        if(shortid.isValid(targetId)){
+            var conditions = {_id : targetId};
+            req.body.updateDate = new Date();
+            var update = {$set : req.body};
+            obj.update(conditions, update, function (err,result) {
+                if(err){
+                    res.end(err);
+                }else{
+                    console.log(logMsg+" success!");
+                    res.end("success");
+                }
+            })
+        }else{
+            res.end("参数非法");
+        }
+
     },
     addOne : function(obj,req,res,logMsg){
         var newObj = new obj(req.body);

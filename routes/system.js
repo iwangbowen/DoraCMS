@@ -111,10 +111,4 @@ router.post('/upload', function(req, res, next) {
     });
 });
 
-//邮件发送
-router.post('/sendEmail', function(req, res, next) {
-    console.log("---------begin to sent email-------------");
-    system.sendEmail();
-});
-
 module.exports = router;

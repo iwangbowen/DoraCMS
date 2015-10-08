@@ -68,7 +68,11 @@ module.exports = {
     email_reg_active : 'reg_active',
     email_notice_contentMsg : 'notice_contentMsg',
     email_notice_contentBug : 'notice_contentBug',
-    email_notice_user_contentMsg : 'notice_user_contentMsg'
+    email_notice_user_contentMsg : 'notice_user_contentMsg',
+
+
+//    信息提示相关
+    system_illegal_param : '非法参数'
 };
 
 

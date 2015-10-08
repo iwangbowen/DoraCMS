@@ -1,11 +1,11 @@
 <!--用户信息完善-->
 <div class="uInfos" ng-controller="userInfo">
     <form class="form-horizontal" name="myForm" ng-submit="processForm(myForm.$valid)" novalidate>
+        <p class="text-danger hide" id="errorInfo">邮箱和密码不匹配</p>
         <div class="form-group">
             <label class="col-sm-2 control-label">Email</label>
             <div class="col-sm-4">
                 <input type="email" class="form-control"  name="email" ng-model="formData.email" disabled />
-                <!--<label for="inputError" class="control-label text-danger" ng-show="myForm.email.$invalid && !myForm.email.$pristine"><i class="glyphicon glyphicon-info-sign"></i>请填写正确的邮箱地址</label>-->
             </div>
         </div>
         <div class="form-group">
@@ -26,7 +26,7 @@
         <div class="form-group">
             <label class="col-sm-2 control-label">所在城市</label>
             <div class="col-sm-4">
-                <input type="text" class="form-control" ng-model="formData.city"/>
+                <input type="text" class="form-control" ng-model="formData.city" ng-minlength="0" ng-maxlength="12"/>
                 <label for="inputError" class="control-label text-danger" ng-show="myForm.city.$invalid && !myForm.city.$pristine"><i class="glyphicon glyphicon-info-sign"></i> 0-12个非特殊字符</label>
             </div>
         </div>
@@ -51,13 +51,13 @@
             <label class="col-sm-2 control-label">学校</label>
             <div class="col-sm-4">
                 <input type="text" class="form-control"  name="company" ng-minlength="0" ng-maxlength="12" ng-model="formData.company"/>
-                <label for="inputError" class="control-label text-danger" ng-show="myForm.company.$invalid && !myForm.company.$pristine"><i class="glyphicon glyphicon-info-sign"></i> 2-12个非特殊字符</label>
+                <label for="inputError" class="control-label text-danger" ng-show="myForm.company.$invalid && !myForm.company.$pristine"><i class="glyphicon glyphicon-info-sign"></i> 0-12个非特殊字符</label>
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-2 control-label">QQ号码</label>
             <div class="col-sm-4">
-                <input type="text" class="form-control"  name="qq" ng-minlength="0" ng-model="formData.qq" />
+                <input type="number" class="form-control"  name="qq" ng-minlength="0" ng-model="formData.qq" ng-pattern="/^[1-9][0-9]{4,9}$/"/>
                 <label for="inputError" class="control-label text-danger" ng-show="myForm.qq.$invalid && !myForm.qq.$pristine"><i class="glyphicon glyphicon-info-sign"></i>请填写正确的QQ号码</label>
 
             </div>
@@ -106,7 +106,7 @@
                     if(data === "success"){
                         alert('修改信息成功')
                     }else{
-                        alert("未知异常，请稍后重试");
+                        $('#errorInfo').removeClass('hide').text(data);
                     }
                 });
             }

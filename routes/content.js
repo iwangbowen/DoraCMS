@@ -21,7 +21,10 @@ var siteFunc = require("../models/db/siteFunc");
 var url = require('url');
 //二维码对象
 var qr = require('qr-image')
-
+//短id
+var shortid = require('shortid');
+//校验
+var validator = require("validator");
 //判断是否登录
 function isLogined(req){
     return req.session.logined;
@@ -40,8 +43,10 @@ router.get('/searchResult/:defaultUrl', function(req, res, next) {
 
     var defaultUrl = req.params.defaultUrl;
     if (defaultUrl.indexOf("—") >= 0) {
-
-        req.query.page = (defaultUrl.split("—")[1]).split(".")[0];
+        var searchPageNo = (defaultUrl.split("—")[1]).split(".")[0];
+        if(searchPageNo && validator.isNumeric(searchPageNo)){
+            req.query.page = searchPageNo;
+        }
         querySearchResult(req, res);
 
     }
