@@ -184,7 +184,7 @@
                 var contentArray = [];
                 var editArrImg = [];
 //                初始化上传按钮
-                initUploadFyBtn('uploadAdsImg',function(data){
+                initUploadFyBtn('uploadAdsImg','',function(data){
                     $("#myImg").attr("src",data);
                     $scope.formData.contentItem.sImg = data;
                 });

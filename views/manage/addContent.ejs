@@ -117,12 +117,13 @@
 
             doraApp.controller("addContent",function($scope,$http){
                 $scope.formData = {};
+                $scope.formData.author = '<%=adminUserInfo.name%>';
 //                初始化文章分类
                 iniTreeData($scope,$http);
 //                初始化文章标签
                 initContentTags($scope,$http);
 //                初始化上传按钮
-                initUploadFyBtn('uploadContentImg',function(data){
+                initUploadFyBtn('uploadContentImg',"ctTopImg",function(data){
                     $("#myImg").attr("src",data);
                     $scope.formData.sImg = data;
                 });

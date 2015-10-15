@@ -92,7 +92,7 @@
 //                初始化插件分类
                 iniCateTree($scope,$http);
 //                初始化上传按钮
-                initUploadFyBtn('uploadPlugImg',function(data){
+                initUploadFyBtn('uploadPlugImg','plugTopImg',function(data){
                     $("#myImg").attr("src",data);
                     $scope.formData.sImg = data;
                 });

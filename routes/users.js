@@ -282,6 +282,7 @@ router.get('/userReplies/:defaultUrl',function(req, res){
         var replyUrl = defaultUrl.split('—')[0];
         var replyPage = defaultUrl.split('—')[1];
         if (replyUrl == 'p') {
+            replyPage = defaultUrl.split('—')[1].split(".")[0]
             if(replyPage && validator.isNumeric(replyPage)){
                 req.query.page = replyPage;
             }
@@ -456,7 +457,7 @@ router.post('/message/sent', function(req, res, next) {
         errors = settings.system_illegal_param;
     }
 
-    if(!validator.isEmail(relationEmail)){
+    if(relationEmail && !validator.isEmail(relationEmail)){
         errors = "请填写正确的邮箱地址";
     }
 

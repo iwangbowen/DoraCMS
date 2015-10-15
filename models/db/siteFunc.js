@@ -44,7 +44,8 @@ var siteFunc = {
             title: title + " | " + settings.SITETITLE,
             cmsDescription: discrip,
             keywords: key,
-            siteIcp: settings.SITEICP
+            siteIcp: settings.SITEICP,
+            version : settings.SITEVERSION
         }
     },
 
@@ -102,7 +103,7 @@ var siteFunc = {
     },
 
     setDataForIndex: function (req, res, q, title) {
-        var requireField = 'title date commentNum discription clickNum';
+        var requireField = 'title date commentNum discription clickNum isTop sImg';
         var documentList = DbOpt.getPaginationResult(Content, req, res, q, requireField);
         var tagsData = DbOpt.getDatasByParam(ContentTags, req, res, {});
         return {
@@ -121,7 +122,7 @@ var siteFunc = {
     },
 
     setDataForCate: function (req, res, dq, cq, cateInfo) {
-        var requireField = 'title date commentNum discription clickNum comments';
+        var requireField = 'title date commentNum discription clickNum comments isTop sImg';
         var documentList = DbOpt.getPaginationResult(Content, req, res, dq, requireField);
         var currentCateList = ContentCategory.find(cq).sort({'sortId': 1});
         var tagsData = DbOpt.getDatasByParam(ContentTags, req, res, {});
@@ -224,7 +225,7 @@ var siteFunc = {
 
     setDataForSiteMap: function (req, res) {
 
-        var root_path = 'http://www.html-js.cn/';
+        var root_path = settings.SITEDOMAIN;
         var priority = 0.8;
         var freq = 'weekly';
         var lastMod = moment().format('YYYY-MM-DD');
@@ -245,7 +246,7 @@ var siteFunc = {
                     } else {
                         cates.forEach(function (cate) {
                             xml += '<url>';
-                            xml += '<loc>' + root_path + cate.defaultUrl + '___' + cate._id + '</loc>';
+                            xml += '<loc>' + root_path + '/' +cate.defaultUrl + '___' + cate._id + '</loc>';
                             xml += '<changefreq>weekly</changefreq>';
                             xml += '<lastmod>' + lastMod + '</lastmod>';
                             xml += '<priority>0.5</priority>';
@@ -258,7 +259,7 @@ var siteFunc = {
                             } else {
                                 contentLists.forEach(function (post) {
                                     xml += '<url>';
-                                    xml += '<loc>' + root_path + 'details/' + post._id + '.html</loc>';
+                                    xml += '<loc>' + root_path + '/details/' + post._id + '.html</loc>';
                                     xml += '<changefreq>Monthly</changefreq>';
                                     xml += '<lastmod>' + lastMod + '</lastmod>';
                                     xml += '<priority>0.5</priority>';

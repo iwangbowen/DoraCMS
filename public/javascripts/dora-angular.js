@@ -357,12 +357,12 @@ function initDelOption($scope,$http,currentPage,searchKey,info){
 
 
 //初始化上传图片按钮
-function initUploadFyBtn(id,callBack){
+function initUploadFyBtn(id,key,callBack){
     $("#"+id).uploadify({
         //指定swf文件
         'swf': '/plugins/uploadify/uploadify.swf',
         //后台处理的页面
-        'uploader': '/system/upload?type=images&key=plugTopImg',
+        'uploader': '/system/upload?type=images&key='+key,
         //按钮显示的文字
         'buttonText': '上传图片',
         //显示的高度和宽度，默认 height 30；width 120
