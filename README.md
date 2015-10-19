@@ -218,7 +218,8 @@ db.adminusers.insert({
 
 ## 二、DorCMS 开发
 ###  2.1 配置文件
-- DoraCMS 的主要配置在 settings.js 中设置（/onlineCMS/models/db/settings.js）:
+- DoraCMS 的主要配置在 settings.js 中设置（/onlineCMS/models/db/settings.js）
+
 ```
     COOKIE_SECRET: 'doramart.com',
     URL: 'mongodb://127.0.0.1:27017/doracms',
