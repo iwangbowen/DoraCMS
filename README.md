@@ -184,7 +184,7 @@ db.adminusers.insert({
   "_id" : "E1jNjZi8",
   "name" : "test",
   "username" : "test",
-  "password" : "581fbebb8a5f5827",
+  "password" : "14700a6f381897e0",
   "phoneNum" : 12358563215.0,
   "email" : "doramart@qq.com",
   "group" : "4yTbsWiI",
@@ -196,7 +196,7 @@ db.adminusers.insert({
 
 ```
 
-- ⑤、插入数据如果存在格式问题，需要在记事本里编辑一下。如果上述执行正常，那么默认的登录名和密码为  test / 000000  ,这样，您就可以正常登录后台了。
+- ⑤、插入数据如果存在格式问题，需要在记事本里编辑一下。如果上述执行正常，那么默认的登录名和密码为  test / doracms  ,这样，您就可以正常登录后台了。
 
 ### 1.3.3运行DoraCMS
 - 在刚刚svn下载的代码目录下 调出cmd命令窗口，执行npm start 
