@@ -165,7 +165,8 @@
 - ①、找到Mongodb安装目录(MongoDB\Server\3.0\bin) 执行 mongo.exe
 - ②、输入 use doracms
 - ③、插入用户组数据:
-###
+
+```
 db.admingroups.insert({
   "_id" : "4yTbsWiI",
   "name" : "超级管理员",
@@ -174,9 +175,10 @@ db.admingroups.insert({
   "__v" : 0
 })
 
+```
 
 - ④、插入用户数据：
-###
+```
 db.adminusers.insert({
   "_id" : "E1jNjZi8",
   "name" : "test",
@@ -190,6 +192,8 @@ db.adminusers.insert({
   "date" : ISODate("2015-06-18T01:17:15.007Z"),
   "__v" : 0
 })
+
+```
 
 - ⑤、插入数据如果存在格式问题，需要在记事本里编辑一下。如果上述执行正常，那么默认的登录名和密码为  test / 000000  ,这样，您就可以正常登录后台了。
 
