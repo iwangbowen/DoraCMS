@@ -164,7 +164,7 @@
 - 在《DoraCMS操作指南》 中有提到插入初始管理数据，因为刚安装的数据是空的，需要插入初始数据来管理后台，这里重新介绍一次：
 - ①、找到Mongodb安装目录(MongoDB\Server\3.0\bin) 执行 mongo.exe
 - ②、输入 use doracms
-- ③、插入用户组数据:
+- ③、插入用户组数据
 
 ```
 db.admingroups.insert({
@@ -177,7 +177,8 @@ db.admingroups.insert({
 
 ```
 
-- ④、插入用户数据：
+- ④、插入用户数据
+
 ```
 db.adminusers.insert({
   "_id" : "E1jNjZi8",
