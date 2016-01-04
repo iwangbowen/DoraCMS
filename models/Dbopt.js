@@ -16,7 +16,7 @@ var ContentTemplate = require("../models/ContentTemplate");
 
 //站点配置
 var settings = require("../models/db/settings");
-var db = mongoose.connect('mongodb://localhost/doracms');
+var db = mongoose.connect(settings.URL);
 //mongoose.connect('mongodb://'+settings.USERNAME+':'+settings.PASSWORD+'@'+settings.HOST+':'+settings.PORT+'/'+settings.DB+'');
 
 //信息删除操作
@@ -128,7 +128,7 @@ var DbOpt = {
         }else if(obj === UserNotify){
             query.populate('user').populate('notify');
         }else if(obj === Content){
-            query.populate('category');
+            query.populate('category').populate('author');
         }else if(obj === ContentCategory){
             query.populate('contentTemp');
         }else if(obj === ContentTemplate){
