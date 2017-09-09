@@ -1,11 +1,5 @@
-User-agent:*
-Disallow: /cache/
-Disallow: /api/
-Disallow: /plugins/
-Disallow: /adminlte/
-Disallow: /ueditor/
-Disallow: /*?
-Disallow: /*.html?*
-Disallow:/content/searchResult/items?
-
-Sitemap:http://www.html-js.cn/sitemap.xml
+User-Agent: *
+Allow: /
+Disallow: /dr-admin
+Disallow: /manage
+Disallow: /users
