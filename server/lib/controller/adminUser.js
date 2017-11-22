@@ -25,9 +25,9 @@ function checkFormData(req, res, fields) {
     if (!validatorUtil.checkName(fields.name)) {
         errMsg = '2-6个中文字符!';
     }
-    if (!validatorUtil.checkPwd(fields.password)) {
-        errMsg = '6-12位，只能包含字母、数字和下划线!';
-    }
+    // if (!validatorUtil.checkPwd(fields.password)) {
+    //     errMsg = '6-12位，只能包含字母、数字和下划线!';
+    // }
     if (fields.password !== fields.confirmPassword) {
         errMsg = '两次输入密码不一致!';
     }
@@ -37,7 +37,7 @@ function checkFormData(req, res, fields) {
     if (!validatorUtil.checkEmail(fields.email)) {
         errMsg = '请填写正确的邮箱!';
     }
-    if (!validator.isLength(fields.comments, 5, 30)) {
+    if (fields.comments && !validator.isLength(fields.comments, 5, 30)) {
         errMsg = '请输入5-30个字符!';
     }
     if (errMsg) {
@@ -77,7 +77,7 @@ class AdminUser {
         try {
             let adminUserCount = await AdminUserModel.count();
             let regUserCount = await UserModel.count();
-            let regUsers = await UserModel.find({},{ password: 0 ,email: 0}).limit(20).sort({ date: -1 });
+            let regUsers = await UserModel.find({}, { password: 0, email: 0 }).limit(20).sort({ date: -1 });
             let contentCount = await ContentModel.count();
             let messageCount = await MessageModel.count();
             let logQuery = { type: 'login' };
@@ -162,17 +162,16 @@ class AdminUser {
     async loginAction(req, res, next) {
         const form = new formidable.IncomingForm();
         form.parse(req, async (err, fields, files) => {
+
             let {
                 userName,
                 password
             } = fields;
             try {
-                let newPsd = service.encrypt(fields.password, settings.encrypt_key);
+
                 let errMsg = '';
                 if (!validatorUtil.checkUserName(fields.userName)) {
                     errMsg = '请输入正确的用户名'
-                } else if (!validatorUtil.checkPwd(fields.password)) {
-                    errMsg = '请输入正确的密码'
                 }
 
                 if (!fields.imageCode || fields.imageCode != req.session.imageCode) {
@@ -197,7 +196,7 @@ class AdminUser {
             }
             const userObj = {
                 userName: fields.userName,
-                password: service.encrypt(fields.password, settings.encrypt_key)
+                password: fields.password
             }
             try {
                 let user = await AdminUserModel.findOne(userObj).populate([{
@@ -291,20 +290,28 @@ class AdminUser {
                 name: fields.name,
                 email: fields.email,
                 phoneNum: fields.phoneNum,
-                password: service.encrypt(fields.password, settings.encrypt_key),
+                password: fields.password,
                 confirm: fields.confirm,
                 group: fields.group,
                 enable: fields.enable,
                 comments: fields.comments
             }
 
-            const newAdminUser = new AdminUserModel(userObj);
             try {
-                await newAdminUser.save();
-                res.send({
-                    state: 'success',
-                    id: newAdminUser._id
-                });
+                let user = await AdminUserModel.find().or([{ userName: fields.userName }])
+                if (!_.isEmpty(user)) {
+                    res.send({
+                        state: 'error',
+                        message: '用户名已存在！'
+                    });
+                } else {
+                    const newAdminUser = new AdminUserModel(userObj);
+                    await newAdminUser.save();
+                    res.send({
+                        state: 'success',
+                        id: newAdminUser._id
+                    });
+                }
             } catch (err) {
                 logUtil.error(err, req);
                 res.send({
@@ -313,6 +320,7 @@ class AdminUser {
                     message: '保存数据失败:',
                 })
             }
+
         })
     }
 
@@ -336,7 +344,7 @@ class AdminUser {
                 name: fields.name,
                 email: fields.email,
                 phoneNum: fields.phoneNum,
-                password: service.encrypt(fields.password, settings.encrypt_key),
+                password: fields.password,
                 confirm: fields.confirm,
                 group: fields.group,
                 enable: fields.enable,

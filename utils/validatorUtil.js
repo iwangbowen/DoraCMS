@@ -23,7 +23,7 @@ module.exports = {
         return str && validator.isLength(str, min, max) && /[\u4e00-\u9fa5]/.test(str);
     },
     // 校验密码
-    checkPwd(str, min = 6, max = 12) {
+    checkPwd(str, min = 6, max = 32) {
         return str && validator.isLength(str, 5, max) && /(?!^\\d+$)(?!^[a-zA-Z]+$)(?!^[_#@]+$).{6,}/.test(str);
     },
     // 校验邮箱
@@ -32,10 +32,10 @@ module.exports = {
     },
     // 校验手机号
     checkPhoneNum(str) {
-        return str && validator.isMobilePhone(str, 'zh-CN')
+        return str && validator.isMobilePhone(str, 'zh-CN');
     },
     // 校验QQ号
-    checkQqNum() {
+    checkQqNum(str) {
         return RegExp(/^[1-9][0-9]{4,9}$/).test(str);
     },
 
