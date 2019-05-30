@@ -6,4 +6,5 @@ npm-debug.log
 admin.lock
 server/config/secret.js
 public/upload/
+public/apidoc/
 logs/
