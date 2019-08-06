@@ -1,4 +1,5 @@
 .DS_Store
+package-lock.json
 node_modules/
 npm-debug.log
 .vscode/
@@ -6,5 +7,6 @@ npm-debug.log
 admin.lock
 server/config/secret.js
 public/upload/
-public/apidoc/
 logs/
+dist/
+.cache
