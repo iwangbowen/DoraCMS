@@ -3,9 +3,11 @@
 ![DoraCMS](https://raw.githubusercontent.com/doramart/picGo/master/img/Snipaste_2019-11-16_00-14-09.png "DoraCMS")
 
 
-## 简介
+## DoraCMS 视频简介
 
-![DoraCMS 视频简介](http://cdn.html-js.cn/cms/uploadfiles/video/doracmsintroduction.mp4 "DoraCMS 视频简介")
+[DoraCMS 视频简介](http://cdn.html-js.cn/cms/uploadfiles/video/doracmsintroduction.mp4)  
+
+
 
 ## 2.1.4 版本更新
 
@@ -34,9 +36,11 @@
 
 
 ## Windows 下开发环境搭建
-![Windows 下开发环境搭建视频教程](http://cdn.html-js.cn/cms/uploadfiles/video/doracms-for-windows.mp4 "Windows 下开发环境搭建")
 
-## MAC OS 开发环境大家:
+[Windows 下开发环境搭建](http://cdn.html-js.cn/cms/uploadfiles/video/doracms-for-windows.mp4)  
+
+
+## MAC OS 开发环境搭建
 
 ### 安装最新稳定版 NodeJS (12.13.0):
 ```javascript
