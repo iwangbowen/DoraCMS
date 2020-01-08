@@ -63,7 +63,7 @@
   </div>
 </template>
 <script>
-import { deleteContent } from "@/api/content";
+import { deleteContent, regUserList } from "@/api/content";
 export default {
   props: {
     device: String,
@@ -158,8 +158,7 @@ export default {
     },
     queryUserListByParams(params = {}) {
       let _this = this;
-      services
-        .regUserList(params)
+      regUserList(params)
         .then(result => {
           let specialList = result.data.data.docs;
           if (specialList) {
