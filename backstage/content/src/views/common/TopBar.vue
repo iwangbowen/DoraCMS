@@ -160,7 +160,7 @@ export default {
       let _this = this;
       regUserList(params)
         .then(result => {
-          let specialList = result.data.data.docs;
+          let specialList = result.data.docs;
           if (specialList) {
             _this.selectUserList = specialList.map(item => {
               return {
