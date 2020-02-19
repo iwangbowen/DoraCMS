@@ -178,7 +178,7 @@ export default {
       loading: false,
       expireTimeOption: {
         disabledDate(date) {
-          return date.getTime() <= new Date().getTime();
+          return date.getTime() <= new Date().getTime() - 1000 * 60 * 60 * 24;
         }
       },
       rules: {
@@ -282,12 +282,12 @@ export default {
         .then(result => {
           let specialList = result.data.docs;
           if (specialList) {
-            _this.selectUserList = specialList.map(item => {
-              return {
-                value: item._id,
-                label: item.userName
-              };
-            });
+            for (const userItem of specialList) {
+              _this.selectUserList.push({
+                value: userItem._id,
+                label: userItem.userName
+              });
+            }
             _this.loading = false;
           } else {
             _this.selectUserList = [];
