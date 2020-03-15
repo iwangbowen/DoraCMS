@@ -139,7 +139,7 @@ export PATH
 ```
 修改完之后需要 `source` 一下使其生效
 ```
-source ~/.bash_profile
+source /etc/profile
 ```
 终端查看效果
 ```
