@@ -12,7 +12,8 @@ module.exports = appInfo => {
                 url: 'mongodb://127.0.0.1:27017/doracms2',
                 options: {
                     useCreateIndex: true,
-                    useUnifiedTopology: true
+                    useUnifiedTopology: true,
+                    keepAlive: 3000
                 },
             },
         },
