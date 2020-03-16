@@ -3,7 +3,7 @@
  * @Description install step_1
  * @Date: 2020-03-13 08:43:33 
  * @Last Modified by: doramart
- * @Last Modified time: 2020-03-14 22:29:08
+ * @Last Modified time: 2020-03-16 12:34:49
  */
 
 
@@ -22,7 +22,7 @@ let agentStr = serverConfig.tbAgent == '1' ? '--registry=https://registry.npm.ta
 const modifyFileByReplace = (targetPath, replaceStr, targetStr) => {
     var readText = fs.readFileSync(targetPath, 'utf-8');
     var reg = new RegExp(replaceStr, "g")
-    if (replaceStr.indexOf('path.join') >= 0 || replaceStr.indexOf('"egg":') >= 0 || replaceStr.indexOf("html-js") >= 0) {
+    if (replaceStr.indexOf('path.join') >= 0 || replaceStr.indexOf('"egg":') >= 0) {
         reg = replaceStr;
     }
     var newRenderContent = readText.replace(reg, targetStr);
