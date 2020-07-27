@@ -516,6 +516,8 @@ class AdminUserController extends Controller {
             }
         }
 
+        renderMap = _.uniqWith(renderMap, _.isEqual);
+
         await ctx.render('manage/index.html', {
             renderMap: renderMap,
             renderMapJson: JSON.stringify(renderMap),
