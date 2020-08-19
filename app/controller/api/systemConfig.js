@@ -1,6 +1,6 @@
 /*
- * @Author: doramart 
- * @Date: 2019-07-07 13:07:27 
+ * @Author: doramart
+ * @Date: 2019-07-07 13:07:27
  * @Last Modified by: doramart
  * @Last Modified time: 2020-02-13 12:34:27
  */
@@ -14,7 +14,7 @@ class SystemConfigController extends Controller {
         let systemConfigList = await ctx.service.systemConfig.find({
             isPaging: '0'
         }, {
-            files: 'siteName ogTitle siteDomain siteDiscription siteKeywords siteAltKeywords registrationNo showImgCode statisticalCode siteLogo'
+            files: 'siteName ogTitle siteDomain siteDescription siteKeywords siteAltKeywords registrationNo showImgCode statisticalCode siteLogo'
         });
         ctx.helper.renderSuccess(ctx, {
             data: systemConfigList[0]

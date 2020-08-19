@@ -1,6 +1,6 @@
 /*
- * @Author: doramart 
- * @Date: 2019-08-15 10:52:18 
+ * @Author: doramart
+ * @Date: 2019-08-15 10:52:18
  * @Last Modified by: doramart
  * @Last Modified time: 2019-09-29 17:44:45
  */
@@ -25,7 +25,7 @@ const form = (ctx) => {
             max: 100,
             message: ctx.__("validate_inputCorrect", [ctx.__("label_sysconfig_site_name")])
         },
-        siteDiscription: {
+        siteDescription: {
             type: "string",
             required: true,
             min: 5,

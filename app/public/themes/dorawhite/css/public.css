@@ -1292,11 +1292,11 @@ textarea {
     z-index: 11;
 }
 
-.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .discription {
+.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .description {
     text-align: left;
 }
 
-.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .discription h2 {
+.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .description h2 {
     margin: 0;
     font-size: 20px;
     word-break: break-all;
@@ -1304,45 +1304,45 @@ textarea {
     line-height: 1.4;
 }
 
-.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .discription .dis {
+.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .description .dis {
     margin: 10px 0;
     font-size: 13px;
     color: #666666;
 }
 
-.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .discription .post-meta {
+.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .description .post-meta {
     position: absolute;
     bottom: 0;
 }
 
-.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .discription .post-meta a:link,
-.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .discription .post-meta a:visited {
+.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .description .post-meta a:link,
+.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .description .post-meta a:visited {
     color: #3ca5f6;
 }
 
-.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .discription .post-meta li {
+.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .description .post-meta li {
     display: inline-block;
     font-size: 13px;
     color: #999999;
     margin: 0px 10px 0px 0;
 }
 
-.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .discription .post-meta li.author {
+.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .description .post-meta li.author {
     margin-right: 20px;
 }
 
-.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .discription .post-meta li.author .logo {
+.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .description .post-meta li.author .logo {
     display: inline-block;
     vertical-align: middle;
 }
 
-.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .discription .post-meta li.author .logo img {
+.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .description .post-meta li.author .logo img {
     border-radius: 50%;
     width: 22px;
     height: 22px;
 }
 
-.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .discription .post-meta li.author span {
+.contentContainer .mainbody .content-list .main-list .article-list .post-b .content-item .description .post-meta li.author span {
     display: inline-block;
 }
 
@@ -1670,17 +1670,17 @@ textarea {
     .content-item .row-list .contentImg .item-category {
         display: none !important;
     }
-    .content-item .discription {
+    .content-item .description {
         margin-top: 10px !important;
         line-height: 1.5;
     }
-    .content-item .discription h2 {
+    .content-item .description h2 {
         font-size: 16px !important;
     }
-    .content-item .discription .post-meta {
+    .content-item .description .post-meta {
         position: relative !important;
     }
-    .content-item .discription .post-meta .author {
+    .content-item .description .post-meta .author {
         display: none !important;
     }
     .top-ads .el-carousel__container {

@@ -21,7 +21,7 @@ export default {
     tagOrKey: "Tag or Keywords",
     sImg: "Thumbnail",
     postValue: "Recommend Index",
-    discription: "Content abstract",
+    description: "Content abstract",
     uploadWord: "Upload Word",
     comments: "Contents Detail",
     flashComments: "News-Flash Summary",

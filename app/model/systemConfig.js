@@ -36,7 +36,7 @@ module.exports = app => {
             type: String,
             default: 'https://www.html-js.cn'
         },
-        siteDiscription: {
+        siteDescription: {
             type: String,
             default: '前端开发'
         },

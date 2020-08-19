@@ -16,7 +16,7 @@ class HomeController extends Controller {
         let configs = await ctx.helper.reqJsonData('systemConfig/getConfig');
         const {
             siteName,
-            siteDiscription,
+            siteDescription,
             siteKeywords,
             siteAltKeywords,
             ogTitle,
@@ -29,14 +29,14 @@ class HomeController extends Controller {
             keywords
         } = ctx.params;
         let pageTitle = title ? (title + ' | ' + siteName) : siteName;
-        let discription = des ? des : siteDiscription;
+        let description = des ? des : siteDescription;
         let key = keywords ? keywords : siteKeywords;
         let altkey = siteAltKeywords || '';
         return {
             title: pageTitle,
             siteLogo,
             ogTitle,
-            discription,
+            description,
             key,
             altkey,
             configs: configs || [],

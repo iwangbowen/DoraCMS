@@ -1,6 +1,6 @@
 /*
- * @Author: doramart 
- * @Date: 2019-06-20 18:55:40 
+ * @Author: doramart
+ * @Date: 2019-06-20 18:55:40
  * @Last Modified by: doramart
  * @Last Modified time: 2020-03-20 12:09:29
  */
@@ -80,7 +80,7 @@ class SystemConfigController extends Controller {
                 siteLogo: fields.siteLogo,
                 ogTitle: fields.ogTitle,
                 siteDomain: fields.siteDomain,
-                siteDiscription: fields.siteDiscription,
+                siteDescription: fields.siteDescription,
                 siteKeywords: fields.siteKeywords,
                 siteAltKeywords: fields.siteAltKeywords,
                 siteEmailServer: fields.siteEmailServer,

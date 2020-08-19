@@ -1,6 +1,6 @@
 /*
- * @Author: doramart 
- * @Date: 2019-06-18 17:27:24 
+ * @Author: doramart
+ * @Date: 2019-06-18 17:27:24
  * @Last Modified by: doramart
  * @Last Modified time: 2020-05-14 12:27:28
  */
@@ -414,11 +414,11 @@ global.HeaderExtension = function () {
         metaArr.push(`<meta charset="utf-8">`);
         metaArr.push(`<title>${_ctx.site.title}</title>`);
         metaArr.push(`<meta name="viewport" content="width=device-width, initial-scale=1">`);
-        metaArr.push(`<meta name="description" content="${_ctx.site.discription}">`);
+        metaArr.push(`<meta name="description" content="${_ctx.site.description}">`);
         metaArr.push(`<meta content="${_ctx.site.key}" name="keywords" />`);
         metaArr.push(`<meta property="og:type" content="website" />`);
         metaArr.push(`<meta property="og:title" content="${_ctx.site.title}" />`);
-        metaArr.push(`<meta property="og:description" content="${_ctx.site.discription}" />`);
+        metaArr.push(`<meta property="og:description" content="${_ctx.site.description}" />`);
         metaArr.push(`<meta property="og:image" content="${_ctx.ogData.img}">`);
         metaArr.push(`<meta property="og:url" content="${_ctx.ogData.url}">`);
         metaArr.push(`<meta name="author" content="DoraCMS">`);

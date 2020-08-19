@@ -23,14 +23,14 @@ item为子元素集合
 					<img src="{{item.sImg}} " class="img-responsive " alt="{{item.title}} " />
 				</a>
 			</div>
-			<div class="col-xs-7 col-md-8 discription ">
+			<div class="col-xs-7 col-md-8 description ">
 				<h2 class="post-title" alt="{{site.altkey}}{{item.title}}">
 					<a href="{{item.url}} " target="_blank ">
 						{{item.title}}
 					</a>
 				</h2>
 				<div class="post-content ">
-					{{item.discription | cutwords(100)}}
+					{{item.description | cutwords(100)}}
 				</div>
 				<ul class="post-meta ">
 					{% if item.author %} {% set renderAuthor = item.author %} {% else %}

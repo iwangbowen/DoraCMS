@@ -37,8 +37,8 @@
             <el-form-item :label="$t('sysTemConfigs.site_domain')" prop="siteDomain">
               <el-input size="small" v-model="systemConfig.configs.siteDomain"></el-input>
             </el-form-item>
-            <el-form-item :label="$t('sysTemConfigs.site_dis')" prop="siteDiscription">
-              <el-input size="small" v-model="systemConfig.configs.siteDiscription"></el-input>
+            <el-form-item :label="$t('sysTemConfigs.site_dis')" prop="siteDescription">
+              <el-input size="small" v-model="systemConfig.configs.siteDescription"></el-input>
             </el-form-item>
             <el-form-item :label="$t('sysTemConfigs.site_keyWords')" prop="siteKeywords">
               <el-input size="small" v-model="systemConfig.configs.siteKeywords"></el-input>
@@ -228,7 +228,7 @@ export default {
             trigger: "blur"
           }
         ],
-        siteDiscription: [
+        siteDescription: [
           {
             required: true,
             message: this.$t("validate.inputNull", {

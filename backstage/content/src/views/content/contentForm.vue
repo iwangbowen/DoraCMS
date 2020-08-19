@@ -133,8 +133,8 @@
           </el-form-item>
         </div>
 
-        <el-form-item :label="$t('contents.discription')" prop="discription">
-          <el-input size="small" type="textarea" v-model="formState.formData.discription"></el-input>
+        <el-form-item :label="$t('contents.description')" prop="description">
+          <el-input size="small" type="textarea" v-model="formState.formData.description"></el-input>
         </el-form-item>
 
         <el-form-item :label="$t('contents.uploadWord')" prop="uploadWord">
@@ -336,11 +336,11 @@ export default {
             trigger: "change"
           }
         ],
-        discription: [
+        description: [
           {
             required: true,
             message: this.$t("validate.inputNull", {
-              label: this.$t("contents.discription")
+              label: this.$t("contents.description")
             }),
             trigger: "blur"
           },

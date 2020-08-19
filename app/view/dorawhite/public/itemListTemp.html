@@ -25,7 +25,7 @@ item为子元素集合
 					<img src="{{item.sImg}} " class="img-responsive " alt="{{item.title}} " />
 				</a>
 			</div>
-			<div class="col-xs-7 col-sm-9 col-md-8 discription ">
+			<div class="col-xs-7 col-sm-9 col-md-8 description ">
 				<h2 class="post-title" alt="{{site.altkey}}{{item.title}}">
 					<a href="{{item.url}} " target="_blank ">
 						{% if item.roofPlacement == 1 %}
@@ -36,8 +36,8 @@ item为子元素集合
 					</a>
 				</h2>
 				<div class="post-content ">
-					{% if targetSearchKey %} {{item.discription | cutwords(200) | hightWords(targetSearchKey) | safe }}
-					{% else %} {{item.discription
+					{% if targetSearchKey %} {{item.description | cutwords(200) | hightWords(targetSearchKey) | safe }}
+					{% else %} {{item.description
 					| cutwords(200)}} {% endif %}
 				</div>
 				<ul class="post-meta post-meta-actions" ms-controller="rcStatic">

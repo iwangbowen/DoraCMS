@@ -85,7 +85,7 @@
 
                             <div class="form-group">
                                 <label for="">{{__('lc_documentDis')}}</label>
-                                <input type="text" class="form-control" name="discription" ms-duplex="@discription"
+                                <input type="text" class="form-control" name="description" ms-duplex="@description"
                                     placeholder="{{__('lc_pleace_documentDis')}}"
                                     ms-rules="{required:true, minlength：5,maxlength:300 }"
                                     data-required-message="{{__('lc_pleace_documentDis_null_tips')}}"
@@ -165,7 +165,7 @@
             url: "/api/content/getWordHtmlContent",
             data: formData,
             type: "POST",
-            // contentType: "multipart/form-data",        
+            // contentType: "multipart/form-data",
             contentType: false,
             /* 不可缺 */
             processData: false, // 默认为true，默认情况下，发送的数据将被转换为对象，设为false不希望进行转换
@@ -302,7 +302,7 @@
     var postArticelVM = avalon.define({
         $id: 'user-post',
         title: '',
-        discription: '',
+        description: '',
         comments: '',
         message: '',
         contentObj: UE.getEditor('container', {
@@ -343,7 +343,7 @@
                         var params = {
                             title: postArticelVM.title,
                             sImg: postArticelVM.sImg,
-                            discription: postArticelVM.discription,
+                            description: postArticelVM.description,
                             categories: postArticelVM.categories,
                             draft: postArticelVM.draft,
                             tags: postArticelVM.tags,
@@ -413,7 +413,7 @@
                     });
                     $('.trashIco').show();
                 }
-                postArticelVM.discription = contentInfo.discription;
+                postArticelVM.description = contentInfo.description;
                 if (contentInfo.keywords) {
                     postArticelVM.keywords = (contentInfo.keywords).join();
                 }

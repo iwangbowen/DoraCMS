@@ -11,7 +11,7 @@ module.exports = {
         let configs = await ctx.helper.reqJsonData('systemConfig/getConfig');
         const {
             siteName,
-            siteDiscription,
+            siteDescription,
             siteKeywords,
             siteAltKeywords,
             ogTitle,
@@ -25,7 +25,7 @@ module.exports = {
             keywords
         } = ctx.params;
         let pageTitle = title ? (title + ' | ' + siteName) : siteName;
-        let discription = des ? des : siteDiscription;
+        let description = des ? des : siteDescription;
         let key = keywords ? keywords : siteKeywords;
         let altkey = siteAltKeywords || '';
         return {
@@ -33,7 +33,7 @@ module.exports = {
             logo: siteLogo,
             url: siteDomain,
             ogTitle,
-            discription,
+            description,
             key,
             altkey,
             configs: configs || [],
@@ -180,7 +180,7 @@ module.exports = {
                 if (!_.isEmpty(pageData.post)) {
                     // 更改文档meta
                     pageData.site.title = pageData.post.title + ' | ' + pageData.site.title;
-                    pageData.site.discription = pageData.post.discription;
+                    pageData.site.description = pageData.post.description;
                     // 获取文档所属类别下的分类列表
                     pageData.currentCateList = await ctx.helper.reqJsonData('contentCategory/getCurrentCategoriesById', {
                         contentId: pageData.post._id

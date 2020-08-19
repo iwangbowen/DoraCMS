@@ -459,7 +459,7 @@
             "type": "string"
           },
           {
-            "name": "discription",
+            "name": "description",
             "in": "query",
             "description": "文档简介",
             "required": true,
@@ -569,7 +569,7 @@
             "type": "string"
           },
           {
-            "name": "discription",
+            "name": "description",
             "in": "query",
             "description": "文档简介",
             "required": true,
@@ -3104,7 +3104,7 @@
           "type": "string",
           "default": ""
         },
-        "discription": {
+        "description": {
           "type": "string"
         },
         "appShowType": {

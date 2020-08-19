@@ -11,7 +11,7 @@
     </div>
     <div class="myContentList" :if="@myContentList.length > 0">
         <div ms-for="(index,el) in @myContentList">
-            <div class="discription ">
+            <div class="description ">
                 <h2 class="post-title ">
                     <a ms-visible="@el.state=='2'" ms-attr="{href:el.url}" target="_blank " ms-text="@el.title"></a>
                     <a ms-visible="@el.state != '2'" ms-text="@el.title"></a>
@@ -24,7 +24,7 @@
                         <span style="color:red;" ms-visible="@el.state == '3'">{{__('lc_content_state_failed')}}</span>
                     </div>
                 </h2>
-                <div class="post-content" ms-html="@el.discription"></div>
+                <div class="post-content" ms-html="@el.description"></div>
                 <ul class="post-meta ">
                     <li>
                         <i class="fa fa-clock-o " aria-hidden="true "></i>&nbsp;&nbsp;
