@@ -3,20 +3,15 @@ const path = require('path');
 const fs = require('fs');
 const defaultConfig = require('./ext/config');
 
-
 module.exports = appInfo => {
-
   return {
-
     keys: 'doracms2',
-
     cluster: {
       listen: {
         port: 8080,
         hostname: '',
       }
     },
-
     session: {
       key: 'DORA_SESS',
       maxAge: 24 * 3600 * 1000, // 1 day
@@ -24,31 +19,24 @@ module.exports = appInfo => {
       encrypt: true,
       renew: true //延长会话有效期
     },
-
     // 前台会员登录有效时间
     userMaxAge: 1000 * 60 * 60 * 24 * 1, // 1 day
-
     // 后台管理员登录有效时间
     adminUserMaxAge: 1000 * 60 * 60 * 24 * 1, // 1 day
-
     // 设置网站图标
     siteFile: {
       '/favicon.ico': fs.readFileSync(path.join(appInfo.baseDir, 'app/public/favicon.ico'))
     },
-
     // 配置需要的中间件,数组顺序即为中间件的加载顺序
     middleware: ['notfoundHandler', 'crossHeader', 'compress', 'authUserToken', 'authAdminToken', 'authAdminPower'],
-
     // gzip压缩
     compress: {
       threshold: 2048,
     },
-
     // 会员中心权限校验
     authPage: {
       threshold: 1024, // 小于 1k 的响应体不压缩
     },
-
     // nunjucks模板引擎
     view: {
       defaultViewEngine: 'nunjucks',
@@ -56,14 +44,10 @@ module.exports = appInfo => {
         '.html': 'nunjucks',
       },
     },
-
     // 国际化
     i18n: {
       defaultLocale: 'zh-CN',
     },
-
-    
-
     // cdn域名
     origin: 'https://cdn.html-js.cn',
     // 系统服务提供商
@@ -74,57 +58,45 @@ module.exports = appInfo => {
     temp_locales_forder: process.cwd() + '/config/locale/',
     // 后台管理根目录
     admin_base_path: '/admin',
-
     // 加密解密
     session_secret: 'doracms_secret',
     auth_cookie_name: 'doracms',
     encrypt_key: 'dora',
     salt_aes_key: "doracms_",
     salt_md5_key: "dora",
-
     // 安全性校验
     security: {
       csrf: {
         enable: false,
       }
     },
-
     // api跨域
     crossHeader: {
       match: ['/api'],
     },
-
     // 后台token校验
     authAdminToken: {
       match: ['/manage', '/admin'],
     },
-
     // 后台权限校验
     authAdminPower: {
       match: ['/manage'],
     },
-
     // 前台用户校验
     authUserToken: {
       ignore: ['/manage', '/admin'],
     },
-
     // 文件上传
     multipart: {
       fileSize: '5mb',
       mode: 'stream',
       fileExtensions: ['.doc', '.docx'], // 扩展几种上传的文件格式
     },
-
     // 数据备份定时
     backUpTick: '0 0 0 */1 * ?', //每天凌晨0点执行一次
-
-
-
     backUpDataRouter: {
       match: [ctx => ctx.path.startsWith('/manage/backupDataManage')],
     },
-
     uploadFileRouter: {
       uploadFileFormat: {
         "upload_path": process.cwd() + '/app/public',
@@ -132,10 +104,6 @@ module.exports = appInfo => {
       },
       match: [ctx => ctx.path.startsWith('/manage/uploadFile'), ctx => ctx.path.startsWith('/api/upload/files'), ctx => ctx.path.startsWith('/api/upload/ueditor'), , ctx => ctx.path.startsWith('/api/upload/filePath')],
     },
-
-    
-
-
     // CONFIG_NORMALPLUGIN_BEGIN
 
     // doraRegUserPluginBegin
@@ -248,7 +216,6 @@ module.exports = appInfo => {
     },
     // doraMailDeliveryPluginEnd
 
-
     // doraMiddleStagePluginBegin
     doraMiddleStageRouter: {
       match: [ctx => ctx.path.startsWith('/manage/singleUser')],
@@ -257,11 +224,7 @@ module.exports = appInfo => {
 
     // CONFIG_NORMALPLUGIN_END
 
-
     // EGGCONFIGDEFAULT
-
-
     ...defaultConfig
-
   }
 }
