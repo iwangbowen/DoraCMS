@@ -2,12 +2,12 @@ const Controller = require('egg').Controller;
 const _ = require('lodash');
 const shortid = require('shortid');
 const pkg = require('@root/package.json')
-const validator = require('validator')
-const captcha = require('trek-captcha')
-const path = require('path')
-const fs = require('fs')
-const qr = require('qr-image')
-const moment = require('moment')
+const validator = require('validator');
+const captcha = require('trek-captcha');
+const path = require('path');
+const fs = require('fs');
+const qr = require('qr-image');
+const moment = require('moment');
 
 class HomeController extends Controller {
 
@@ -48,11 +48,12 @@ class HomeController extends Controller {
     }
 
     async getImgCode(ctx, app) {
-
         const {
             token,
             buffer
-        } = await captcha();
+        } = await captcha({
+            size: 3
+        });
         ctx.session.imageCode = token;
         ctx.set('Content-Type', 'image/png');
         ctx.status = 200;
