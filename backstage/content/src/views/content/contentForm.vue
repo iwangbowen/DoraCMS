@@ -234,6 +234,7 @@ export default {
       selectSpecialList: [],
       selectCoverList: [],
       content: "",
+      filePaths: [],
       simpleComments: "",
       isflash: false,
       config: {
@@ -462,10 +463,9 @@ export default {
     },
     onSuccess(res, file) {
       tryHideFullScreenLoading();
-      this.wordFileUrl = res.data ? res.data : "";
-      this.ueditorObj.setContent(res.data);
+      this.filePaths = [...this.filePaths, res.data.filePath];
       this.$message({
-        message: "恭喜，导入成功！",
+        message: "上传成功！",
         type: "success",
       });
     },
