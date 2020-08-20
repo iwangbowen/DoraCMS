@@ -2,14 +2,14 @@ const path = require('path');
 var modulesPath = path.resolve(__dirname, '../');
 var shell = require('shelljs');
 const {
-    scanforder
+    scanFolder
 } = require('./utils');
 
 // 指定打包模块
 let designatedModule = [];
 
 
-let targetBuildModules = scanforder(modulesPath);
+let targetBuildModules = scanFolder(modulesPath);
 if (designatedModule.length > 0) {
     targetBuildModules = designatedModule;
 }

@@ -5,24 +5,25 @@ const envSetStr = os.type() == 'Windows_NT' ? 'set' : 'export';
 var modulesPath = path.resolve(__dirname, '../');
 var shell = require('shelljs');
 var settings = require('../publicMethods/settings');
+
 const {
     scanFiles,
-    scanforder,
+    scanFolder,
     uploadByQiniu
 } = require('./utils');
 
 // 指定打包模块
-let designatedModule = [];
+let designatedModule = ['content'];
 
 let copyType = "dev",
     targetModules = '',
     localDistPath = ''; //  ALL 或 separate 可选
-let argvs = process.argv;
-if (argvs[2] == '--type') {
-    copyType = argvs[3];
+const argv = process.argv;
+if (argv[2] == '--type') {
+    copyType = argv[3];
 }
-if (argvs[4] == '--modules') {
-    targetModules = argvs[5];
+if (argv[4] == '--modules') {
+    targetModules = argv[5];
     if (targetModules && targetModules != 'ALL') {
         if (targetModules.indexOf(',') >= 0 && targetModules.split(',').length > 0) {
             designatedModule = designatedModule.concat(targetModules.split(','));
@@ -33,11 +34,11 @@ if (argvs[4] == '--modules') {
     }
 }
 
-if (argvs[6] == '--localDistPath') {
-    localDistPath = argvs[7];
+if (argv[6] == '--localDistPath') {
+    localDistPath = argv[7];
 }
 
-let targetBuildModules = scanforder(modulesPath);
+let targetBuildModules = scanFolder(modulesPath);
 if (designatedModule.length > 0) {
     targetBuildModules = designatedModule;
 }

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 var qiniu = require("qiniu");
 var modulesPath = path.resolve(__dirname, '../');
-let scanforder = (path) => {
+let scanFolder = (path) => {
     let folderList = [];
     let files = fs.readdirSync(path);
     files.forEach(function (item) {
@@ -94,7 +94,7 @@ let uploadByQiniu = (localFile, targetKey) => {
 
 
 module.exports = {
-    scanforder,
+    scanFolder,
     scanFiles,
     uploadByQiniu
 };
