@@ -140,7 +140,7 @@
         <el-form-item :label="$t('contents.uploadFile')" prop="uploadFile">
           <el-upload
             class="upload-demo"
-            action="/api/content/getWordHtmlContent"
+            action="/api/content/uploadFileToContent"
             :on-preview="handleWordPreview"
             :on-remove="onRemove"
             :before-remove="beforeRemove"
