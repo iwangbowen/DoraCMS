@@ -53,9 +53,9 @@ module.exports = appInfo => {
     // 系统服务提供商
     doracms_api: 'https://api.html-js.cn',
     // 模板文件目录
-    temp_static_forder: process.cwd() + '/app/public/themes/',
-    temp_view_forder: process.cwd() + '/app/view/',
-    temp_locales_forder: process.cwd() + '/config/locale/',
+    temp_static_folder: process.cwd() + '/app/public/themes/',
+    temp_view_folder: process.cwd() + '/app/view/',
+    temp_locales_folder: process.cwd() + '/config/locale/',
     // 后台管理根目录
     admin_base_path: '/admin',
     // 加密解密

@@ -75,7 +75,7 @@ module.exports = {
             currentPath = defaultItem[0].forder + "/" + fileName;
         }
         // 校验模板的真实路径
-        let themePath = this.app.config.temp_view_forder + defaultTemp.alias + '/';
+        let themePath = this.app.config.temp_view_folder + defaultTemp.alias + '/';
         // console.log('--current--', current)
         if (fs.existsSync(themePath + currentPath)) {
             return currentPath;

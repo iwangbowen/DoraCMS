@@ -1,6 +1,6 @@
 /*
- * @Author: doramart 
- * @Date: 2019-08-15 14:23:19 
+ * @Author: doramart
+ * @Date: 2019-08-15 14:23:19
  * @Last Modified by: doramart
  * @Last Modified time: 2020-05-02 17:06:17
  */
@@ -399,7 +399,7 @@ module.exports = {
 
     checkTempUnzipSuccess(targetForder) {
         return new Promise((resolve, reject) => {
-            let system_template_forder = this.app.config.temp_view_forder;
+            let system_template_forder = this.app.config.temp_view_folder;
             var tempForder = system_template_forder + targetForder;
             var DOWNLOAD_DIR = system_template_forder + targetForder + '/tempconfig.json';
             var DIST_DIR = system_template_forder + targetForder + '/dist';
