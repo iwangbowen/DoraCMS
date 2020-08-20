@@ -23,6 +23,7 @@ export default {
     postValue: "Recommend Index",
     description: "Content abstract",
     uploadWord: "Upload Word",
+    uploadFile: "Upload File",
     comments: "Contents Detail",
     flashComments: "News-Flash Summary",
     rec: "Recommend",

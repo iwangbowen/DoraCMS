@@ -137,22 +137,21 @@
           <el-input size="small" type="textarea" v-model="formState.formData.description"></el-input>
         </el-form-item>
 
-        <el-form-item :label="$t('contents.uploadWord')" prop="uploadWord">
+        <el-form-item :label="$t('contents.uploadFile')" prop="uploadFile">
           <el-upload
             class="upload-demo"
             action="/api/content/getWordHtmlContent"
             :on-preview="handleWordPreview"
-            :on-remove="handleWordRemove"
-            :before-remove="beforeWordRemove"
-            :on-success="uploadWordSuccess"
-            :before-upload="beforeWordUpload"
+            :on-remove="onRemove"
+            :before-remove="beforeRemove"
+            :on-success="onSuccess"
+            :before-upload="beforeUpload"
             multiple
-            :limit="1"
-            :on-exceed="handleWordExceed"
+            :on-exceed="onExceed"
             :file-list="wordFileList"
           >
             <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传doc/docx文件，且不超过5mb</div>
+            <div slot="tip" class="el-upload__tip">文件大小不能超过10MB</div>
           </el-upload>
         </el-form-item>
 
@@ -185,7 +184,7 @@ import { initEvent } from "@root/publicMethods/events";
 import CoverTable from "./coverTable";
 import {
   showFullScreenLoading,
-  tryHideFullScreenLoading
+  tryHideFullScreenLoading,
 } from "@root/publicMethods/axiosLoading";
 import {
   getOneContent,
@@ -196,15 +195,22 @@ import {
   coverList,
   coverInfo,
   uploadCover,
-  contentCoverTypeList
+  contentCoverTypeList,
 } from "@/api/content";
 
 import _ from "lodash";
 import { mapGetters, mapActions } from "vuex";
 import html2canvas from "html2canvas";
+
+const fileSizeLimitInMB = 10;
+
+function gtFileSize(fileSizeInByte, fileSizeInMB) {
+  return _.gt(fileSizeInByte / 1024 / 1024, fileSizeInMB);
+}
+
 export default {
   props: {
-    groups: Array
+    groups: Array,
   },
   data() {
     return {
@@ -220,7 +226,7 @@ export default {
         { value: "0", label: "退回" },
         { value: "1", label: "待审核" },
         { value: "2", label: "审核通过" },
-        { value: "3", label: "审核不通过" }
+        { value: "3", label: "审核不通过" },
       ],
       selectUserList: [],
       loading: false,
@@ -232,7 +238,7 @@ export default {
       isflash: false,
       config: {
         initialFrameWidth: null,
-        initialFrameHeight: 320
+        initialFrameHeight: 320,
       },
       editorConfig: {
         // 编辑器不自动被内容撑高
@@ -244,13 +250,13 @@ export default {
         // 上传文件接口（这个地址是我为了方便各位体验文件上传功能搭建的临时接口，请勿在生产环境使用！！！）
         serverUrl: "/api/upload/ueditor",
         // UEditor 资源文件的存放路径，如果你使用的是 vue-cli 生成的项目，通常不需要设置该选项，vue-ueditor-wrap 会自动处理常见的情况，如果需要特殊配置，参考下方的常见问题2
-        UEDITOR_HOME_URL: this.$root.staticRootPath + "/plugins/ueditor/"
+        UEDITOR_HOME_URL: this.$root.staticRootPath + "/plugins/ueditor/",
       },
       imageUrl: "",
       categoryProps: {
         value: "_id",
         label: "name",
-        children: "children"
+        children: "children",
       },
       currentType: "1",
       rules: {
@@ -258,66 +264,66 @@ export default {
           {
             required: true,
             message: this.$t("validate.selectNull", {
-              label: "指定用户"
+              label: "指定用户",
             }),
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         sImg: [
           {
             required: true,
             message: this.$t("validate.selectNull", {
-              label: "缩略图"
+              label: "缩略图",
             }),
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         categories: [
           {
             required: true,
             message: this.$t("validate.selectNull", {
-              label: this.$t("contents.categories")
+              label: this.$t("contents.categories"),
             }),
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         title: [
           {
             required: true,
             message: this.$t("validate.inputNull", {
-              label: this.$t("contents.title")
+              label: this.$t("contents.title"),
             }),
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             min: 2,
             max: 50,
             message: this.$t("validate.rangelength", { min: 2, max: 50 }),
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         stitle: [
           {
             required: true,
             message: this.$t("validate.inputNull", {
-              label: this.$t("contents.stitle")
+              label: this.$t("contents.stitle"),
             }),
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             min: 2,
             max: 50,
             message: this.$t("validate.rangelength", { min: 2, max: 50 }),
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         tags: [
           {
             required: true,
             message: this.$t("validate.inputNull", {
-              label: this.$t("contents.tags")
+              label: this.$t("contents.tags"),
             }),
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             validator: (rule, value, callback) => {
@@ -325,7 +331,7 @@ export default {
                 callback(
                   new Error(
                     this.$t("validate.selectNull", {
-                      label: this.$t("contents.tags")
+                      label: this.$t("contents.tags"),
                     })
                   )
                 );
@@ -333,44 +339,44 @@ export default {
                 callback();
               }
             },
-            trigger: "change"
-          }
+            trigger: "change",
+          },
         ],
         description: [
           {
             required: true,
             message: this.$t("validate.inputNull", {
-              label: this.$t("contents.description")
+              label: this.$t("contents.description"),
             }),
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             min: 5,
             max: 300,
             message: this.$t("validate.rangelength", { min: 5, max: 100 }),
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         comments: [
           {
             required: true,
             message: this.$t("validate.inputNull", {
-              label: this.$t("contents.comments")
+              label: this.$t("contents.comments"),
             }),
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             min: 5,
             message: this.$t("validate.rangelength", { min: 5, max: 100000 }),
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   components: {
     VueUeditorWrap,
-    CoverTable
+    CoverTable,
   },
   methods: {
     updateTargetCover(item) {
@@ -384,7 +390,7 @@ export default {
           : this.coverTypeList[0]._id;
         this.$store.dispatch("content/getContentCoverList", {
           type: defaultCoverType,
-          pageSize: 30
+          pageSize: 30,
         });
       }
     },
@@ -414,16 +420,16 @@ export default {
           taintTest: true, //在渲染前测试图片
           useCORS: true, //貌似与跨域有关，但和allowTaint不能共存
           dpi: window.devicePixelRatio, // window.devicePixelRatio是设备像素比
-          background: "#fff"
+          background: "#fff",
         };
 
-        html2canvas(element, options).then(function(canvas) {
+        html2canvas(element, options).then(function (canvas) {
           var dataURL = canvas.toDataURL("image/png", 1.0); //将图片转为base64, 0-1 表示清晰度
           var base64String = dataURL
             .toString()
             .substring(dataURL.indexOf(",") + 1); //截取base64以便上传
           let params = { base64: base64String };
-          uploadCover(params).then(result => {
+          uploadCover(params).then((result) => {
             if (result.status === 200) {
               reslove(result.data);
             } else {
@@ -439,57 +445,51 @@ export default {
         this.formState.formData.cover = item._id;
       }
     },
-    handleWordRemove(file, fileList) {
-      console.log(file, fileList);
+    onRemove(file, fileList) {
     },
     handleWordPreview(file) {
       console.log(file);
     },
-    handleWordExceed(files, fileList) {
+    onExceed(files, fileList) {
       this.$message.warning(
-        `当前限制选择 1 个文件，本次选择了 ${
-          files.length
-        } 个文件，共选择了 ${files.length + fileList.length} 个文件`
+        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${
+          files.length + fileList.length
+        } 个文件`
       );
     },
-    beforeWordRemove(file, fileList) {
+    beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
-    uploadWordSuccess(res, file) {
+    onSuccess(res, file) {
       tryHideFullScreenLoading();
       this.wordFileUrl = res.data ? res.data : "";
       this.ueditorObj.setContent(res.data);
       this.$message({
         message: "恭喜，导入成功！",
-        type: "success"
+        type: "success",
       });
     },
-    beforeWordUpload(file) {
-      const isDocx = file.type.indexOf("officedocument") > 0 ? true : false;
-      const isLt5M = file.size / 1024 / 1024 < 5;
-      if (!isDocx) {
-        this.$message.error("只能上传docx,doc格式！");
-      }
-      if (!isLt5M) {
+    beforeUpload(file) {
+      const isGT = gtFileSize(file.size, fileSizeLimitInMB);
+      if (isGT) {
         this.$message.error(
-          this.$t("validate.limitUploadImgSize", { size: 5 })
+          this.$t("validate.limitUploadFileSize", { size: fileSizeLimitInMB })
         );
-      }
-      if (isDocx && isLt5M) {
+      } else {
         showFullScreenLoading();
       }
-      return isDocx && isLt5M;
+      return !isGT;
     },
     queryUserListByParams(params = {}) {
       let _this = this;
       regUserList(params)
-        .then(result => {
+        .then((result) => {
           let specialList = result.data.docs;
           if (specialList) {
-            _this.selectUserList = specialList.map(item => {
+            _this.selectUserList = specialList.map((item) => {
               return {
                 value: item._id,
-                label: item.userName
+                label: item.userName,
               };
             });
             _this.userLoading = false;
@@ -497,7 +497,7 @@ export default {
             _this.selectUserList = [];
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
           _this.selectUserList = [];
         });
@@ -505,33 +505,33 @@ export default {
     getRandomContentImg(params = {}) {
       let _this = this;
       getRandomContentImg(params)
-        .then(result => {
+        .then((result) => {
           if (result.status == 200 && result && result.data) {
             let randomImg = result.data[0];
             let initFormData = Object.assign({}, this.formState.formData, {
-              sImg: randomImg
+              sImg: randomImg,
             });
             this.$store.dispatch("content/showContentForm", {
-              formData: initFormData
+              formData: initFormData,
             });
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
     queryCoverListByParams(params = {}) {
       let _this = this;
       coverList(params)
-        .then(result => {
+        .then((result) => {
           let cvList = result.data.docs;
           if (cvList) {
             _this.selectCoverList = cvList;
             setTimeout(() => {
               if (this.$route.params.id) {
                 coverInfo({
-                  id: _this.formState.formData.cover
-                }).then(result => {
+                  id: _this.formState.formData.cover,
+                }).then((result) => {
                   if (!_.isEmpty(result)) {
                     _this.targetCover = result.data;
                     _this.formState.formData.cover = result.data._id;
@@ -546,7 +546,7 @@ export default {
             _this.selectCoverList = [];
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
           _this.selectUserList = [];
         });
@@ -555,11 +555,11 @@ export default {
     queryCoverTypeListByParams(params = {}) {
       let _this = this;
       contentCoverTypeList(params)
-        .then(result => {
+        .then((result) => {
           let typeList = result.data;
           if (typeList) {
             _this.coverTypeList = typeList;
-            let defaultType = _.filter(typeList, item => {
+            let defaultType = _.filter(typeList, (item) => {
               return item.isDefault;
             });
             if (!_.isEmpty(defaultType)) {
@@ -569,7 +569,7 @@ export default {
             _this.coverTypeList = [];
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
           _this.coverTypeList = [];
         });
@@ -579,16 +579,16 @@ export default {
       this.$store.dispatch("content/showContentForm", {
         edit: this.formState.edit,
         formData: Object.assign({}, this.formState.formData, {
-          type: currentType ? "2" : "1"
-        })
+          type: currentType ? "2" : "1",
+        }),
       });
     },
     inputEditor(value) {
       this.$store.dispatch("content/showContentForm", {
         edit: this.formState.edit,
         formData: Object.assign({}, this.formState.formData, {
-          markDownComments: value
-        })
+          markDownComments: value,
+        }),
       });
     },
     changeEditor(value) {
@@ -611,8 +611,8 @@ export default {
       this.$store.dispatch("content/showContentForm", {
         edit: this.formState.edit,
         formData: Object.assign({}, this.formState.formData, {
-          sImg: imageUrl
-        })
+          sImg: imageUrl,
+        }),
       });
     },
     beforeAvatarUpload(file) {
@@ -637,12 +637,12 @@ export default {
       this.$router.push(this.$root.adminBasePath + "/content");
     },
     submitForm(formName, type = "") {
-      this.$refs[formName].validate(async valid => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
           try {
             let params = Object.assign({}, this.formState.formData, {
               comments: this.ueditorObj.getContent(),
-              simpleComments: this.ueditorObj.getPlainTxt()
+              simpleComments: this.ueditorObj.getPlainTxt(),
             });
             // 上传合成图片
             if (this.formState.formData.sImgType == "1") {
@@ -650,12 +650,12 @@ export default {
             }
             // 更新
             if (this.formState.edit) {
-              updateContent(params).then(result => {
+              updateContent(params).then((result) => {
                 if (result.status === 200) {
                   this.$router.push(this.$root.adminBasePath + "/content");
                   this.$message({
                     message: this.$t("main.updateSuccess"),
-                    type: "success"
+                    type: "success",
                   });
                 } else {
                   this.$message.error(result.message);
@@ -673,12 +673,12 @@ export default {
                 this.$router.push(this.$root.adminBasePath + "/content");
                 return false;
               }
-              addContent(params).then(result => {
+              addContent(params).then((result) => {
                 if (result.status === 200) {
                   this.$router.push(this.$root.adminBasePath + "/content");
                   this.$message({
                     message: this.$t("main.addSuccess"),
-                    type: "success"
+                    type: "success",
                   });
                 } else {
                   this.$message.error(result.message);
@@ -693,14 +693,14 @@ export default {
           return false;
         }
       });
-    }
+    },
   },
   computed: {
     ...mapGetters([
       "contentTagList",
       "contentCategoryList",
       "adminUserInfo",
-      "contentCoverDialog"
+      "contentCoverDialog",
     ]),
     formState() {
       return this.$store.getters.contentFormState;
@@ -710,7 +710,7 @@ export default {
         hideSidebar: !this.sidebarOpened,
         openSidebar: this.sidebarOpened,
         withoutAnimation: "false",
-        mobile: this.device === "mobile"
+        mobile: this.device === "mobile",
       };
     },
     coverActiveStyle() {
@@ -721,7 +721,7 @@ export default {
         width: "100%",
         height: "100%",
         background: "rgba(0, 0, 0, 0.4)",
-        display: "block"
+        display: "block",
       };
     },
     currentStyle() {
@@ -730,7 +730,7 @@ export default {
         {},
         {
           color: this.targetCover.titleColor,
-          fontSize: Number(this.targetCover.titleSize) + "px"
+          fontSize: Number(this.targetCover.titleSize) + "px",
         }
       );
     },
@@ -740,7 +740,7 @@ export default {
         backgroundImage: "url(" + this.targetCover.cover + ")",
         backgroundSize: "cover",
         width: this.targetCover.width + "px",
-        height: this.targetCover.height + "px"
+        height: this.targetCover.height + "px",
       };
       if (!_.isEmpty(backStyle)) {
         Object.assign(defaultCss, JSON.parse(backStyle));
@@ -772,7 +772,7 @@ export default {
       } else {
         return "";
       }
-    }
+    },
   },
   mounted() {
     initEvent(this);
@@ -782,7 +782,7 @@ export default {
     // 针对手动页面刷新
     let _this = this;
     if (this.$route.params.id) {
-      getOneContent({ id: this.$route.params.id }).then(result => {
+      getOneContent({ id: this.$route.params.id }).then((result) => {
         if (result.status === 200) {
           if (result.data) {
             let contentObj = result.data,
@@ -806,14 +806,14 @@ export default {
             }
             if (contentObj.uAuthor) {
               this.queryUserListByParams({
-                searchkey: contentObj.uAuthor.userName
+                searchkey: contentObj.uAuthor.userName,
               });
               contentObj.targetUser = contentObj.uAuthor._id;
             }
 
             this.$store.dispatch("content/showContentForm", {
               edit: true,
-              formData: contentObj
+              formData: contentObj,
             });
           } else {
             this.$message({
@@ -821,7 +821,7 @@ export default {
               type: "warning",
               onClose: () => {
                 this.$router.push(this.$root.adminBasePath + "/content");
-              }
+              },
             });
           }
         } else {
@@ -837,7 +837,7 @@ export default {
           {
             confirmButtonText: this.$t("main.confirmBtnText"),
             cancelButtonText: this.$t("main.cancelBtnText"),
-            type: "warning"
+            type: "warning",
           }
         )
           .then(() => {
@@ -847,14 +847,14 @@ export default {
             localStorage.removeItem(this.$route.path.split("/")[1]);
             this.$store.dispatch("content/showContentForm", {
               edit: false,
-              formData: localContent
+              formData: localContent,
             });
           })
           .catch(() => {
             localStorage.removeItem(this.$route.path.split("/")[1]);
             this.$message({
               type: "info",
-              message: this.$t("main.scr_modal_del_error_info")
+              message: this.$t("main.scr_modal_del_error_info"),
             });
           });
       } else {
@@ -863,9 +863,9 @@ export default {
     }
     this.$store.dispatch("contentCategory/getContentCategoryList");
     this.$store.dispatch("contentTag/getContentTagList", {
-      pageSize: 200
+      pageSize: 200,
     });
-  }
+  },
 };
 </script>
 <style lang="scss">

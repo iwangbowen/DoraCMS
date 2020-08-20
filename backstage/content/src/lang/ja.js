@@ -23,6 +23,7 @@ export default {
     postValue: "推荐指数",
     description: "内容摘要",
     uploadWord: "上传Word文档",
+    uploadFile: "上传文件",
     comments: "文档详情",
     flashComments: "快讯摘要",
     rec: "推荐",
