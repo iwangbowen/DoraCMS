@@ -11,9 +11,8 @@ const {
     scanFolder,
     uploadByQiniu
 } = require('./utils');
-
 // 指定打包模块
-let designatedModule = ['content'];
+let designatedModules = ['content'];
 
 let copyType = "dev",
     targetModules = '',
@@ -26,9 +25,9 @@ if (argv[4] == '--modules') {
     targetModules = argv[5];
     if (targetModules && targetModules != 'ALL') {
         if (targetModules.indexOf(',') >= 0 && targetModules.split(',').length > 0) {
-            designatedModule = designatedModule.concat(targetModules.split(','));
+            designatedModules = designatedModules.concat(targetModules.split(','));
         } else {
-            designatedModule.push(targetModules);
+            designatedModules.push(targetModules);
         }
         console.log('begin build target module: ', targetModules);
     }
@@ -38,14 +37,13 @@ if (argv[6] == '--localDistPath') {
     localDistPath = argv[7];
 }
 
-let targetBuildModules = scanFolder(modulesPath);
-if (designatedModule.length > 0) {
-    targetBuildModules = designatedModule;
-}
-targetBuildModules.forEach(function (name) {
-    if (name != '.git' && name != 'build' && name != 'publicMethods' && name != 'dist') {
+const targetBuildModules = designatedModules.length ? designatedModules : scanFolder(modulesPath);
+targetBuildModules
+    .filter(dir => dir != '.git' && dir != 'build' && dir != 'publicMethods' && dir != 'dist')
+    .forEach(function (name) {
+        console.log(modulesPath, name);
         shell.cd(`${modulesPath}/${name}`);
-        shell.exec(`${envSetStr} NODE_ENV=production && npm run build`);
+        shell.exec(`npm run build`);
         if (!fs.existsSync(`${modulesPath}/dist/${name}`)) {
             shell.mkdir('-p', `${modulesPath}/dist/${name}`);
         } else {
@@ -53,14 +51,13 @@ targetBuildModules.forEach(function (name) {
         }
         shell.cp('-R', `${modulesPath}/${name}/dist/*`, `${modulesPath}/dist/${name}`);
         console.info(`module ${name} build success!`);
-    }
-});
+    });
 
 if (copyType == 'prd') {
 
     let uploadInfo = [];
 
-    let updateQniu = async (uploadInfo) => {
+    let updateQiniu = async (uploadInfo) => {
         console.log('Begin upload to Qiniu');
         for (const uploadItem of uploadInfo) {
             let {
@@ -75,10 +72,10 @@ if (copyType == 'prd') {
         console.log('All upload to Qiniu success!');
     }
 
-    if (designatedModule.length > 0) {
+    if (designatedModules.length > 0) {
         for (const moduleItem of targetBuildModules) {
             uploadInfo = scanFiles(modulesPath, `${modulesPath}/dist/${moduleItem}`);
-            updateQniu(uploadInfo);
+            updateQiniu(uploadInfo);
 
             if (localDistPath) {
                 let targetLocalPluginPath = `${localDistPath}/${moduleItem}`;
@@ -97,7 +94,6 @@ if (copyType == 'prd') {
             shell.cp('-R', `${modulesPath}/dist/*`, `${localDistPath}`);
         }
         uploadInfo = scanFiles(modulesPath, `${modulesPath}/dist`);
-        updateQniu(uploadInfo);
+        updateQiniu(uploadInfo);
     }
-
 }
